@@ -127,11 +127,11 @@ async def main():
                     )
 
             if changes:
-                msg = "🇧🇩 <b>PCC স্ট্যাটাস পরিবর্তন!</b>\n\n" + "\n\n".join(changes)
-                send_telegram(msg)
+                for chunk in changes:
+                    send_telegram(f"🇧🇩 <b>PCC পরিবর্তন!</b>\n\n{chunk}")
             else:
-                send_telegram(f"✅ চেক সম্পন্ন। {len(applications)}টি আবেদন, কোনো পরিবর্তন নেই।")
-
+                # First run - just confirm
+                send_telegram(f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি\n\nপরবর্তীতে স্ট্যাটাস বদলালে notification আসবে।")
             save_state(new_state)
 
         except Exception as e:

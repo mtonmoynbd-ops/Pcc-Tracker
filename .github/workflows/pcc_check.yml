@@ -1,0 +1,34 @@
+name: PCC Status Checker
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run PCC checker
+        env:
+          PCC_USERNAME: ${{ secrets.PCC_USERNAME }}
+          PCC_PASSWORD: ${{ secrets.PCC_PASSWORD }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python check_pcc.py
+
+      - name: Save state
+        uses: actions/upload-artifact@v3
+        with:
+          name: pcc-state
+          path: pcc_state.json

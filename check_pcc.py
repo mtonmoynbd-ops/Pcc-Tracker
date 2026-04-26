@@ -1,5 +1,6 @@
-import os, json, asyncio, requests
+import os, json, asyncio, requests, re
 from playwright.async_api import async_playwright
+from bs4 import BeautifulSoup
 
 USERNAME = os.environ["PCC_USERNAME"]
 PASSWORD = os.environ["PCC_PASSWORD"]
@@ -38,53 +39,57 @@ async def main():
             await page.wait_for_load_state("networkidle")
             await page.wait_for_timeout(2000)
 
-            print(f"Login page loaded: {page.url}")
+            # Fill form
+            await page.fill("input[type='text']", USERNAME)
+            await page.fill("input[type='password']", PASSWORD)
+            print("Form filled")
 
-            # Fill mobile number
-            mobile_input = await page.query_selector("input[type='text']")
-            if mobile_input:
-                await mobile_input.fill(USERNAME)
-                print("Mobile filled")
-
-            # Fill password
-            pass_input = await page.query_selector("input[type='password']")
-            if pass_input:
-                await pass_input.fill(PASSWORD)
-                print("Password filled")
-
-            # Click sign in
+            # Click sign in and wait
             await page.click("button:has-text('Sign in')")
+            await page.wait_for_load_state("networkidle")
+            await page.wait_for_timeout(4000)
+
+            current_url = page.url
+            print(f"After login URL: {current_url}")
+
+            if "login" in current_url.lower():
+                send_telegram("❌ লগইন ব্যর্থ। Username/Password ভুল হতে পারে।")
+                await browser.close()
+                return
+
+            # Extract session from current URL
+            session_match = re.search(r'session=(\d+)', current_url)
+            if session_match:
+                session_id = session_match.group(1)
+                print(f"Session ID: {session_id}")
+                account_url = f"https://pcc.police.gov.bd/ords/r/pcc/pcc/23?session={session_id}"
+            else:
+                # Try clicking My Account link directly
+                account_url = "https://pcc.police.gov.bd/ords/r/pcc/pcc/23"
+
+            await page.goto(account_url, timeout=30000)
             await page.wait_for_load_state("networkidle")
             await page.wait_for_timeout(3000)
 
-            print(f"After login: {page.url}")
-
-            # Check if login successful
-            if "login" in page.url.lower():
-                send_telegram("❌ লগইন ব্যর্থ হয়েছে। Username/Password চেক করুন।")
-                await browser.close()
-                return
-
-            # Navigate to My Account
-            await page.goto("https://pcc.police.gov.bd/ords/r/pcc/pcc/23", timeout=30000)
-            await page.wait_for_load_state("networkidle")
-            await page.wait_for_timeout(2000)
-
-            print(f"Account page: {page.url}")
+            print(f"Account page URL: {page.url}")
 
             if "login" in page.url.lower():
-                send_telegram("❌ My Account পেজে যাওয়া যায়নি।")
-                await browser.close()
-                return
+                # Try clicking the My Account link from the page
+                await page.goto(current_url, timeout=30000)
+                await page.wait_for_timeout(2000)
+                my_account = await page.query_selector("a:has-text('My Account')")
+                if my_account:
+                    await my_account.click()
+                    await page.wait_for_load_state("networkidle")
+                    await page.wait_for_timeout(3000)
+                    print(f"After clicking My Account: {page.url}")
 
-            # Get page content
-            from bs4 import BeautifulSoup
             content = await page.content()
             soup = BeautifulSoup(content, "html.parser")
 
             applications = []
             rows = soup.select("table tr")
-            print(f"Rows: {len(rows)}")
+            print(f"Rows found: {len(rows)}")
 
             for row in rows[1:]:
                 cols = row.select("td")
@@ -92,16 +97,15 @@ async def main():
                     ref = cols[0].text.strip()
                     name = cols[1].text.strip()
                     status = cols[2].text.strip()
-                    if ref:
+                    if ref and len(ref) > 2:
                         applications.append({"ref": ref, "name": name, "status": status})
 
-            print(f"Applications: {len(applications)}")
+            print(f"Applications found: {len(applications)}")
 
             if not applications:
-                # Try finding application data differently
-                all_text = soup.get_text()
-                print(f"Page text preview: {all_text[:300]}")
-                send_telegram(f"⚠️ আবেদন পাওয়া যায়নি। পেজ URL: {page.url}")
+                preview = soup.get_text()[:200]
+                print(f"Page preview: {preview}")
+                send_telegram(f"⚠️ আবেদন পাওয়া যায়নি।\nURL: {page.url}")
                 await browser.close()
                 return
 
@@ -115,13 +119,11 @@ async def main():
                 new_state[ref] = status
 
                 if ref not in old_state:
-                    changes.append(f"🆕 <b>{app['name']}</b>\n📄 Ref: {ref}\n✅ স্ট্যাটাস: {status}")
+                    changes.append(f"🆕 <b>{app['name']}</b>\n📄 Ref: {ref}\n✅ {status}")
                 elif old_state[ref] != status:
                     changes.append(
-                        f"🔔 <b>{app['name']}</b>\n"
-                        f"📄 Ref: {ref}\n"
-                        f"⬅️ আগে: {old_state[ref]}\n"
-                        f"✅ এখন: {status}"
+                        f"🔔 <b>{app['name']}</b>\n📄 Ref: {ref}\n"
+                        f"⬅️ আগে: {old_state[ref]}\n✅ এখন: {status}"
                     )
 
             if changes:
@@ -133,7 +135,7 @@ async def main():
             save_state(new_state)
 
         except Exception as e:
-            send_telegram(f"⚠️ সমস্যা:\n{e}")
+            send_telegram(f"⚠️ সমস্যা:\n{str(e)[:200]}")
             print(f"Error: {e}")
 
         await browser.close()

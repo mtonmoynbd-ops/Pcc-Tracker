@@ -93,12 +93,18 @@ async def main():
 
             for row in rows[1:]:
                 cols = row.select("td")
-                if len(cols) >= 3:
+                if len(cols) >= 9:
                     ref = cols[0].text.strip()
-                    name = cols[1].text.strip()
-                    status = cols[2].text.strip()
+                    apply_date = cols[3].text.strip()
+                    name = cols[5].text.strip()
+                    status = cols[8].text.strip()
                     if ref and len(ref) > 2:
-                        applications.append({"ref": ref, "name": name, "status": status})
+                        applications.append({
+                            "ref": ref,
+                            "name": name,
+                            "apply_date": apply_date,
+                            "status": status
+                        })
 
             print(f"Applications found: {len(applications)}")
 
@@ -119,11 +125,18 @@ async def main():
                 new_state[ref] = status
 
                 if ref not in old_state:
-                    changes.append(f"🆕 <b>{app['name']}</b>\n📄 Ref: {ref}\n✅ {status}")
+                    changes.append(
+                        f"🆕 <b>{app['name']}</b>\n"
+                        f"📄 Ref: {ref}\n"
+                        f"📅 তারিখ: {app['apply_date']}\n"
+                        f"✅ স্ট্যাটাস: {status}"
+                    )
                 elif old_state[ref] != status:
                     changes.append(
-                        f"🔔 <b>{app['name']}</b>\n📄 Ref: {ref}\n"
-                        f"⬅️ আগে: {old_state[ref]}\n✅ এখন: {status}"
+                        f"🔔 <b>{app['name']}</b>\n"
+                        f"📄 Ref: {ref}\n"
+                        f"⬅️ আগে: {old_state[ref]}\n"
+                        f"✅ এখন: {status}"
                     )
 
             if changes:

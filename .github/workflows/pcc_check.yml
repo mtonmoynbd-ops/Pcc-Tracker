@@ -1,10 +1,8 @@
 name: PCC Status Checker
-
 on:
   schedule:
     - cron: '0 * * * *'
   workflow_dispatch:
-
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -12,71 +10,33 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
-      - name: Download previous state
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: pcc-state
           path: .
         continue-on-error: true
-
-      - name: Install dependencies
-        run: |
+      - run: |
           pip install requests beautifulsoup4 playwright
           playwright install chromium
           playwright install-deps chromium
-
-      - name: Run PCC checker
+      - run: python check_pcc.py
         env:
           PCC_USERNAME: ${{ secrets.PCC_USERNAME }}
           PCC_PASSWORD: ${{ secrets.PCC_PASSWORD }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
-        run: python check_pcc.py
-
-      - name: Push data to repo
-        run: |
+      - run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add docs/data.json
-          git diff --staged --quiet || git commit -m "Update PCC data"
+          git diff --staged --quiet || git commit -m "Update data"
           git push
-
-      - name: Save state
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: pcc-state
           path: pcc_state.json
-          overwrite: true          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
-        run: python check_pcc.py
-
-      - name: Push data.json to repo
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add docs/data.json
-          git diff --staged --quiet || git commit -m "Update PCC data"
-          git push
-
-      - name: Save state
-        uses: actions/upload-artifact@v4
-        with:
-          name: pcc-state
-          path: pcc_state.json
-          overwrite: true          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
-        run: python check_pcc.py
-
-      - name: Save state
-        uses: actions/upload-artifact@v4
-        with:
-          name: pcc-state
-          path: pcc_state.json
-          overwrite: true
+          overwrite: true          

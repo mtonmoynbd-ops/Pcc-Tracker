@@ -125,7 +125,9 @@ async def main():
                     send_telegram(f"<b>স্ট্যাটাস:</b>\n\n{chunk}", CHANNEL_ID)
             else:
                 if not old_state:
-                    send_telegram(f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি\n\nস্ট্যাটাস বদলালে notification আসবে।")
+                    msg = f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি\n\nস্ট্যাটাস বদলালে notification আসবে।"
+                    send_telegram(msg, CHAT_ID)
+                    send_telegram(msg, CHANNEL_ID)
 
             save_state(new_state)
 

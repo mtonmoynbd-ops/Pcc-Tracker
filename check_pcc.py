@@ -9,6 +9,7 @@ TOKEN = os.environ["TELEGRAM_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 STATE_FILE = "pcc_state.json"
 DATA_FILE = "docs/data.json"
+RSS_FILE = "docs/rss.xml"
 
 def send_telegram(msg):
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
@@ -33,6 +34,31 @@ def save_data(applications):
             "updated": datetime.now().strftime("%d-%b-%Y %I:%M %p"),
             "applications": applications
         }, f, ensure_ascii=False)
+
+def save_rss(changes):
+    os.makedirs("docs", exist_ok=True)
+    now = datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0600")
+    items = ""
+    for c in changes:
+        items += f"""
+    <item>
+      <title>{c['name']} — {c['new']}</title>
+      <description>Ref: {c['ref']} | আগে: {c['old']} → এখন: {c['new']}</description>
+      <pubDate>{now}</pubDate>
+      <guid>{c['ref']}-{c['new']}</guid>
+    </item>"""
+    rss = f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>PCC Tracker</title>
+    <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+    <description>PCC Status Updates</description>
+    <lastBuildDate>{now}</lastBuildDate>
+    {items}
+  </channel>
+</rss>"""
+    with open(RSS_FILE, "w", encoding="utf-8") as f:
+        f.write(rss)
 
 async def main():
     async with async_playwright() as p:
@@ -102,7 +128,6 @@ async def main():
                 await browser.close()
                 return
 
-            # Save for web page
             save_data(applications)
 
             old_state = load_state()
@@ -115,18 +140,27 @@ async def main():
                 new_state[ref] = status
 
                 if old_state.get(ref) and old_state.get(ref) != status:
-                    changes.append(
-                        f"<b>{app['name']}</b>\n"
-                        f"📄 Ref: {ref}\n"
-                        f"📅 তারিখ: {app['apply_date']}\n"
-                        f"⬅️ আগে: {old_state[ref]}\n"
-                        f"✅ এখন: {status}"
-                    )
+                    changes.append({
+                        "ref": ref,
+                        "name": app["name"],
+                        "old": old_state[ref],
+                        "new": status,
+                        "date": app["apply_date"]
+                    })
 
             if changes:
-                for chunk in changes:
-                    send_telegram(f"<b>স্ট্যাটাস:</b>\n\n{chunk}")
+                save_rss(changes)
+                for c in changes:
+                    send_telegram(
+                        f"<b>স্ট্যাটাস:</b>\n\n"
+                        f"<b>{c['name']}</b>\n"
+                        f"📄 Ref: {c['ref']}\n"
+                        f"📅 তারিখ: {c['date']}\n"
+                        f"⬅️ আগে: {c['old']}\n"
+                        f"✅ এখন: {c['new']}"
+                    )
             elif not old_state:
+                save_rss([])
                 send_telegram(f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি")
 
             save_state(new_state)

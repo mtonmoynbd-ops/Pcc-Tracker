@@ -16,6 +16,13 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Download previous state
+        uses: actions/download-artifact@v4
+        with:
+          name: pcc-state
+          path: .
+        continue-on-error: true
+
       - name: Install dependencies
         run: |
           pip install requests beautifulsoup4 playwright
@@ -24,7 +31,6 @@ jobs:
 
       - name: Run PCC checker
         env:
-          env:
           PCC_USERNAME: ${{ secrets.PCC_USERNAME }}
           PCC_PASSWORD: ${{ secrets.PCC_PASSWORD }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -37,3 +43,4 @@ jobs:
         with:
           name: pcc-state
           path: pcc_state.json
+          overwrite: true

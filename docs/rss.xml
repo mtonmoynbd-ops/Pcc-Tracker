@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>PCC Tracker</title>
+    <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+    <description>PCC Status Updates</description>
+    <lastBuildDate>Tue, 28 Apr 2026 15:48:33 +0600</lastBuildDate>
+    
+    <item>
+      <title>TAHSIN AHMED — 8/10</title>
+      <description>Ref: 1BFHG9W | আগে: 7/10 → এখন: 8/10</description>
+      <pubDate>Tue, 28 Apr 2026 15:48:33 +0600</pubDate>
+      <guid>1BFHG9W-8/10</guid>
+    </item>
+  </channel>
+</rss>

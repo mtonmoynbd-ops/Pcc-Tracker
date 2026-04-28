@@ -1,17 +1,18 @@
 import os, json, asyncio, requests, re
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 USERNAME = os.environ["PCC_USERNAME"]
 PASSWORD = os.environ["PCC_PASSWORD"]
 TOKEN = os.environ["TELEGRAM_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-CHANNEL_ID = os.environ["TELEGRAM_CHANNEL_ID"]
 STATE_FILE = "pcc_state.json"
+DATA_FILE = "docs/data.json"
 
-def send_telegram(msg, target=None):
+def send_telegram(msg):
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    r = requests.post(url, json={"chat_id": target or CHAT_ID, "text": msg, "parse_mode": "HTML"})
+    r = requests.post(url, json={"chat_id": CHAT_ID, "text": msg, "parse_mode": "HTML"})
     print(f"Telegram: {r.status_code}")
 
 def load_state():
@@ -24,6 +25,14 @@ def load_state():
 def save_state(state):
     with open(STATE_FILE, "w") as f:
         json.dump(state, f)
+
+def save_data(applications):
+    os.makedirs("docs", exist_ok=True)
+    with open(DATA_FILE, "w") as f:
+        json.dump({
+            "updated": datetime.now().strftime("%d-%b-%Y %I:%M %p"),
+            "applications": applications
+        }, f, ensure_ascii=False)
 
 async def main():
     async with async_playwright() as p:
@@ -40,23 +49,19 @@ async def main():
 
             await page.fill("input[type='text']", USERNAME)
             await page.fill("input[type='password']", PASSWORD)
-
             await page.click("button:has-text('Sign in')")
             await page.wait_for_load_state("networkidle")
             await page.wait_for_timeout(4000)
 
             current_url = page.url
-            print(f"After login URL: {current_url}")
-
             if "login" in current_url.lower():
-                send_telegram("❌ লগইন ব্যর্থ। Username/Password চেক করুন।")
+                send_telegram("❌ লগইন ব্যর্থ।")
                 await browser.close()
                 return
 
             session_match = re.search(r'session=(\d+)', current_url)
             if session_match:
-                session_id = session_match.group(1)
-                account_url = f"https://pcc.police.gov.bd/ords/r/pcc/pcc/23?session={session_id}"
+                account_url = f"https://pcc.police.gov.bd/ords/r/pcc/pcc/23?session={session_match.group(1)}"
             else:
                 account_url = "https://pcc.police.gov.bd/ords/r/pcc/pcc/23"
 
@@ -92,12 +97,13 @@ async def main():
                             "status": status
                         })
 
-            print(f"Applications found: {len(applications)}")
-
             if not applications:
-                send_telegram(f"⚠️ আবেদন পাওয়া যায়নি।")
+                send_telegram("⚠️ আবেদন পাওয়া যায়নি।")
                 await browser.close()
                 return
+
+            # Save for web page
+            save_data(applications)
 
             old_state = load_state()
             new_state = {}
@@ -119,17 +125,12 @@ async def main():
 
             if changes:
                 for chunk in changes:
-                    # ব্যক্তিগত message তোমাকে
-                    send_telegram(f"<b>স্ট্যাটাস:</b>\n\n{chunk}", CHAT_ID)
-                    # Channel-এও post হবে
-                    send_telegram(f"<b>স্ট্যাটাস:</b>\n\n{chunk}", CHANNEL_ID)
-            else:
-                if not old_state:
-                    msg = f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি\n\nস্ট্যাটাস বদলালে notification আসবে।"
-                    send_telegram(msg, CHAT_ID)
-                    send_telegram(msg, CHANNEL_ID)
+                    send_telegram(f"<b>স্ট্যাটাস:</b>\n\n{chunk}")
+            elif not old_state:
+                send_telegram(f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি")
 
             save_state(new_state)
+            print(f"Done. {len(applications)} applications, {len(changes)} changes.")
 
         except Exception as e:
             send_telegram(f"⚠️ সমস্যা:\n{str(e)[:200]}")

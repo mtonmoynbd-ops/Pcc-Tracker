@@ -6,11 +6,12 @@ USERNAME = os.environ["PCC_USERNAME"]
 PASSWORD = os.environ["PCC_PASSWORD"]
 TOKEN = os.environ["TELEGRAM_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
+CHANNEL_ID = os.environ["TELEGRAM_CHANNEL_ID"]
 STATE_FILE = "pcc_state.json"
 
-def send_telegram(msg):
+def send_telegram(msg, target=None):
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    r = requests.post(url, json={"chat_id": CHAT_ID, "text": msg, "parse_mode": "HTML"})
+    r = requests.post(url, json={"chat_id": target or CHAT_ID, "text": msg, "parse_mode": "HTML"})
     print(f"Telegram: {r.status_code}")
 
 def load_state():
@@ -63,8 +64,6 @@ async def main():
             await page.wait_for_load_state("networkidle")
             await page.wait_for_timeout(3000)
 
-            print(f"Account page URL: {page.url}")
-
             if "login" in page.url.lower():
                 send_telegram("❌ My Account পেজে যাওয়া যায়নি।")
                 await browser.close()
@@ -75,7 +74,6 @@ async def main():
 
             applications = []
             rows = soup.select("table tr")
-            print(f"Rows found: {len(rows)}")
 
             for row in rows[1:]:
                 cols = row.select("td")
@@ -97,7 +95,7 @@ async def main():
             print(f"Applications found: {len(applications)}")
 
             if not applications:
-                send_telegram(f"⚠️ আবেদন পাওয়া যায়নি।\nURL: {page.url}")
+                send_telegram(f"⚠️ আবেদন পাওয়া যায়নি।")
                 await browser.close()
                 return
 
@@ -121,7 +119,10 @@ async def main():
 
             if changes:
                 for chunk in changes:
-                    send_telegram(f"<b>স্ট্যাটাস:</b>\n\n{chunk}")
+                    # ব্যক্তিগত message তোমাকে
+                    send_telegram(f"<b>স্ট্যাটাস:</b>\n\n{chunk}", CHAT_ID)
+                    # Channel-এও post হবে
+                    send_telegram(f"<b>স্ট্যাটাস:</b>\n\n{chunk}", CHANNEL_ID)
             else:
                 if not old_state:
                     send_telegram(f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি\n\nস্ট্যাটাস বদলালে notification আসবে।")

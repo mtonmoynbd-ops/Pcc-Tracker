@@ -25,8 +25,6 @@ def save_state(state):
         json.dump(state, f)
 
 async def main():
-    send_telegram("🔄 PCC চেক শুরু হয়েছে...")
-
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         context = await browser.new_context(
@@ -39,12 +37,9 @@ async def main():
             await page.wait_for_load_state("networkidle")
             await page.wait_for_timeout(2000)
 
-            # Fill form
             await page.fill("input[type='text']", USERNAME)
             await page.fill("input[type='password']", PASSWORD)
-            print("Form filled")
 
-            # Click sign in and wait
             await page.click("button:has-text('Sign in')")
             await page.wait_for_load_state("networkidle")
             await page.wait_for_timeout(4000)
@@ -53,18 +48,15 @@ async def main():
             print(f"After login URL: {current_url}")
 
             if "login" in current_url.lower():
-                send_telegram("❌ লগইন ব্যর্থ। Username/Password ভুল হতে পারে।")
+                send_telegram("❌ লগইন ব্যর্থ। Username/Password চেক করুন।")
                 await browser.close()
                 return
 
-            # Extract session from current URL
             session_match = re.search(r'session=(\d+)', current_url)
             if session_match:
                 session_id = session_match.group(1)
-                print(f"Session ID: {session_id}")
                 account_url = f"https://pcc.police.gov.bd/ords/r/pcc/pcc/23?session={session_id}"
             else:
-                # Try clicking My Account link directly
                 account_url = "https://pcc.police.gov.bd/ords/r/pcc/pcc/23"
 
             await page.goto(account_url, timeout=30000)
@@ -74,15 +66,9 @@ async def main():
             print(f"Account page URL: {page.url}")
 
             if "login" in page.url.lower():
-                # Try clicking the My Account link from the page
-                await page.goto(current_url, timeout=30000)
-                await page.wait_for_timeout(2000)
-                my_account = await page.query_selector("a:has-text('My Account')")
-                if my_account:
-                    await my_account.click()
-                    await page.wait_for_load_state("networkidle")
-                    await page.wait_for_timeout(3000)
-                    print(f"After clicking My Account: {page.url}")
+                send_telegram("❌ My Account পেজে যাওয়া যায়নি।")
+                await browser.close()
+                return
 
             content = await page.content()
             soup = BeautifulSoup(content, "html.parser")
@@ -97,7 +83,9 @@ async def main():
                     ref = cols[0].text.strip()
                     apply_date = cols[3].text.strip()
                     name = cols[5].text.strip()
-                    status = cols[8].text.strip()
+                    full_status = cols[8].text.strip()
+                    match = re.match(r'(\d+/\d+)', full_status)
+                    status = match.group(1) if match else full_status
                     if ref and len(ref) > 2:
                         applications.append({
                             "ref": ref,
@@ -109,8 +97,6 @@ async def main():
             print(f"Applications found: {len(applications)}")
 
             if not applications:
-                preview = soup.get_text()[:200]
-                print(f"Page preview: {preview}")
                 send_telegram(f"⚠️ আবেদন পাওয়া যায়নি।\nURL: {page.url}")
                 await browser.close()
                 return
@@ -124,27 +110,22 @@ async def main():
                 status = app["status"]
                 new_state[ref] = status
 
-                if ref not in old_state:
+                if old_state.get(ref) and old_state.get(ref) != status:
                     changes.append(
-                        f"🆕 <b>{app['name']}</b>\n"
+                        f"<b>{app['name']}</b>\n"
                         f"📄 Ref: {ref}\n"
                         f"📅 তারিখ: {app['apply_date']}\n"
-                        f"✅ স্ট্যাটাস: {status}"
-                    )
-                elif old_state[ref] != status:
-                    changes.append(
-                        f"🔔 <b>{app['name']}</b>\n"
-                        f"📄 Ref: {ref}\n"
                         f"⬅️ আগে: {old_state[ref]}\n"
                         f"✅ এখন: {status}"
                     )
 
             if changes:
                 for chunk in changes:
-                    send_telegram(f"🇧🇩 <b>PCC পরিবর্তন!</b>\n\n{chunk}")
+                    send_telegram(f"<b>স্ট্যাটাস:</b>\n\n{chunk}")
             else:
-                # First run - just confirm
-                send_telegram(f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি\n\nপরবর্তীতে স্ট্যাটাস বদলালে notification আসবে।")
+                if not old_state:
+                    send_telegram(f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি\n\nস্ট্যাটাস বদলালে notification আসবে।")
+
             save_state(new_state)
 
         except Exception as e:

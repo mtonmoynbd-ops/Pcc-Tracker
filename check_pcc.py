@@ -118,7 +118,7 @@ async def main():
                     full_status = cols[8].text.strip()
                     match = re.match(r'(\d+/\d+)', full_status)
                     status = match.group(1) if match else full_status
-                    if ref and len(ref) > 2:
+                    if ref and len(ref) > 2 and status != "10/10":
                         applications.append({
                             "ref": ref,
                             "name": name,

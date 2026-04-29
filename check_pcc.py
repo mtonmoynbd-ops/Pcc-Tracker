@@ -37,25 +37,28 @@ def save_data(applications):
 
 def save_rss(changes):
     os.makedirs("docs", exist_ok=True)
-    now = datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0600")
+    now = datetime.now().strftime("%a, %d %b %Y %H:%M:%S +0000")
     items = ""
     for c in changes:
-        items += f"""
-    <item>
-      <title>{c['name']} — {c['new']}</title>
-      <description>Ref: {c['ref']} | আগে: {c['old']} → এখন: {c['new']}</description>
-      <pubDate>{now}</pubDate>
-      <guid>{c['ref']}-{c['new']}</guid>
-    </item>"""
+        items += f"""<item>
+<title>{c['name']} - {c['new']}</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: {c['ref']} | Before: {c['old']} - Now: {c['new']}</description>
+<pubDate>{now}</pubDate>
+<guid isPermaLink="false">{c['ref']}-{c['new']}-{datetime.now().strftime('%Y%m%d%H%M')}</guid>
+</item>
+"""
     rss = f"""<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
-  <channel>
-    <title>PCC Tracker</title>
-    <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-    <description>PCC Status Updates</description>
-    <lastBuildDate>{now}</lastBuildDate>
-    {items}
-  </channel>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>PCC Tracker</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>PCC Status Updates</description>
+<language>bn</language>
+<lastBuildDate>{now}</lastBuildDate>
+<atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
+{items}
+</channel>
 </rss>"""
     with open(RSS_FILE, "w", encoding="utf-8") as f:
         f.write(rss)

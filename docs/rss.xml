@@ -1,16 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
-  <channel>
-    <title>PCC Tracker</title>
-    <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-    <description>PCC Status Updates</description>
-    <lastBuildDate>Tue, 28 Apr 2026 15:48:33 +0600</lastBuildDate>
-    
-    <item>
-      <title>TAHSIN AHMED — 8/10</title>
-      <description>Ref: 1BFHG9W | আগে: 7/10 → এখন: 8/10</description>
-      <pubDate>Tue, 28 Apr 2026 15:48:33 +0600</pubDate>
-      <guid>1BFHG9W-8/10</guid>
-    </item>
-  </channel>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>PCC Tracker</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>PCC Status Updates</description>
+<language>bn</language>
+<lastBuildDate>Wed, 29 Apr 2026 13:12:30 +0000</lastBuildDate>
+<atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
+<item>
+<title>MD DELOWAR HOSSAN - 7/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BFEXVK | Before: 6/10 - Now: 7/10</description>
+<pubDate>Wed, 29 Apr 2026 13:12:30 +0000</pubDate>
+<guid isPermaLink="false">1BFEXVK-7/10-202604291312</guid>
+</item>
+<item>
+<title>SIFAT HOSSAIN - 7/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BFEXSW | Before: 6/10 - Now: 7/10</description>
+<pubDate>Wed, 29 Apr 2026 13:12:30 +0000</pubDate>
+<guid isPermaLink="false">1BFEXSW-7/10-202604291312</guid>
+</item>
+<item>
+<title>MD MEZBAH ALI - 10/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BFKKJP | Before: 9/10 - Now: 10/10</description>
+<pubDate>Wed, 29 Apr 2026 13:12:30 +0000</pubDate>
+<guid isPermaLink="false">1BFKKJP-10/10-202604291312</guid>
+</item>
+<item>
+<title>PARULI BEGUM - 10/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BFK4S5 | Before: 9/10 - Now: 10/10</description>
+<pubDate>Wed, 29 Apr 2026 13:12:30 +0000</pubDate>
+<guid isPermaLink="false">1BFK4S5-10/10-202604291312</guid>
+</item>
+<item>
+<title>SIAM HOSSAIN - 10/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BFJHUL | Before: 9/10 - Now: 10/10</description>
+<pubDate>Wed, 29 Apr 2026 13:12:30 +0000</pubDate>
+<guid isPermaLink="false">1BFJHUL-10/10-202604291312</guid>
+</item>
+<item>
+<title>SHEIKH RAHIM - 10/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BFJ88V | Before: 9/10 - Now: 10/10</description>
+<pubDate>Wed, 29 Apr 2026 13:12:30 +0000</pubDate>
+<guid isPermaLink="false">1BFJ88V-10/10-202604291312</guid>
+</item>
+<item>
+<title>NAHID HOSSAIN - 10/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BFJ86T | Before: 9/10 - Now: 10/10</description>
+<pubDate>Wed, 29 Apr 2026 13:12:30 +0000</pubDate>
+<guid isPermaLink="false">1BFJ86T-10/10-202604291312</guid>
+</item>
+<item>
+<title>UTTAM KUMAR SHIL - 10/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BFJ3K8 | Before: 9/10 - Now: 10/10</description>
+<pubDate>Wed, 29 Apr 2026 13:12:30 +0000</pubDate>
+<guid isPermaLink="false">1BFJ3K8-10/10-202604291312</guid>
+</item>
+
+</channel>
 </rss>

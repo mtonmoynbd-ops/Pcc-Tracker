@@ -93,6 +93,7 @@ function cardHTML(app) {
       <button class="star-btn" onclick="toggleStar('${app.ref}')">${icon}</button>
       <div class="name">${app.name}</div>
       <div class="info">📄 ${app.ref} &nbsp;|&nbsp; 📅 ${app.apply_date}</div>
+      ${app.phone ? `<div class="info"><a href="tel:${app.phone}" style="color:#38bdf8;text-decoration:none;">📞 ${app.phone}</a></div>` : ''}
       <span class="status ${scls}">${app.status}</span>
     </div>`;
 }

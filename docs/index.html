@@ -7,27 +7,31 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0a1628; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 16px; overflow-x: hidden; }
-  h1 { font-size: 18px; color: #60a5fa; margin-bottom: 4px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  h1 { font-size: 18px; color: #60a5fa; }
+  .counts { text-align: right; font-size: 11px; line-height: 1.6; }
+  .counts .urgent { color: #ef4444; font-weight: 700; }
+  .counts .important { color: #f59e0b; font-weight: 700; }
   .updated { font-size: 12px; color: #475569; margin-bottom: 16px; }
-  .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; }
-  .swipe-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; border-radius: 12px; }
-  .swipe-bg.left { background: #1e3a5f; justify-content: flex-end; padding-right: 20px; color: #34d399; font-size: 13px; font-weight: 700; }
-  .swipe-bg.right { background: #3b0a0a; justify-content: flex-start; padding-left: 20px; color: #ef4444; font-size: 13px; font-weight: 700; }
-  .card { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 12px; padding: 14px; position: relative; transition: transform 0.2s; touch-action: pan-y; }
+  .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; height: auto; }
+  .swipe-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; border-radius: 12px; pointer-events: none; }
+  .swipe-bg.left { background: #14532d; justify-content: flex-end; padding-right: 24px; color: #34d399; font-size: 14px; font-weight: 700; }
+  .swipe-bg.right { background: #3b0a0a; justify-content: flex-start; padding-left: 24px; color: #ef4444; font-size: 14px; font-weight: 700; }
+  .card { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 12px; padding: 14px; position: relative; will-change: transform; }
   .card.star1 { border-color: #f59e0b; }
   .card.star2 { border-color: #ef4444; border-width: 2px; }
   .card.delivered { opacity: 0.4; border-color: #334155; }
   .name { font-weight: 700; font-size: 15px; color: #f1f5f9; margin-bottom: 6px; padding-right: 50px; }
   .info { font-size: 12px; color: #64748b; margin-bottom: 4px; }
   .bottom-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-  .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; }
+  .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
   .s1,.s2 { background: #1e3a5f; color: #60a5fa; }
   .s3,.s4,.s5 { background: #1e3a5f; color: #f59e0b; }
   .s6,.s7 { background: #1e3a5f; color: #a78bfa; }
   .s8,.s9 { background: #1e3a5f; color: #34d399; }
-  .deu { color: #ef4444; font-size: 13px; font-weight: 700; margin-left: 8px; }
-  .deu-input { background: none; border: none; border-bottom: 1px solid #ef4444; color: #ef4444; font-size: 13px; font-weight: 700; width: 60px; outline: none; text-align: center; }
-  .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; }
+  .deu-text { color: #ef4444; font-size: 13px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: #3b0a0a; cursor: pointer; flex-shrink: 0; }
+  .deu-input { background: none; border: none; border-bottom: 1px solid #ef4444; color: #ef4444; font-size: 13px; font-weight: 700; width: 60px; outline: none; text-align: center; flex-shrink: 0; }
+  .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; flex-shrink: 0; }
   .star-btn { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; font-size: 20px; opacity: 0.4; }
   .star-btn:hover, .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
   .section-title { font-size: 12px; color: #475569; margin: 12px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
@@ -35,8 +39,13 @@
 </style>
 </head>
 <body>
-<h1>🛡️ PCC Tracker</h1>
-<div class="updated" id="updated">লোড হচ্ছে...</div>
+<div class="header">
+  <div>
+    <h1>🛡️ PCC Tracker</h1>
+    <div class="updated" id="updated">লোড হচ্ছে...</div>
+  </div>
+  <div class="counts" id="counts"></div>
+</div>
 <div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
 
 <script>
@@ -45,6 +54,7 @@ let stars = JSON.parse(localStorage.getItem('pcc_stars') || '{}');
 let delivered = JSON.parse(localStorage.getItem('pcc_delivered') || '{}');
 let codes = JSON.parse(localStorage.getItem('pcc_codes') || '{}');
 let showDeu = JSON.parse(localStorage.getItem('pcc_showdeu') || '{}');
+let editingDeu = {};
 
 function save() {
   localStorage.setItem('pcc_stars', JSON.stringify(stars));
@@ -60,7 +70,17 @@ function toggleStar(ref) {
 
 function updateCode(ref, val) {
   codes[ref] = val;
-  save();
+  editingDeu[ref] = false;
+  save(); render();
+}
+
+function startEditDeu(ref) {
+  editingDeu[ref] = true;
+  render();
+  setTimeout(() => {
+    const inp = document.getElementById('deu-input-' + ref);
+    if (inp) inp.focus();
+  }, 50);
 }
 
 function cardHTML(app) {
@@ -71,8 +91,22 @@ function cardHTML(app) {
   const num = parseInt((app.status || '').split('/')[0]) || 0;
   const scls = 's' + Math.min(num, 10);
   const showPhone = s > 0 && app.phone;
-  const hasDeu = showDeu[app.ref];
+  const hasDeu = !isDelivered && showDeu[app.ref];
   const deuVal = codes[app.ref] || '';
+  const isEditing = editingDeu[app.ref];
+
+  let deuHTML = '';
+  if (hasDeu) {
+    if (isEditing || !deuVal) {
+      deuHTML = `<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6"
+        placeholder="Deu" value="${deuVal}"
+        onblur="updateCode('${app.ref}', this.value)"
+        onkeydown="if(event.key==='Enter') this.blur()"
+        onclick="event.stopPropagation()">`;
+    } else {
+      deuHTML = `<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;
+    }
+  }
 
   return `
     <div class="card-wrap" id="wrap-${app.ref}">
@@ -80,27 +114,22 @@ function cardHTML(app) {
       <div class="swipe-bg right">Deu</div>
       <div class="card ${cls}" id="card-${app.ref}"
         data-ref="${app.ref}"
-        ontouchstart="swipeStart(event, '${app.ref}')"
-        ontouchmove="swipeMove(event, '${app.ref}')"
-        ontouchend="swipeEnd(event, '${app.ref}')">
+        ontouchstart="swipeStart(event,'${app.ref}')"
+        ontouchmove="swipeMove(event,'${app.ref}')"
+        ontouchend="swipeEnd(event,'${app.ref}')">
         <button class="star-btn" onclick="toggleStar('${app.ref}')">${starIcon}</button>
         <div class="name">${app.name}</div>
         <div class="info">📄 ${app.ref} &nbsp;|&nbsp; 📅 ${app.apply_date}</div>
         <div class="bottom-row">
           <span class="status ${scls}">${app.status}</span>
-          ${hasDeu ? `<input class="deu-input" type="text" maxlength="6" placeholder="Deu"
-            value="${deuVal}"
-            onchange="updateCode('${app.ref}', this.value)"
-            onclick="event.stopPropagation()">` : ''}
+          ${deuHTML}
           ${showPhone ? `<a class="phone-link" href="tel:${app.phone}">📞 ${app.phone}</a>` : ''}
         </div>
       </div>
     </div>`;
 }
 
-// Swipe handling
-let touchStartX = {};
-let touchStartY = {};
+let touchStartX = {}, touchStartY = {};
 
 function swipeStart(e, ref) {
   touchStartX[ref] = e.touches[0].clientX;
@@ -124,29 +153,46 @@ function swipeEnd(e, ref) {
   card.style.transform = '';
 
   if (dx < -80) {
-    // সোয়াইপ বামে → Delivered
     delivered[ref] = !delivered[ref];
+    if (delivered[ref]) { showDeu[ref] = false; }
     save(); render();
   } else if (dx > 80) {
-    // সোয়াইপ ডানে → Deu toggle
-    showDeu[ref] = !showDeu[ref];
-    save(); render();
+    if (!delivered[ref]) {
+      showDeu[ref] = !showDeu[ref];
+      if (showDeu[ref]) editingDeu[ref] = true;
+      save(); render();
+      if (showDeu[ref]) {
+        setTimeout(() => {
+          const inp = document.getElementById('deu-input-' + ref);
+          if (inp) inp.focus();
+        }, 50);
+      }
+    }
   }
 }
 
+function updateCounts() {
+  const urgent = allApps.filter(a => !delivered[a.ref] && (stars[a.ref] || 0) === 2).length;
+  const important = allApps.filter(a => !delivered[a.ref] && (stars[a.ref] || 0) === 1).length;
+  document.getElementById('counts').innerHTML =
+    `<div class="urgent">Urgent: ${String(urgent).padStart(2,'0')}</div>
+     <div class="important">Important: ${String(important).padStart(2,'0')}</div>`;
+}
+
 function render() {
-  const star2 = allApps.filter(a => !delivered[a.ref] && (stars[a.ref] || 0) === 2);
-  const star1 = allApps.filter(a => !delivered[a.ref] && (stars[a.ref] || 0) === 1);
-  const normal = allApps.filter(a => !delivered[a.ref] && (stars[a.ref] || 0) === 0);
+  const star2 = allApps.filter(a => !delivered[a.ref] && (stars[a.ref]||0)===2);
+  const star1 = allApps.filter(a => !delivered[a.ref] && (stars[a.ref]||0)===1);
+  const normal = allApps.filter(a => !delivered[a.ref] && (stars[a.ref]||0)===0);
   const done = allApps.filter(a => delivered[a.ref]);
 
   let html = '';
   if (star2.length) { html += '<div class="section-title">🔴 জরুরি</div>'; star2.forEach(a => html += cardHTML(a)); }
   if (star1.length) { html += '<div class="section-title">⭐ গুরুত্বপূর্ণ</div>'; star1.forEach(a => html += cardHTML(a)); }
-  if (normal.length) { if (star1.length || star2.length) html += '<div class="section-title">সাধারণ</div>'; normal.forEach(a => html += cardHTML(a)); }
+  if (normal.length) { if (star1.length||star2.length) html += '<div class="section-title">সাধারণ</div>'; normal.forEach(a => html += cardHTML(a)); }
   if (done.length) { html += '<div class="section-title">✓ বিতরণ হয়েছে</div>'; done.forEach(a => html += cardHTML(a)); }
 
   document.getElementById('list').innerHTML = html;
+  updateCounts();
 }
 
 async function load() {

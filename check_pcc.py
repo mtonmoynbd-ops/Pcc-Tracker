@@ -114,6 +114,7 @@ async def main():
                 if len(cols) >= 9:
                     ref = cols[0].text.strip()
                     apply_date = cols[3].text.strip()
+                    phone = cols[4].text.strip()
                     name = cols[5].text.strip()
                     full_status = cols[8].text.strip()
                     match = re.match(r'(\d+/\d+)', full_status)
@@ -123,6 +124,7 @@ async def main():
                             "ref": ref,
                             "name": name,
                             "apply_date": apply_date,
+                            "phone": phone,
                             "status": status
                         })
 

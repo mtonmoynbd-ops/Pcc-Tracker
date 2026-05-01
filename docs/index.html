@@ -15,7 +15,13 @@
   .counts { text-align: right; font-size: 11px; line-height: 1.8; }
   .counts .urgent { color: #ef4444; font-weight: 700; cursor: pointer; }
   .counts .important { color: #f59e0b; font-weight: 700; cursor: pointer; }
-  .updated { font-size: 12px; color: #475569; margin-bottom: 16px; }
+  .updated { font-size: 12px; color: #475569; margin-bottom: 8px; }
+
+  /* Search & Filter */
+  .search-bar { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; width: 100%; outline: none; margin-bottom: 8px; }
+  .filter-row { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
+  .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
 
   /* Modal */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
@@ -24,11 +30,15 @@
   .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
   .modal-close { background: none; border: none; color: #64748b; font-size: 20px; cursor: pointer; }
   .modal-adj { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-  .adj-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .adj-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 18px; cursor: pointer; }
   .adj-num { font-size: 22px; font-weight: 700; min-width: 40px; text-align: center; }
   .modal-list { font-size: 12px; color: #64748b; line-height: 2; border-top: 1px solid #1e3a5f; padding-top: 10px; }
   .modal-list-item { color: #94a3b8; }
+  .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; font-size: 13px; }
+  .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; }
+  .date-modal-item .dm-info { font-size: 11px; color: #64748b; margin-top: 2px; }
 
+  /* Cards */
   .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; }
   .swipe-hint { position: absolute; top: 0; bottom: 0; width: 100%; display: flex; align-items: center; border-radius: 12px; pointer-events: none; opacity: 0; transition: opacity 0.1s; }
   .swipe-hint.left-hint { background: #14532d; justify-content: flex-end; padding-right: 24px; color: #34d399; font-size: 13px; font-weight: 700; }
@@ -39,7 +49,12 @@
   .card.delivered { opacity: 0.4; border-color: #334155; }
   .name { font-weight: 700; font-size: 15px; color: #f1f5f9; margin-bottom: 6px; padding-right: 50px; }
   .info { font-size: 12px; color: #64748b; margin-bottom: 2px; }
-  .day-count { color: #60a5fa; font-size: 11px; font-weight: 600; }
+  .day-count { font-size: 11px; font-weight: 600; }
+  .day-normal { color: #60a5fa; }
+  .day-warn-urgent { color: #ef4444; font-weight: 800; }
+  .day-warn-important { color: #f97316; font-weight: 800; }
+  .date-link { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; color: #64748b; }
+  .date-link:hover { color: #94a3b8; }
   .bottom-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
   .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
   .s1,.s2 { background: #1e3a5f; color: #60a5fa; }
@@ -51,8 +66,17 @@
   .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; flex-shrink: 0; }
   .star-btn { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; font-size: 20px; opacity: 0.4; }
   .star-btn:hover, .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
+
+  /* Note */
+  .note-row { margin-top: 8px; }
+  .note-text { font-size: 12px; color: #94a3b8; font-style: italic; cursor: pointer; padding: 4px 0; }
+  .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; resize: none; }
+
   .section-title { font-size: 12px; color: #475569; margin: 12px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
   .loading { text-align: center; padding: 40px; color: #475569; }
+
+  /* Toast */
+  #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -71,9 +95,20 @@
   </div>
 </div>
 
-<div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
+<input class="search-bar" type="text" placeholder="🔍 নাম বা Ref খুঁজুন..." oninput="render()">
 
-<!-- Modal -->
+<div class="filter-row">
+  <button class="filter-btn active" onclick="setFilter('all',this)">সব</button>
+  <button class="filter-btn" onclick="setFilter('1-3',this)">1-3</button>
+  <button class="filter-btn" onclick="setFilter('4-6',this)">4-6</button>
+  <button class="filter-btn" onclick="setFilter('7-9',this)">7-9</button>
+  <button class="filter-btn" onclick="setFilter('draft',this)">Draft</button>
+</div>
+
+<div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
+<div id="toast"></div>
+
+<!-- Count Modal -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title">
@@ -89,25 +124,58 @@
   </div>
 </div>
 
+<!-- Date Modal -->
+<div class="modal" id="date-modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span id="date-modal-title"></span>
+      <button class="modal-close" onclick="closeDateModal()">✕</button>
+    </div>
+    <div id="date-modal-list"></div>
+  </div>
+</div>
+
 <script>
 let allApps = [];
 let stars = JSON.parse(localStorage.getItem('pcc_stars') || '{}');
 let delivered = JSON.parse(localStorage.getItem('pcc_delivered') || '{}');
 let codes = JSON.parse(localStorage.getItem('pcc_codes') || '{}');
 let showDeu = JSON.parse(localStorage.getItem('pcc_showdeu') || '{}');
+let notes = JSON.parse(localStorage.getItem('pcc_notes') || '{}');
+let showNote = {};
 let editingDeu = {};
 let counts = JSON.parse(localStorage.getItem('pcc_counts') || '{"urgent":0,"important":0}');
 let history = JSON.parse(localStorage.getItem('pcc_history') || '{"urgent":[],"important":[]}');
 let resetConfirm = false, resetTimer = null;
 let modalType = null;
+let activeFilter = 'all';
 
 function save() {
   localStorage.setItem('pcc_stars', JSON.stringify(stars));
   localStorage.setItem('pcc_delivered', JSON.stringify(delivered));
   localStorage.setItem('pcc_codes', JSON.stringify(codes));
   localStorage.setItem('pcc_showdeu', JSON.stringify(showDeu));
+  localStorage.setItem('pcc_notes', JSON.stringify(notes));
   localStorage.setItem('pcc_counts', JSON.stringify(counts));
   localStorage.setItem('pcc_history', JSON.stringify(history));
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function matchesFilter(app) {
+  const num = parseInt((app.status || '').split('/')[0]) || 0;
+  const isDraft = (app.status || '').toLowerCase().includes('draft');
+  if (activeFilter === 'all') return true;
+  if (activeFilter === 'draft') return isDraft;
+  if (activeFilter === '1-3') return !isDraft && num >= 1 && num <= 3;
+  if (activeFilter === '4-6') return !isDraft && num >= 4 && num <= 6;
+  if (activeFilter === '7-9') return !isDraft && num >= 7 && num <= 9;
+  return true;
 }
 
 function daysSince(dateStr) {
@@ -115,147 +183,130 @@ function daysSince(dateStr) {
     const months = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
     const parts = dateStr.toUpperCase().split('-');
     if (parts.length !== 3) return null;
-    const day = parseInt(parts[0]);
-    const mon = months[parts[1]];
-    const yr = 2000 + parseInt(parts[2]);
-    if (isNaN(day) || mon === undefined || isNaN(yr)) return null;
-    const applyDate = new Date(yr, mon, day);
+    const d = parseInt(parts[0]), m = months[parts[1]], y = 2000+parseInt(parts[2]);
+    if (isNaN(d)||m===undefined||isNaN(y)) return null;
+    const applyDate = new Date(y,m,d);
     const today = new Date(); today.setHours(0,0,0,0);
-    const diff = Math.floor((today - applyDate) / 86400000);
+    const diff = Math.floor((today-applyDate)/86400000);
     return diff > 0 ? diff : null;
   } catch { return null; }
 }
 
 function toggleStar(ref) {
   const prev = stars[ref] || 0;
-  stars[ref] = (prev + 1) % 3;
+  stars[ref] = (prev+1) % 3;
   const next = stars[ref];
-  const app = allApps.find(a => a.ref === ref);
+  const app = allApps.find(a => a.ref===ref);
   const entry = app ? `${app.name} ${ref}` : ref;
-
-  // উপরে উঠলে count বাড়াও, নিচে নামলে কমাও
-  if (prev === 0 && next === 1) {
-    counts.important++;
-    if (!history.important.includes(entry)) history.important.push(entry);
-  } else if (prev === 1 && next === 2) {
-    counts.important = Math.max(0, counts.important - 1);
-    history.important = history.important.filter(e => e !== entry);
-    counts.urgent++;
-    if (!history.urgent.includes(entry)) history.urgent.push(entry);
-  } else if (prev === 2 && next === 0) {
-    counts.urgent = Math.max(0, counts.urgent - 1);
-    history.urgent = history.urgent.filter(e => e !== entry);
-  }
-
+  if (prev===0&&next===1) { counts.important++; if(!history.important.includes(entry)) history.important.push(entry); }
+  else if (prev===1&&next===2) { counts.important=Math.max(0,counts.important-1); history.important=history.important.filter(e=>e!==entry); counts.urgent++; if(!history.urgent.includes(entry)) history.urgent.push(entry); }
+  else if (prev===2&&next===0) { counts.urgent=Math.max(0,counts.urgent-1); history.urgent=history.urgent.filter(e=>e!==entry); }
   save(); render();
 }
 
-function startEditDeu(ref) {
-  editingDeu[ref] = true;
-  render();
-  setTimeout(() => { const inp = document.getElementById('deu-input-' + ref); if (inp) inp.focus(); }, 50);
-}
+function startEditDeu(ref) { editingDeu[ref]=true; render(); setTimeout(()=>{ const i=document.getElementById('deu-input-'+ref); if(i) i.focus(); },50); }
+function updateCode(ref,val) { codes[ref]=val; editingDeu[ref]=false; save(); render(); }
+function toggleNote(ref) { showNote[ref]=!showNote[ref]; render(); setTimeout(()=>{ const i=document.getElementById('note-input-'+ref); if(i) i.focus(); },50); }
+function updateNote(ref,val) { notes[ref]=val; save(); }
 
-function updateCode(ref, val) {
-  codes[ref] = val; editingDeu[ref] = false; save(); render();
-}
-
-// Long press to share
-let pressTimer = {};
 function showToast(msg) {
-  let t = document.getElementById('toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'toast';
-    t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;transition:opacity 0.3s';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  setTimeout(() => t.style.opacity = '0', 2000);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',2000);
 }
 
+let pressTimer={};
 function pressStart(ref) {
-  pressTimer[ref] = setTimeout(() => {
-    const app = allApps.find(a => a.ref === ref);
-    if (!app) return;
-    const text = `${app.name} ${ref}`;
-    if (navigator.share) {
-      navigator.share({ text });
-    } else {
-      navigator.clipboard.writeText(text)
-        .then(() => showToast('✓ কপি: ' + text))
-        .catch(() => showToast('✓ ' + text));
-    }
-  }, 600);
+  pressTimer[ref]=setTimeout(()=>{
+    const app=allApps.find(a=>a.ref===ref);
+    if(!app) return;
+    const text=`${app.name} ${ref}`;
+    if(navigator.share) navigator.share({text});
+    else navigator.clipboard.writeText(text).then(()=>showToast('✓ কপি: '+text)).catch(()=>showToast('✓ '+text));
+  },600);
 }
 function pressEnd(ref) { clearTimeout(pressTimer[ref]); }
 
+function openDateModal(dateStr) {
+  const same = allApps.filter(a => a.apply_date === dateStr);
+  document.getElementById('date-modal-title').textContent = '📅 '+dateStr+' — '+same.length+'টি ফাইল';
+  document.getElementById('date-modal-list').innerHTML = same.map(a => {
+    const num = parseInt((a.status||'').split('/')[0])||0;
+    const scls = 's'+Math.min(num,10);
+    return `<div class="date-modal-item">
+      <div class="dm-name">${a.name}</div>
+      <div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${scls}" style="font-size:11px;padding:2px 8px">${a.status}</span></div>
+    </div>`;
+  }).join('');
+  document.getElementById('date-modal').classList.add('open');
+}
+function closeDateModal() { document.getElementById('date-modal').classList.remove('open'); }
+
 function openModal(type) {
-  modalType = type;
-  document.getElementById('modal-title-text').textContent = type === 'urgent' ? '🔴 Urgent' : '⭐ Important';
-  document.getElementById('modal-count').textContent = counts[type];
-  const list = history[type];
-  document.getElementById('modal-list').innerHTML = list.length
-    ? list.map(e => `<div class="modal-list-item">• ${e}</div>`).join('')
-    : '<div style="color:#475569">কোনো রেকর্ড নেই</div>';
+  modalType=type;
+  document.getElementById('modal-title-text').textContent=type==='urgent'?'🔴 Urgent':'⭐ Important';
+  document.getElementById('modal-count').textContent=counts[type];
+  const list=history[type];
+  document.getElementById('modal-list').innerHTML=list.length?list.map(e=>`<div class="modal-list-item">• ${e}</div>`).join(''):'<div style="color:#475569">কোনো রেকর্ড নেই</div>';
   document.getElementById('modal').classList.add('open');
 }
-
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-  modalType = null;
-}
-
+function closeModal() { document.getElementById('modal').classList.remove('open'); modalType=null; }
 function adjustCount(delta) {
-  if (!modalType) return;
-  counts[modalType] = Math.max(0, counts[modalType] + delta);
-  document.getElementById('modal-count').textContent = counts[modalType];
-  document.getElementById('cnt-' + modalType).textContent = String(counts[modalType]).padStart(2,'0');
+  if(!modalType) return;
+  counts[modalType]=Math.max(0,counts[modalType]+delta);
+  document.getElementById('modal-count').textContent=counts[modalType];
+  document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');
   save();
 }
 
 function resetCounts() {
-  if (!resetConfirm) {
-    resetConfirm = true;
+  if(!resetConfirm) {
+    resetConfirm=true;
     document.getElementById('reset-btn').classList.add('confirm');
-    resetTimer = setTimeout(() => {
-      resetConfirm = false;
-      document.getElementById('reset-btn').classList.remove('confirm');
-    }, 3000);
+    resetTimer=setTimeout(()=>{ resetConfirm=false; document.getElementById('reset-btn').classList.remove('confirm'); },3000);
   } else {
-    clearTimeout(resetTimer);
-    resetConfirm = false;
-    counts = {urgent: 0, important: 0};
-    history = {urgent: [], important: []};
-    save(); render();
-    document.getElementById('reset-btn').classList.remove('confirm');
+    clearTimeout(resetTimer); resetConfirm=false;
+    counts={urgent:0,important:0}; history={urgent:[],important:[]};
+    save(); render(); document.getElementById('reset-btn').classList.remove('confirm');
   }
 }
 
 function cardHTML(app) {
-  const s = stars[app.ref] || 0;
-  const isDelivered = delivered[app.ref] || false;
-  const starIcon = s === 2 ? '🔴' : s === 1 ? '⭐' : '☆';
-  const cls = isDelivered ? 'delivered' : s === 2 ? 'star2' : s === 1 ? 'star1' : '';
-  const num = parseInt((app.status || '').split('/')[0]) || 0;
-  const scls = 's' + Math.min(num, 10);
-  const showPhone = s > 0 && app.phone;
-  const hasDeu = !isDelivered && showDeu[app.ref];
-  const deuVal = codes[app.ref] || '';
-  const isEditing = editingDeu[app.ref];
-  const days = (!isDelivered && s > 0) ? daysSince(app.apply_date) : null;
+  const s=stars[app.ref]||0;
+  const isDelivered=delivered[app.ref]||false;
+  const starIcon=s===2?'🔴':s===1?'⭐':'☆';
+  const cls=isDelivered?'delivered':s===2?'star2':s===1?'star1':'';
+  const num=parseInt((app.status||'').split('/')[0])||0;
+  const scls='s'+Math.min(num,10);
+  const showPhone=s>0&&app.phone;
+  const hasDeu=!isDelivered&&showDeu[app.ref];
+  const deuVal=codes[app.ref]||'';
+  const isEditing=editingDeu[app.ref];
+  const days=(!isDelivered&&s>0)?daysSince(app.apply_date):null;
 
-  let deuHTML = '';
-  if (hasDeu) {
-    if (isEditing || !deuVal) {
-      deuHTML = `<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6"
-        placeholder="Deu" value="${deuVal}"
-        onblur="updateCode('${app.ref}', this.value)"
-        onkeydown="if(event.key==='Enter') this.blur()"
-        onclick="event.stopPropagation()">`;
+  let dayClass='day-normal';
+  if (days) {
+    if (s===2&&days>=5) dayClass='day-warn-urgent';
+    else if (s===1&&days>=12) dayClass='day-warn-important';
+  }
+
+  let deuHTML='';
+  if(hasDeu) {
+    if(isEditing||!deuVal) {
+      deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;
     } else {
-      deuHTML = `<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;
+      deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;
+    }
+  }
+
+  const noteVal=notes[app.ref]||'';
+  const isShowNote=showNote[app.ref];
+  let noteHTML='';
+  if(s>0&&!isDelivered) {
+    if(isShowNote) {
+      noteHTML=`<div class="note-row"><textarea id="note-input-${app.ref}" class="note-input" rows="2" placeholder="নোট লিখুন..." onblur="updateNote('${app.ref}',this.value)" onclick="event.stopPropagation()">${noteVal}</textarea></div>`;
+    } else {
+      noteHTML=`<div class="note-row"><div class="note-text" onclick="toggleNote('${app.ref}');event.stopPropagation()">${noteVal?'📝 '+noteVal:'+ নোট'}</div></div>`;
     }
   }
 
@@ -263,8 +314,7 @@ function cardHTML(app) {
     <div class="card-wrap" id="wrap-${app.ref}">
       <div class="swipe-hint left-hint" id="hint-left-${app.ref}">Delivered</div>
       <div class="swipe-hint right-hint" id="hint-right-${app.ref}">Deu</div>
-      <div class="card ${cls}" id="card-${app.ref}"
-        data-ref="${app.ref}"
+      <div class="card ${cls}" id="card-${app.ref}" data-ref="${app.ref}"
         ontouchstart="swipeStart(event,'${app.ref}');pressStart('${app.ref}')"
         ontouchmove="swipeMove(event,'${app.ref}');pressEnd('${app.ref}')"
         ontouchend="swipeEnd(event,'${app.ref}');pressEnd('${app.ref}')"
@@ -272,100 +322,89 @@ function cardHTML(app) {
         <button class="star-btn" onclick="toggleStar('${app.ref}')">${starIcon}</button>
         <div class="name">${app.name}</div>
         <div class="info">
-          📄 ${app.ref} &nbsp;|&nbsp; 📅 ${app.apply_date}
-          ${days ? `&nbsp;<span class="day-count">Day:${String(days).padStart(2,'0')}</span>` : ''}
+          📄 ${app.ref} &nbsp;|&nbsp;
+          <span class="date-link" onclick="openDateModal('${app.apply_date}');event.stopPropagation()">📅 ${app.apply_date}</span>
+          ${days?`&nbsp;<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:''}
         </div>
         <div class="bottom-row">
           <span class="status ${scls}">${app.status}</span>
           ${deuHTML}
-          ${showPhone ? `<a class="phone-link" href="tel:${app.phone}">📞 ${app.phone}</a>` : ''}
+          ${showPhone?`<a class="phone-link" href="tel:${app.phone}">📞 ${app.phone}</a>`:''}
         </div>
+        ${noteHTML}
       </div>
     </div>`;
 }
 
-let touchStartX = {}, touchStartY = {}, touching = {};
-
-function swipeStart(e, ref) {
-  touchStartX[ref] = e.touches[0].clientX;
-  touchStartY[ref] = e.touches[0].clientY;
-  touching[ref] = true;
-}
-
-function swipeMove(e, ref) {
-  if (!touching[ref]) return;
-  const dx = e.touches[0].clientX - touchStartX[ref];
-  const dy = e.touches[0].clientY - touchStartY[ref];
-  if (Math.abs(dx) < Math.abs(dy)) return;
+let touchStartX={},touchStartY={},touching={};
+function swipeStart(e,ref) { touchStartX[ref]=e.touches[0].clientX; touchStartY[ref]=e.touches[0].clientY; touching[ref]=true; }
+function swipeMove(e,ref) {
+  if(!touching[ref]) return;
+  const dx=e.touches[0].clientX-touchStartX[ref];
+  const dy=e.touches[0].clientY-touchStartY[ref];
+  if(Math.abs(dx)<Math.abs(dy)) return;
   e.preventDefault();
-  const card = document.getElementById('card-' + ref);
-  if (!card) return;
-  card.style.transition = 'none';
-  card.style.transform = `translateX(${dx}px)`;
-  const hl = document.getElementById('hint-left-' + ref);
-  const hr = document.getElementById('hint-right-' + ref);
-  if (dx < -30 && hl) hl.style.opacity = Math.min(1, Math.abs(dx)/80);
-  else if (hl) hl.style.opacity = 0;
-  if (dx > 30 && hr) hr.style.opacity = Math.min(1, dx/80);
-  else if (hr) hr.style.opacity = 0;
+  const card=document.getElementById('card-'+ref);
+  if(!card) return;
+  card.style.transition='none'; card.style.transform=`translateX(${dx}px)`;
+  const hl=document.getElementById('hint-left-'+ref);
+  const hr=document.getElementById('hint-right-'+ref);
+  if(dx<-30&&hl) hl.style.opacity=Math.min(1,Math.abs(dx)/80); else if(hl) hl.style.opacity=0;
+  if(dx>30&&hr) hr.style.opacity=Math.min(1,dx/80); else if(hr) hr.style.opacity=0;
 }
-
-function swipeEnd(e, ref) {
-  if (!touching[ref]) return;
-  touching[ref] = false;
-  const dx = e.changedTouches[0].clientX - touchStartX[ref];
-  const card = document.getElementById('card-' + ref);
-  const hl = document.getElementById('hint-left-' + ref);
-  const hr = document.getElementById('hint-right-' + ref);
-  if (card) { card.style.transition = 'transform 0.2s ease'; card.style.transform = ''; }
-  if (hl) hl.style.opacity = 0;
-  if (hr) hr.style.opacity = 0;
-
-  if (dx < -80) {
-    delivered[ref] = !delivered[ref];
-    if (delivered[ref]) showDeu[ref] = false;
-    save(); render();
-  } else if (dx > 80) {
-    if (!delivered[ref]) {
-      showDeu[ref] = !showDeu[ref];
-      if (showDeu[ref]) editingDeu[ref] = true;
-      save(); render();
-      if (showDeu[ref]) setTimeout(() => { const inp = document.getElementById('deu-input-' + ref); if (inp) inp.focus(); }, 50);
-    }
-  }
+function swipeEnd(e,ref) {
+  if(!touching[ref]) return;
+  touching[ref]=false;
+  const dx=e.changedTouches[0].clientX-touchStartX[ref];
+  const card=document.getElementById('card-'+ref);
+  const hl=document.getElementById('hint-left-'+ref);
+  const hr=document.getElementById('hint-right-'+ref);
+  if(card){card.style.transition='transform 0.2s ease';card.style.transform='';}
+  if(hl) hl.style.opacity=0;
+  if(hr) hr.style.opacity=0;
+  if(dx<-80) { delivered[ref]=!delivered[ref]; if(delivered[ref]) showDeu[ref]=false; save(); render(); }
+  else if(dx>80) { if(!delivered[ref]){showDeu[ref]=!showDeu[ref];if(showDeu[ref])editingDeu[ref]=true;save();render();if(showDeu[ref])setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);} }
 }
 
 function render() {
-  const star2 = allApps.filter(a => !delivered[a.ref] && (stars[a.ref]||0)===2);
-  const star1 = allApps.filter(a => !delivered[a.ref] && (stars[a.ref]||0)===1);
-  const normal = allApps.filter(a => !delivered[a.ref] && (stars[a.ref]||0)===0);
-  const done = allApps.filter(a => delivered[a.ref]);
+  const q=(document.querySelector('.search-bar').value||'').toLowerCase();
+  let apps=allApps.filter(a=>{
+    if(!matchesFilter(a)) return false;
+    if(q&&!a.name.toLowerCase().includes(q)&&!a.ref.toLowerCase().includes(q)) return false;
+    return true;
+  });
 
-  let html = '';
-  if (star2.length) { html += '<div class="section-title">🔴 জরুরি</div>'; star2.forEach(a => html += cardHTML(a)); }
-  if (star1.length) { html += '<div class="section-title">⭐ গুরুত্বপূর্ণ</div>'; star1.forEach(a => html += cardHTML(a)); }
-  if (normal.length) { if (star1.length||star2.length) html += '<div class="section-title">সাধারণ</div>'; normal.forEach(a => html += cardHTML(a)); }
-  if (done.length) { html += '<div class="section-title">✓ Delivered</div>'; done.forEach(a => html += cardHTML(a)); }
+  const star2=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2);
+  const star1=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1);
+  const normal=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
+  const done=apps.filter(a=>delivered[a.ref]);
 
-  document.getElementById('list').innerHTML = html;
-  document.getElementById('cnt-urgent').textContent = String(counts.urgent).padStart(2,'0');
-  document.getElementById('cnt-important').textContent = String(counts.important).padStart(2,'0');
+  let html='';
+  if(star2.length){html+='<div class="section-title">🔴 জরুরি</div>';star2.forEach(a=>html+=cardHTML(a));}
+  if(star1.length){html+='<div class="section-title">⭐ গুরুত্বপূর্ণ</div>';star1.forEach(a=>html+=cardHTML(a));}
+  if(normal.length){if(star1.length||star2.length)html+='<div class="section-title">সাধারণ</div>';normal.forEach(a=>html+=cardHTML(a));}
+  if(done.length){html+='<div class="section-title">✓ Delivered</div>';done.forEach(a=>html+=cardHTML(a));}
+  if(!html) html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
+
+  document.getElementById('list').innerHTML=html;
+  document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
+  document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
 }
 
 async function load() {
   try {
-    const r = await fetch('data.json?t=' + Date.now());
-    const d = await r.json();
-    document.getElementById('updated').textContent = 'আপডেট: ' + d.updated;
-    allApps = d.applications;
+    const r=await fetch('data.json?t='+Date.now());
+    const d=await r.json();
+    document.getElementById('updated').textContent='আপডেট: '+d.updated;
+    allApps=d.applications;
     render();
   } catch(e) {
-    document.getElementById('list').innerHTML = '<div class="loading">❌ লোড হয়নি</div>';
+    document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';
   }
 }
 
 load();
-setInterval(load, 60000);
+setInterval(load,60000);
 </script>
 </body>
 </html>

@@ -162,6 +162,19 @@ function updateCode(ref, val) {
 
 // Long press to share
 let pressTimer = {};
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;transition:opacity 0.3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 2000);
+}
+
 function pressStart(ref) {
   pressTimer[ref] = setTimeout(() => {
     const app = allApps.find(a => a.ref === ref);
@@ -170,7 +183,9 @@ function pressStart(ref) {
     if (navigator.share) {
       navigator.share({ text });
     } else {
-      navigator.clipboard.writeText(text).then(() => alert('কপি হয়েছে: ' + text));
+      navigator.clipboard.writeText(text)
+        .then(() => showToast('✓ কপি: ' + text))
+        .catch(() => showToast('✓ ' + text));
     }
   }, 600);
 }

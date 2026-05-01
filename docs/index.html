@@ -10,7 +10,7 @@
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
   .header-left { display: flex; align-items: center; gap: 10px; }
   h1 { font-size: 18px; color: #60a5fa; }
-  .web-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; flex-shrink: 0; }
+  .web-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; flex-shrink: 0; cursor: pointer; }
   .counts-wrap { display: flex; align-items: flex-start; gap: 8px; margin-top: 2px; }
   .reset-btn { width: 14px; height: 14px; border-radius: 50%; background: #0f1f3d; border: 1px solid #1e3a5f; color: #334155; font-size: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.3; margin-top: 3px; }
   .reset-btn.confirm { background: #7f1d1d; border-color: #ef4444; color: #ef4444; opacity: 1; }
@@ -18,12 +18,23 @@
   .counts .urgent { color: #ef4444; font-weight: 700; cursor: pointer; }
   .counts .important { color: #f59e0b; font-weight: 700; cursor: pointer; }
   .updated { font-size: 12px; color: #475569; margin-bottom: 8px; }
-  .search-bar { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; width: 100%; outline: none; margin-bottom: 8px; }
+  .search-wrap { position: relative; margin-bottom: 8px; }
+  .search-bar { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 8px; padding: 8px 44px 8px 12px; color: #e2e8f0; font-size: 13px; width: 100%; outline: none; }
+  .cal-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #1e3a5f; border: 1px solid #2563eb; border-radius: 6px; color: #60a5fa; font-size: 14px; padding: 3px 7px; cursor: pointer; }
+  .cal-box { display: none; background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+  .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .cal-nav { background: #1e293b; border: 1px solid #334155; color: #94a3b8; border-radius: 6px; padding: 2px 10px; cursor: pointer; font-size: 14px; }
+  .cal-title { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+  .cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; text-align: center; font-size: 10px; color: #475569; margin-bottom: 4px; }
+  .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; text-align: center; }
+  .cal-day { padding: 4px 2px; border-radius: 6px; font-size: 12px; position: relative; border: 1px solid transparent; }
+  .cal-day.has-file { color: #60a5fa; font-weight: 700; background: #1e3a5f; border-color: #2563eb; cursor: pointer; }
+  .cal-day.today { background: #1d4ed8; color: #fff; font-weight: 700; }
+  .cal-day.empty { color: #475569; }
+  .cal-dot { position: absolute; bottom: 1px; right: 2px; width: 4px; height: 4px; background: #2563eb; border-radius: 50%; }
   .filter-row { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
-
-  /* Multi-select bar */
   .select-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1f3d; border-top: 1px solid #1e3a5f; padding: 12px 16px; z-index: 50; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
   .select-bar.visible { display: flex; }
   .select-bar-info { font-size: 13px; color: #94a3b8; }
@@ -31,7 +42,6 @@
   .select-bar-btns { display: flex; gap: 8px; }
   .sel-copy-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
   .sel-cancel-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
-
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
   .modal.open { display: flex; }
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 20px; width: 90%; max-width: 360px; max-height: 80vh; overflow-y: auto; }
@@ -45,7 +55,6 @@
   .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; }
   .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
   .date-modal-item .dm-info { font-size: 11px; color: #64748b; margin-top: 2px; }
-
   .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; }
   .card-wrap.selected .card { border-color: #2563eb !important; border-width: 2px !important; }
   .card-wrap.selected::after { content: '✓'; position: absolute; top: 10px; left: 10px; background: #2563eb; color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; z-index: 10; }
@@ -89,7 +98,7 @@
       <h1>🛡️ PCC Tracker</h1>
       <div class="updated" id="updated">লোড হচ্ছে...</div>
     </div>
-    <a class="web-btn" href="https://pcc.police.gov.bd/ords/r/pcc/pcc/login_desktop" target="_blank" title="PCC সাইট">🌐</a>
+    <button class="web-btn" onclick="window.open('https://pcc.police.gov.bd/ords/r/pcc/pcc/login_desktop','_system')" title="PCC সাইট">🌐</button>
   </div>
   <div class="counts-wrap">
     <button class="reset-btn" id="reset-btn" onclick="resetCounts()">R</button>
@@ -100,7 +109,22 @@
   </div>
 </div>
 
-<input class="search-bar" type="text" placeholder="🔍 নাম বা Ref খুঁজুন..." oninput="render()">
+<div class="search-wrap">
+  <input class="search-bar" type="text" placeholder="🔍 নাম বা Ref খুঁজুন..." oninput="render()">
+  <button class="cal-btn" onclick="toggleCal()">📅</button>
+</div>
+
+<div class="cal-box" id="cal-box">
+  <div class="cal-header">
+    <button class="cal-nav" onclick="calNav(-1)">‹</button>
+    <span class="cal-title" id="cal-title"></span>
+    <button class="cal-nav" onclick="calNav(1)">›</button>
+  </div>
+  <div class="cal-weekdays">
+    <div>রবি</div><div>সোম</div><div>মঙ্গল</div><div>বুধ</div><div>বৃহ</div><div>শুক্র</div><div>শনি</div>
+  </div>
+  <div class="cal-days" id="cal-days"></div>
+</div>
 
 <div class="filter-row">
   <button class="filter-btn active" onclick="setFilter('all',this)">সব</button>
@@ -113,7 +137,6 @@
 <div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
 <div id="toast"></div>
 
-<!-- Multi-select bar -->
 <div class="select-bar" id="select-bar">
   <div class="select-bar-info"><span id="sel-count">0</span>টি ফাইল নির্বাচিত</div>
   <div class="select-bar-btns">
@@ -163,6 +186,7 @@ let modalType = null;
 let activeFilter = 'all';
 let selected = new Set();
 let selectMode = false;
+let calDate = new Date();
 
 function save() {
   localStorage.setItem('pcc_stars', JSON.stringify(stars));
@@ -174,6 +198,60 @@ function save() {
   localStorage.setItem('pcc_history', JSON.stringify(history));
 }
 
+// Calendar
+function toggleCal() {
+  const box = document.getElementById('cal-box');
+  const isHidden = box.style.display === 'none' || box.style.display === '';
+  box.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) renderCal();
+}
+
+function calNav(dir) {
+  calDate.setMonth(calDate.getMonth() + dir);
+  renderCal();
+}
+
+function renderCal() {
+  const monthNames = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+  const shortMonths = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  document.getElementById('cal-title').textContent = monthNames[m] + ' ' + y;
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const activeDates = new Set();
+  allApps.forEach(a => {
+    if (!a.apply_date) return;
+    const parts = a.apply_date.toUpperCase().split('-');
+    const ms = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+    if (parts.length===3) {
+      const dd=parseInt(parts[0]), mo=ms[parts[1]], yr=2000+parseInt(parts[2]);
+      if (mo===m&&yr===y) activeDates.add(dd);
+    }
+  });
+  let html = '';
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day"></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = new Date(y,m,d).getTime()===today.getTime();
+    const hasFile = activeDates.has(d);
+    const dateStr = String(d).padStart(2,'0')+'-'+shortMonths[m]+'-'+String(y).slice(2);
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    else if (hasFile) cls += ' has-file';
+    else cls += ' empty';
+    html += `<div class="${cls}" ${hasFile?`onclick="calDayClick('${dateStr}')"`:''}>${d}${hasFile&&!isToday?'<span class="cal-dot"></span>':''}</div>`;
+  }
+  document.getElementById('cal-days').innerHTML = html;
+}
+
+function calDayClick(dateStr) {
+  const same = allApps.filter(a => a.apply_date === dateStr);
+  if (!same.length) return;
+  document.getElementById('cal-box').style.display = 'none';
+  openDateModal(dateStr);
+}
+
+// Multi-select
 function toggleSelect(ref) {
   if (selected.has(ref)) selected.delete(ref);
   else selected.add(ref);
@@ -184,11 +262,10 @@ function toggleSelect(ref) {
 
 function updateSelectBar() {
   const bar = document.getElementById('select-bar');
-  const cnt = document.getElementById('sel-count');
   if (selected.size > 0) {
     selectMode = true;
     bar.classList.add('visible');
-    cnt.textContent = selected.size;
+    document.getElementById('sel-count').textContent = selected.size;
   } else {
     selectMode = false;
     bar.classList.remove('visible');
@@ -207,17 +284,10 @@ function clearSelection() {
 
 function copySelected() {
   const lines = [];
-  allApps.forEach(a => {
-    if (selected.has(a.ref)) lines.push(`${a.name} ${a.ref}`);
-  });
+  allApps.forEach(a => { if (selected.has(a.ref)) lines.push(`${a.name} ${a.ref}`); });
   const text = lines.join('\n');
-  if (navigator.share) {
-    navigator.share({text});
-  } else {
-    navigator.clipboard.writeText(text)
-      .then(() => showToast('✓ ' + selected.size + 'টি ফাইল কপি হয়েছে'))
-      .catch(() => showToast('✓ কপি হয়েছে'));
-  }
+  if (navigator.share) navigator.share({text});
+  else navigator.clipboard.writeText(text).then(() => showToast('✓ '+selected.size+'টি ফাইল কপি হয়েছে')).catch(() => showToast('✓ কপি হয়েছে'));
   clearSelection();
 }
 
@@ -241,10 +311,10 @@ function matchesFilter(app) {
 
 function daysSince(dateStr) {
   try {
-    const months = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+    const ms = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
     const parts = dateStr.toUpperCase().split('-');
     if (parts.length!==3) return null;
-    const d=parseInt(parts[0]),m=months[parts[1]],y=2000+parseInt(parts[2]);
+    const d=parseInt(parts[0]),m=ms[parts[1]],y=2000+parseInt(parts[2]);
     if(isNaN(d)||m===undefined||isNaN(y)) return null;
     const applyDate=new Date(y,m,d);
     const today=new Date(); today.setHours(0,0,0,0);
@@ -267,7 +337,6 @@ function toggleStar(ref) {
 
 function startEditDeu(ref) { editingDeu[ref]=true; render(); setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50); }
 function updateCode(ref,val) { codes[ref]=val; editingDeu[ref]=false; save(); render(); }
-
 function toggleNote(ref) {
   if(showNote[ref]&&!notes[ref]) showNote[ref]=false;
   else showNote[ref]=!showNote[ref];
@@ -284,17 +353,10 @@ function showToast(msg) {
 
 let pressTimer={};
 function pressStart(ref) {
-  pressTimer[ref]=setTimeout(()=>{
-    if(selectMode) { toggleSelect(ref); return; }
-    // First long press — enter select mode and select this card
-    toggleSelect(ref);
-  },600);
+  pressTimer[ref]=setTimeout(()=>{ toggleSelect(ref); },600);
 }
 function pressEnd(ref) { clearTimeout(pressTimer[ref]); }
-
-function handleTap(ref) {
-  if(selectMode) { toggleSelect(ref); }
-}
+function handleTap(ref) { if(selectMode) toggleSelect(ref); }
 
 function openDateModal(dateStr) {
   const same=allApps.filter(a=>a.apply_date===dateStr);
@@ -302,10 +364,7 @@ function openDateModal(dateStr) {
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
     const num=parseInt((a.status||'').split('/')[0])||0;
     const scls='s'+Math.min(num,10);
-    return `<div class="date-modal-item">
-      <div class="dm-name">${a.name}</div>
-      <div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${scls}" style="font-size:11px;padding:2px 8px">${a.status}</span></div>
-    </div>`;
+    return `<div class="date-modal-item"><div class="dm-name">${a.name}</div><div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${scls}" style="font-size:11px;padding:2px 8px">${a.status}</span></div></div>`;
   }).join('');
   document.getElementById('date-modal').classList.add('open');
 }
@@ -329,7 +388,7 @@ function adjustCount(delta) {
 }
 
 function resetCounts() {
-  if(!resetConfirm) {
+  if(!resetConfirm){
     resetConfirm=true;
     document.getElementById('reset-btn').classList.add('confirm');
     resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);
@@ -453,7 +512,7 @@ function render(){
   if(star1.length){html+='<div class="section-title">⭐ গুরুত্বপূর্ণ</div>';star1.forEach(a=>html+=cardHTML(a));}
   if(normal.length){if(star1.length||star2.length)html+='<div class="section-title">সাধারণ</div>';normal.forEach(a=>html+=cardHTML(a));}
   if(done.length){html+='<div class="section-title">✓ Delivered</div>';done.forEach(a=>html+=cardHTML(a));}
-  if(!html) html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
+  if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
   document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
   document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');

@@ -9,21 +9,17 @@
   body { background: #0a1628; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 16px; overflow-x: hidden; }
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
   h1 { font-size: 18px; color: #60a5fa; }
-  .counts-wrap { display: flex; align-items: center; gap: 4px; }
-  .reset-btn { width: 16px; height: 16px; border-radius: 50%; background: #0f1f3d; border: 1px solid #1e3a5f; color: #334155; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.4; }
+  .counts-wrap { display: flex; align-items: flex-start; gap: 8px; margin-top: 2px; }
+  .reset-btn { width: 14px; height: 14px; border-radius: 50%; background: #0f1f3d; border: 1px solid #1e3a5f; color: #334155; font-size: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.3; margin-top: 3px; }
   .reset-btn.confirm { background: #7f1d1d; border-color: #ef4444; color: #ef4444; opacity: 1; }
   .counts { text-align: right; font-size: 11px; line-height: 1.8; }
   .counts .urgent { color: #ef4444; font-weight: 700; cursor: pointer; }
   .counts .important { color: #f59e0b; font-weight: 700; cursor: pointer; }
   .updated { font-size: 12px; color: #475569; margin-bottom: 8px; }
-
-  /* Search & Filter */
   .search-bar { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; width: 100%; outline: none; margin-bottom: 8px; }
   .filter-row { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
-
-  /* Modal */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
   .modal.open { display: flex; }
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 20px; width: 90%; max-width: 360px; max-height: 80vh; overflow-y: auto; }
@@ -34,11 +30,9 @@
   .adj-num { font-size: 22px; font-weight: 700; min-width: 40px; text-align: center; }
   .modal-list { font-size: 12px; color: #64748b; line-height: 2; border-top: 1px solid #1e3a5f; padding-top: 10px; }
   .modal-list-item { color: #94a3b8; }
-  .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; font-size: 13px; }
-  .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; }
+  .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; }
+  .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
   .date-modal-item .dm-info { font-size: 11px; color: #64748b; margin-top: 2px; }
-
-  /* Cards */
   .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; }
   .swipe-hint { position: absolute; top: 0; bottom: 0; width: 100%; display: flex; align-items: center; border-radius: 12px; pointer-events: none; opacity: 0; transition: opacity 0.1s; }
   .swipe-hint.left-hint { background: #14532d; justify-content: flex-end; padding-right: 24px; color: #34d399; font-size: 13px; font-weight: 700; }
@@ -49,13 +43,11 @@
   .card.delivered { opacity: 0.4; border-color: #334155; }
   .name { font-weight: 700; font-size: 15px; color: #f1f5f9; margin-bottom: 6px; padding-right: 50px; }
   .info { font-size: 12px; color: #64748b; margin-bottom: 2px; }
-  .day-count { font-size: 11px; font-weight: 600; }
-  .day-normal { color: #60a5fa; }
-  .day-warn-urgent { color: #ef4444; font-weight: 800; }
-  .day-warn-important { color: #f97316; font-weight: 800; }
-  .date-link { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; color: #64748b; }
-  .date-link:hover { color: #94a3b8; }
-  .bottom-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .day-normal { color: #60a5fa; font-size: 11px; font-weight: 600; }
+  .day-warn-urgent { color: #ef4444; font-size: 11px; font-weight: 800; }
+  .day-warn-important { color: #f97316; font-size: 11px; font-weight: 800; }
+  .date-link { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; }
+  .bottom-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
   .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
   .s1,.s2 { background: #1e3a5f; color: #60a5fa; }
   .s3,.s4,.s5 { background: #1e3a5f; color: #f59e0b; }
@@ -63,20 +55,15 @@
   .s8,.s9 { background: #1e3a5f; color: #34d399; }
   .deu-text { color: #ef4444; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #3b0a0a; cursor: pointer; flex-shrink: 0; }
   .deu-input { background: none; border: none; border-bottom: 1px solid #ef4444; color: #ef4444; font-size: 13px; font-weight: 700; width: 60px; outline: none; text-align: center; flex-shrink: 0; }
+  .note-btn { color: #64748b; font-size: 11px; cursor: pointer; padding: 2px 8px; border: 1px solid #334155; border-radius: 4px; background: #1e293b; flex-shrink: 0; }
+  .note-content { font-size: 12px; color: #94a3b8; margin-top: 6px; cursor: pointer; }
+  .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; resize: none; margin-top: 6px; }
   .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; flex-shrink: 0; }
   .star-btn { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; font-size: 20px; opacity: 0.4; }
   .star-btn:hover, .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
-
-  /* Note */
-  .note-row { margin-top: 8px; }
-  .note-text { font-size: 12px; color: #94a3b8; font-style: italic; cursor: pointer; padding: 4px 0; }
-  .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; resize: none; }
-
   .section-title { font-size: 12px; color: #475569; margin: 12px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
   .loading { text-align: center; padding: 40px; color: #475569; }
-
-  /* Toast */
-  #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -108,7 +95,6 @@
 <div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
 <div id="toast"></div>
 
-<!-- Count Modal -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title">
@@ -124,7 +110,6 @@
   </div>
 </div>
 
-<!-- Date Modal -->
 <div class="modal" id="date-modal">
   <div class="modal-box">
     <div class="modal-title">
@@ -204,26 +189,40 @@ function toggleStar(ref) {
   save(); render();
 }
 
-function startEditDeu(ref) { editingDeu[ref]=true; render(); setTimeout(()=>{ const i=document.getElementById('deu-input-'+ref); if(i) i.focus(); },50); }
-function updateCode(ref,val) { codes[ref]=val; editingDeu[ref]=false; save(); render(); }
-function toggleNote(ref) { showNote[ref]=!showNote[ref]; render(); setTimeout(()=>{ const i=document.getElementById('note-input-'+ref); if(i) i.focus(); },50); }
-function updateNote(ref,val) { notes[ref]=val; save(); }
-
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.style.opacity='1';
-  setTimeout(()=>t.style.opacity='0',2000);
+function startEditDeu(ref) {
+  editingDeu[ref] = true; render();
+  setTimeout(() => { const i = document.getElementById('deu-input-'+ref); if(i) i.focus(); }, 50);
 }
 
-let pressTimer={};
+function updateCode(ref, val) { codes[ref]=val; editingDeu[ref]=false; save(); render(); }
+
+function toggleNote(ref) {
+  if (showNote[ref] && !notes[ref]) {
+    showNote[ref] = false;
+  } else {
+    showNote[ref] = !showNote[ref];
+  }
+  render();
+  if (showNote[ref]) setTimeout(() => { const i = document.getElementById('note-input-'+ref); if(i) i.focus(); }, 50);
+}
+
+function updateNote(ref, val) { notes[ref]=val; save(); render(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => t.style.opacity = '0', 2000);
+}
+
+let pressTimer = {};
 function pressStart(ref) {
-  pressTimer[ref]=setTimeout(()=>{
-    const app=allApps.find(a=>a.ref===ref);
-    if(!app) return;
-    const text=`${app.name} ${ref}`;
-    if(navigator.share) navigator.share({text});
-    else navigator.clipboard.writeText(text).then(()=>showToast('✓ কপি: '+text)).catch(()=>showToast('✓ '+text));
-  },600);
+  pressTimer[ref] = setTimeout(() => {
+    const app = allApps.find(a => a.ref===ref);
+    if (!app) return;
+    const text = `${app.name} ${ref}`;
+    if (navigator.share) navigator.share({text});
+    else navigator.clipboard.writeText(text).then(() => showToast('✓ কপি: '+text)).catch(() => showToast('✓ '+text));
+  }, 600);
 }
 function pressEnd(ref) { clearTimeout(pressTimer[ref]); }
 
@@ -243,27 +242,29 @@ function openDateModal(dateStr) {
 function closeDateModal() { document.getElementById('date-modal').classList.remove('open'); }
 
 function openModal(type) {
-  modalType=type;
-  document.getElementById('modal-title-text').textContent=type==='urgent'?'🔴 Urgent':'⭐ Important';
-  document.getElementById('modal-count').textContent=counts[type];
-  const list=history[type];
-  document.getElementById('modal-list').innerHTML=list.length?list.map(e=>`<div class="modal-list-item">• ${e}</div>`).join(''):'<div style="color:#475569">কোনো রেকর্ড নেই</div>';
+  modalType = type;
+  document.getElementById('modal-title-text').textContent = type==='urgent'?'🔴 Urgent':'⭐ Important';
+  document.getElementById('modal-count').textContent = counts[type];
+  const list = history[type];
+  document.getElementById('modal-list').innerHTML = list.length
+    ? list.map(e => `<div class="modal-list-item">• ${e}</div>`).join('')
+    : '<div style="color:#475569">কোনো রেকর্ড নেই</div>';
   document.getElementById('modal').classList.add('open');
 }
 function closeModal() { document.getElementById('modal').classList.remove('open'); modalType=null; }
 function adjustCount(delta) {
-  if(!modalType) return;
-  counts[modalType]=Math.max(0,counts[modalType]+delta);
-  document.getElementById('modal-count').textContent=counts[modalType];
-  document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');
+  if (!modalType) return;
+  counts[modalType] = Math.max(0, counts[modalType]+delta);
+  document.getElementById('modal-count').textContent = counts[modalType];
+  document.getElementById('cnt-'+modalType).textContent = String(counts[modalType]).padStart(2,'0');
   save();
 }
 
 function resetCounts() {
-  if(!resetConfirm) {
-    resetConfirm=true;
+  if (!resetConfirm) {
+    resetConfirm = true;
     document.getElementById('reset-btn').classList.add('confirm');
-    resetTimer=setTimeout(()=>{ resetConfirm=false; document.getElementById('reset-btn').classList.remove('confirm'); },3000);
+    resetTimer = setTimeout(() => { resetConfirm=false; document.getElementById('reset-btn').classList.remove('confirm'); }, 3000);
   } else {
     clearTimeout(resetTimer); resetConfirm=false;
     counts={urgent:0,important:0}; history={urgent:[],important:[]};
@@ -272,41 +273,45 @@ function resetCounts() {
 }
 
 function cardHTML(app) {
-  const s=stars[app.ref]||0;
-  const isDelivered=delivered[app.ref]||false;
-  const starIcon=s===2?'🔴':s===1?'⭐':'☆';
-  const cls=isDelivered?'delivered':s===2?'star2':s===1?'star1':'';
-  const num=parseInt((app.status||'').split('/')[0])||0;
-  const scls='s'+Math.min(num,10);
-  const showPhone=s>0&&app.phone;
-  const hasDeu=!isDelivered&&showDeu[app.ref];
-  const deuVal=codes[app.ref]||'';
-  const isEditing=editingDeu[app.ref];
-  const days=(!isDelivered&&s>0)?daysSince(app.apply_date):null;
+  const s = stars[app.ref]||0;
+  const isDelivered = delivered[app.ref]||false;
+  const starIcon = s===2?'🔴':s===1?'⭐':'☆';
+  const cls = isDelivered?'delivered':s===2?'star2':s===1?'star1':'';
+  const num = parseInt((app.status||'').split('/')[0])||0;
+  const scls = 's'+Math.min(num,10);
+  const showPhone = s>0 && app.phone;
+  const hasDeu = !isDelivered && showDeu[app.ref];
+  const deuVal = codes[app.ref]||'';
+  const isEditing = editingDeu[app.ref];
+  const days = (!isDelivered&&s>0) ? daysSince(app.apply_date) : null;
+  const noteVal = notes[app.ref]||'';
+  const isShowNote = showNote[app.ref];
 
-  let dayClass='day-normal';
+  let dayClass = 'day-normal';
   if (days) {
     if (s===2&&days>=5) dayClass='day-warn-urgent';
     else if (s===1&&days>=12) dayClass='day-warn-important';
   }
 
-  let deuHTML='';
-  if(hasDeu) {
-    if(isEditing||!deuVal) {
-      deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;
+  let deuHTML = '';
+  if (hasDeu) {
+    if (isEditing||!deuVal) {
+      deuHTML = `<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;
     } else {
-      deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;
+      deuHTML = `<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;
     }
   }
 
-  const noteVal=notes[app.ref]||'';
-  const isShowNote=showNote[app.ref];
-  let noteHTML='';
-  if(s>0&&!isDelivered) {
-    if(isShowNote) {
-      noteHTML=`<div class="note-row"><textarea id="note-input-${app.ref}" class="note-input" rows="2" placeholder="নোট লিখুন..." onblur="updateNote('${app.ref}',this.value)" onclick="event.stopPropagation()">${noteVal}</textarea></div>`;
-    } else {
-      noteHTML=`<div class="note-row"><div class="note-text" onclick="toggleNote('${app.ref}');event.stopPropagation()">${noteVal?'📝 '+noteVal:'+ নোট'}</div></div>`;
+  const noteBtn = (s>0&&!isDelivered)
+    ? `<span class="note-btn" onclick="toggleNote('${app.ref}');event.stopPropagation()">Note</span>`
+    : '';
+
+  let noteHTML = '';
+  if (s>0&&!isDelivered) {
+    if (isShowNote) {
+      noteHTML = `<textarea id="note-input-${app.ref}" class="note-input" rows="2" placeholder="নোট লিখুন..." onblur="updateNote('${app.ref}',this.value)" onclick="event.stopPropagation()">${noteVal}</textarea>`;
+    } else if (noteVal) {
+      noteHTML = `<div class="note-content" onclick="toggleNote('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`;
     }
   }
 
@@ -329,6 +334,7 @@ function cardHTML(app) {
         <div class="bottom-row">
           <span class="status ${scls}">${app.status}</span>
           ${deuHTML}
+          ${noteBtn}
           ${showPhone?`<a class="phone-link" href="tel:${app.phone}">📞 ${app.phone}</a>`:''}
         </div>
         ${noteHTML}
@@ -336,7 +342,7 @@ function cardHTML(app) {
     </div>`;
 }
 
-let touchStartX={},touchStartY={},touching={};
+let touchStartX={}, touchStartY={}, touching={};
 function swipeStart(e,ref) { touchStartX[ref]=e.touches[0].clientX; touchStartY[ref]=e.touches[0].clientY; touching[ref]=true; }
 function swipeMove(e,ref) {
   if(!touching[ref]) return;
@@ -362,49 +368,59 @@ function swipeEnd(e,ref) {
   if(card){card.style.transition='transform 0.2s ease';card.style.transform='';}
   if(hl) hl.style.opacity=0;
   if(hr) hr.style.opacity=0;
-  if(dx<-80) { delivered[ref]=!delivered[ref]; if(delivered[ref]) showDeu[ref]=false; save(); render(); }
-  else if(dx>80) { if(!delivered[ref]){showDeu[ref]=!showDeu[ref];if(showDeu[ref])editingDeu[ref]=true;save();render();if(showDeu[ref])setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);} }
+  if(dx<-80) {
+    delivered[ref]=!delivered[ref];
+    if(delivered[ref]) { showDeu[ref]=false; showNote[ref]=false; }
+    save(); render();
+  } else if(dx>80) {
+    if(!delivered[ref]) {
+      showDeu[ref]=!showDeu[ref];
+      if(showDeu[ref]) editingDeu[ref]=true;
+      save(); render();
+      if(showDeu[ref]) setTimeout(()=>{ const i=document.getElementById('deu-input-'+ref); if(i) i.focus(); },50);
+    }
+  }
 }
 
 function render() {
-  const q=(document.querySelector('.search-bar').value||'').toLowerCase();
-  let apps=allApps.filter(a=>{
-    if(!matchesFilter(a)) return false;
-    if(q&&!a.name.toLowerCase().includes(q)&&!a.ref.toLowerCase().includes(q)) return false;
+  const q = (document.querySelector('.search-bar').value||'').toLowerCase();
+  let apps = allApps.filter(a => {
+    if (!matchesFilter(a)) return false;
+    if (q && !a.name.toLowerCase().includes(q) && !a.ref.toLowerCase().includes(q)) return false;
     return true;
   });
 
-  const star2=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2);
-  const star1=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1);
-  const normal=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
-  const done=apps.filter(a=>delivered[a.ref]);
+  const star2 = apps.filter(a => !delivered[a.ref]&&(stars[a.ref]||0)===2);
+  const star1 = apps.filter(a => !delivered[a.ref]&&(stars[a.ref]||0)===1);
+  const normal = apps.filter(a => !delivered[a.ref]&&(stars[a.ref]||0)===0);
+  const done = apps.filter(a => delivered[a.ref]);
 
-  let html='';
+  let html = '';
   if(star2.length){html+='<div class="section-title">🔴 জরুরি</div>';star2.forEach(a=>html+=cardHTML(a));}
   if(star1.length){html+='<div class="section-title">⭐ গুরুত্বপূর্ণ</div>';star1.forEach(a=>html+=cardHTML(a));}
   if(normal.length){if(star1.length||star2.length)html+='<div class="section-title">সাধারণ</div>';normal.forEach(a=>html+=cardHTML(a));}
   if(done.length){html+='<div class="section-title">✓ Delivered</div>';done.forEach(a=>html+=cardHTML(a));}
   if(!html) html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
 
-  document.getElementById('list').innerHTML=html;
-  document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
-  document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
+  document.getElementById('list').innerHTML = html;
+  document.getElementById('cnt-urgent').textContent = String(counts.urgent).padStart(2,'0');
+  document.getElementById('cnt-important').textContent = String(counts.important).padStart(2,'0');
 }
 
 async function load() {
   try {
-    const r=await fetch('data.json?t='+Date.now());
-    const d=await r.json();
-    document.getElementById('updated').textContent='আপডেট: '+d.updated;
-    allApps=d.applications;
+    const r = await fetch('data.json?t='+Date.now());
+    const d = await r.json();
+    document.getElementById('updated').textContent = 'আপডেট: '+d.updated;
+    allApps = d.applications;
     render();
   } catch(e) {
-    document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';
+    document.getElementById('list').innerHTML = '<div class="loading">❌ লোড হয়নি</div>';
   }
 }
 
 load();
-setInterval(load,60000);
+setInterval(load, 60000);
 </script>
 </body>
 </html>

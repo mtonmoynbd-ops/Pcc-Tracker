@@ -8,7 +8,9 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0a1628; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 16px; overflow-x: hidden; }
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .header-left { display: flex; align-items: center; gap: 10px; }
   h1 { font-size: 18px; color: #60a5fa; }
+  .web-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; flex-shrink: 0; }
   .counts-wrap { display: flex; align-items: flex-start; gap: 8px; margin-top: 2px; }
   .reset-btn { width: 14px; height: 14px; border-radius: 50%; background: #0f1f3d; border: 1px solid #1e3a5f; color: #334155; font-size: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.3; margin-top: 3px; }
   .reset-btn.confirm { background: #7f1d1d; border-color: #ef4444; color: #ef4444; opacity: 1; }
@@ -20,6 +22,16 @@
   .filter-row { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
+
+  /* Multi-select bar */
+  .select-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1f3d; border-top: 1px solid #1e3a5f; padding: 12px 16px; z-index: 50; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
+  .select-bar.visible { display: flex; }
+  .select-bar-info { font-size: 13px; color: #94a3b8; }
+  .select-bar-info span { color: #60a5fa; font-weight: 700; }
+  .select-bar-btns { display: flex; gap: 8px; }
+  .sel-copy-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
+  .sel-cancel-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
   .modal.open { display: flex; }
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 20px; width: 90%; max-width: 360px; max-height: 80vh; overflow-y: auto; }
@@ -33,7 +45,10 @@
   .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; }
   .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
   .date-modal-item .dm-info { font-size: 11px; color: #64748b; margin-top: 2px; }
+
   .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; }
+  .card-wrap.selected .card { border-color: #2563eb !important; border-width: 2px !important; }
+  .card-wrap.selected::after { content: '✓'; position: absolute; top: 10px; left: 10px; background: #2563eb; color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; z-index: 10; }
   .swipe-hint { position: absolute; top: 0; bottom: 0; width: 100%; display: flex; align-items: center; border-radius: 12px; pointer-events: none; opacity: 0; transition: opacity 0.1s; }
   .swipe-hint.left-hint { background: #14532d; justify-content: flex-end; padding-right: 24px; color: #34d399; font-size: 13px; font-weight: 700; }
   .swipe-hint.right-hint { background: #3b0a0a; justify-content: flex-start; padding-left: 24px; color: #ef4444; font-size: 13px; font-weight: 700; }
@@ -63,15 +78,18 @@
   .star-btn:hover, .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
   .section-title { font-size: 12px; color: #475569; margin: 12px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
   .loading { text-align: center; padding: 40px; color: #475569; }
-  #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+  #toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div>
-    <h1>🛡️ PCC Tracker</h1>
-    <div class="updated" id="updated">লোড হচ্ছে...</div>
+  <div class="header-left">
+    <div>
+      <h1>🛡️ PCC Tracker</h1>
+      <div class="updated" id="updated">লোড হচ্ছে...</div>
+    </div>
+    <a class="web-btn" href="https://pcc.police.gov.bd/ords/r/pcc/pcc/login_desktop" target="_blank" title="PCC সাইট">🌐</a>
   </div>
   <div class="counts-wrap">
     <button class="reset-btn" id="reset-btn" onclick="resetCounts()">R</button>
@@ -94,6 +112,15 @@
 
 <div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
 <div id="toast"></div>
+
+<!-- Multi-select bar -->
+<div class="select-bar" id="select-bar">
+  <div class="select-bar-info"><span id="sel-count">0</span>টি ফাইল নির্বাচিত</div>
+  <div class="select-bar-btns">
+    <button class="sel-cancel-btn" onclick="clearSelection()">বাতিল</button>
+    <button class="sel-copy-btn" onclick="copySelected()">📋 কপি</button>
+  </div>
+</div>
 
 <div class="modal" id="modal">
   <div class="modal-box">
@@ -134,6 +161,8 @@ let history = JSON.parse(localStorage.getItem('pcc_history') || '{"urgent":[],"i
 let resetConfirm = false, resetTimer = null;
 let modalType = null;
 let activeFilter = 'all';
+let selected = new Set();
+let selectMode = false;
 
 function save() {
   localStorage.setItem('pcc_stars', JSON.stringify(stars));
@@ -145,6 +174,53 @@ function save() {
   localStorage.setItem('pcc_history', JSON.stringify(history));
 }
 
+function toggleSelect(ref) {
+  if (selected.has(ref)) selected.delete(ref);
+  else selected.add(ref);
+  updateSelectBar();
+  const wrap = document.getElementById('wrap-'+ref);
+  if (wrap) wrap.classList.toggle('selected', selected.has(ref));
+}
+
+function updateSelectBar() {
+  const bar = document.getElementById('select-bar');
+  const cnt = document.getElementById('sel-count');
+  if (selected.size > 0) {
+    selectMode = true;
+    bar.classList.add('visible');
+    cnt.textContent = selected.size;
+  } else {
+    selectMode = false;
+    bar.classList.remove('visible');
+  }
+}
+
+function clearSelection() {
+  selected.forEach(ref => {
+    const wrap = document.getElementById('wrap-'+ref);
+    if (wrap) wrap.classList.remove('selected');
+  });
+  selected.clear();
+  selectMode = false;
+  document.getElementById('select-bar').classList.remove('visible');
+}
+
+function copySelected() {
+  const lines = [];
+  allApps.forEach(a => {
+    if (selected.has(a.ref)) lines.push(`${a.name} ${a.ref}`);
+  });
+  const text = lines.join('\n');
+  if (navigator.share) {
+    navigator.share({text});
+  } else {
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('✓ ' + selected.size + 'টি ফাইল কপি হয়েছে'))
+      .catch(() => showToast('✓ কপি হয়েছে'));
+  }
+  clearSelection();
+}
+
 function setFilter(f, btn) {
   activeFilter = f;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -153,13 +229,13 @@ function setFilter(f, btn) {
 }
 
 function matchesFilter(app) {
-  const num = parseInt((app.status || '').split('/')[0]) || 0;
-  const isDraft = (app.status || '').toLowerCase().includes('draft');
-  if (activeFilter === 'all') return true;
-  if (activeFilter === 'draft') return isDraft;
-  if (activeFilter === '1-3') return !isDraft && num >= 1 && num <= 3;
-  if (activeFilter === '4-6') return !isDraft && num >= 4 && num <= 6;
-  if (activeFilter === '7-9') return !isDraft && num >= 7 && num <= 9;
+  const num = parseInt((app.status||'').split('/')[0])||0;
+  const isDraft = (app.status||'').toLowerCase().includes('draft');
+  if (activeFilter==='all') return true;
+  if (activeFilter==='draft') return isDraft;
+  if (activeFilter==='1-3') return !isDraft&&num>=1&&num<=3;
+  if (activeFilter==='4-6') return !isDraft&&num>=4&&num<=6;
+  if (activeFilter==='7-9') return !isDraft&&num>=7&&num<=9;
   return true;
 }
 
@@ -167,71 +243,65 @@ function daysSince(dateStr) {
   try {
     const months = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
     const parts = dateStr.toUpperCase().split('-');
-    if (parts.length !== 3) return null;
-    const d = parseInt(parts[0]), m = months[parts[1]], y = 2000+parseInt(parts[2]);
-    if (isNaN(d)||m===undefined||isNaN(y)) return null;
-    const applyDate = new Date(y,m,d);
-    const today = new Date(); today.setHours(0,0,0,0);
-    const diff = Math.floor((today-applyDate)/86400000);
-    return diff > 0 ? diff : null;
+    if (parts.length!==3) return null;
+    const d=parseInt(parts[0]),m=months[parts[1]],y=2000+parseInt(parts[2]);
+    if(isNaN(d)||m===undefined||isNaN(y)) return null;
+    const applyDate=new Date(y,m,d);
+    const today=new Date(); today.setHours(0,0,0,0);
+    const diff=Math.floor((today-applyDate)/86400000);
+    return diff>0?diff:null;
   } catch { return null; }
 }
 
 function toggleStar(ref) {
-  const prev = stars[ref] || 0;
-  stars[ref] = (prev+1) % 3;
-  const next = stars[ref];
-  const app = allApps.find(a => a.ref===ref);
-  const entry = app ? `${app.name} ${ref}` : ref;
-  if (prev===0&&next===1) { counts.important++; if(!history.important.includes(entry)) history.important.push(entry); }
-  else if (prev===1&&next===2) { counts.important=Math.max(0,counts.important-1); history.important=history.important.filter(e=>e!==entry); counts.urgent++; if(!history.urgent.includes(entry)) history.urgent.push(entry); }
-  else if (prev===2&&next===0) { counts.urgent=Math.max(0,counts.urgent-1); history.urgent=history.urgent.filter(e=>e!==entry); }
+  const prev=stars[ref]||0;
+  stars[ref]=(prev+1)%3;
+  const next=stars[ref];
+  const app=allApps.find(a=>a.ref===ref);
+  const entry=app?`${app.name} ${ref}`:ref;
+  if(prev===0&&next===1){counts.important++;if(!history.important.includes(entry))history.important.push(entry);}
+  else if(prev===1&&next===2){counts.important=Math.max(0,counts.important-1);history.important=history.important.filter(e=>e!==entry);counts.urgent++;if(!history.urgent.includes(entry))history.urgent.push(entry);}
+  else if(prev===2&&next===0){counts.urgent=Math.max(0,counts.urgent-1);history.urgent=history.urgent.filter(e=>e!==entry);}
   save(); render();
 }
 
-function startEditDeu(ref) {
-  editingDeu[ref] = true; render();
-  setTimeout(() => { const i = document.getElementById('deu-input-'+ref); if(i) i.focus(); }, 50);
-}
-
-function updateCode(ref, val) { codes[ref]=val; editingDeu[ref]=false; save(); render(); }
+function startEditDeu(ref) { editingDeu[ref]=true; render(); setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50); }
+function updateCode(ref,val) { codes[ref]=val; editingDeu[ref]=false; save(); render(); }
 
 function toggleNote(ref) {
-  if (showNote[ref] && !notes[ref]) {
-    showNote[ref] = false;
-  } else {
-    showNote[ref] = !showNote[ref];
-  }
+  if(showNote[ref]&&!notes[ref]) showNote[ref]=false;
+  else showNote[ref]=!showNote[ref];
   render();
-  if (showNote[ref]) setTimeout(() => { const i = document.getElementById('note-input-'+ref); if(i) i.focus(); }, 50);
+  if(showNote[ref]) setTimeout(()=>{const i=document.getElementById('note-input-'+ref);if(i)i.focus();},50);
 }
-
-function updateNote(ref, val) { notes[ref]=val; save(); render(); }
+function updateNote(ref,val) { notes[ref]=val; save(); render(); }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.opacity = '1';
-  setTimeout(() => t.style.opacity = '0', 2000);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',2000);
 }
 
-let pressTimer = {};
+let pressTimer={};
 function pressStart(ref) {
-  pressTimer[ref] = setTimeout(() => {
-    const app = allApps.find(a => a.ref===ref);
-    if (!app) return;
-    const text = `${app.name} ${ref}`;
-    if (navigator.share) navigator.share({text});
-    else navigator.clipboard.writeText(text).then(() => showToast('✓ কপি: '+text)).catch(() => showToast('✓ '+text));
-  }, 600);
+  pressTimer[ref]=setTimeout(()=>{
+    if(selectMode) { toggleSelect(ref); return; }
+    // First long press — enter select mode and select this card
+    toggleSelect(ref);
+  },600);
 }
 function pressEnd(ref) { clearTimeout(pressTimer[ref]); }
 
+function handleTap(ref) {
+  if(selectMode) { toggleSelect(ref); }
+}
+
 function openDateModal(dateStr) {
-  const same = allApps.filter(a => a.apply_date === dateStr);
-  document.getElementById('date-modal-title').textContent = '📅 '+dateStr+' — '+same.length+'টি ফাইল';
-  document.getElementById('date-modal-list').innerHTML = same.map(a => {
-    const num = parseInt((a.status||'').split('/')[0])||0;
-    const scls = 's'+Math.min(num,10);
+  const same=allApps.filter(a=>a.apply_date===dateStr);
+  document.getElementById('date-modal-title').textContent='📅 '+dateStr+' — '+same.length+'টি ফাইল';
+  document.getElementById('date-modal-list').innerHTML=same.map(a=>{
+    const num=parseInt((a.status||'').split('/')[0])||0;
+    const scls='s'+Math.min(num,10);
     return `<div class="date-modal-item">
       <div class="dm-name">${a.name}</div>
       <div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${scls}" style="font-size:11px;padding:2px 8px">${a.status}</span></div>
@@ -242,29 +312,27 @@ function openDateModal(dateStr) {
 function closeDateModal() { document.getElementById('date-modal').classList.remove('open'); }
 
 function openModal(type) {
-  modalType = type;
-  document.getElementById('modal-title-text').textContent = type==='urgent'?'🔴 Urgent':'⭐ Important';
-  document.getElementById('modal-count').textContent = counts[type];
-  const list = history[type];
-  document.getElementById('modal-list').innerHTML = list.length
-    ? list.map(e => `<div class="modal-list-item">• ${e}</div>`).join('')
-    : '<div style="color:#475569">কোনো রেকর্ড নেই</div>';
+  modalType=type;
+  document.getElementById('modal-title-text').textContent=type==='urgent'?'🔴 Urgent':'⭐ Important';
+  document.getElementById('modal-count').textContent=counts[type];
+  const list=history[type];
+  document.getElementById('modal-list').innerHTML=list.length?list.map(e=>`<div class="modal-list-item">• ${e}</div>`).join(''):'<div style="color:#475569">কোনো রেকর্ড নেই</div>';
   document.getElementById('modal').classList.add('open');
 }
 function closeModal() { document.getElementById('modal').classList.remove('open'); modalType=null; }
 function adjustCount(delta) {
-  if (!modalType) return;
-  counts[modalType] = Math.max(0, counts[modalType]+delta);
-  document.getElementById('modal-count').textContent = counts[modalType];
-  document.getElementById('cnt-'+modalType).textContent = String(counts[modalType]).padStart(2,'0');
+  if(!modalType) return;
+  counts[modalType]=Math.max(0,counts[modalType]+delta);
+  document.getElementById('modal-count').textContent=counts[modalType];
+  document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');
   save();
 }
 
 function resetCounts() {
-  if (!resetConfirm) {
-    resetConfirm = true;
+  if(!resetConfirm) {
+    resetConfirm=true;
     document.getElementById('reset-btn').classList.add('confirm');
-    resetTimer = setTimeout(() => { resetConfirm=false; document.getElementById('reset-btn').classList.remove('confirm'); }, 3000);
+    resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);
   } else {
     clearTimeout(resetTimer); resetConfirm=false;
     counts={urgent:0,important:0}; history={urgent:[],important:[]};
@@ -273,58 +341,54 @@ function resetCounts() {
 }
 
 function cardHTML(app) {
-  const s = stars[app.ref]||0;
-  const isDelivered = delivered[app.ref]||false;
-  const starIcon = s===2?'🔴':s===1?'⭐':'☆';
-  const cls = isDelivered?'delivered':s===2?'star2':s===1?'star1':'';
-  const num = parseInt((app.status||'').split('/')[0])||0;
-  const scls = 's'+Math.min(num,10);
-  const showPhone = s>0 && app.phone;
-  const hasDeu = !isDelivered && showDeu[app.ref];
-  const deuVal = codes[app.ref]||'';
-  const isEditing = editingDeu[app.ref];
-  const days = (!isDelivered&&s>0) ? daysSince(app.apply_date) : null;
-  const noteVal = notes[app.ref]||'';
-  const isShowNote = showNote[app.ref];
+  const s=stars[app.ref]||0;
+  const isDelivered=delivered[app.ref]||false;
+  const starIcon=s===2?'🔴':s===1?'⭐':'☆';
+  const cls=isDelivered?'delivered':s===2?'star2':s===1?'star1':'';
+  const num=parseInt((app.status||'').split('/')[0])||0;
+  const scls='s'+Math.min(num,10);
+  const showPhone=s>0&&app.phone;
+  const hasDeu=!isDelivered&&showDeu[app.ref];
+  const deuVal=codes[app.ref]||'';
+  const isEditing=editingDeu[app.ref];
+  const days=(!isDelivered&&s>0)?daysSince(app.apply_date):null;
+  const noteVal=notes[app.ref]||'';
+  const isShowNote=showNote[app.ref];
+  const isSelected=selected.has(app.ref);
 
-  let dayClass = 'day-normal';
-  if (days) {
-    if (s===2&&days>=5) dayClass='day-warn-urgent';
-    else if (s===1&&days>=12) dayClass='day-warn-important';
-  }
+  let dayClass='day-normal';
+  if(days){if(s===2&&days>=5)dayClass='day-warn-urgent';else if(s===1&&days>=12)dayClass='day-warn-important';}
 
-  let deuHTML = '';
-  if (hasDeu) {
-    if (isEditing||!deuVal) {
-      deuHTML = `<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;
+  let deuHTML='';
+  if(hasDeu){
+    if(isEditing||!deuVal){
+      deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;
     } else {
-      deuHTML = `<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;
+      deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;
     }
   }
 
-  const noteBtn = (s>0&&!isDelivered)
-    ? `<span class="note-btn" onclick="toggleNote('${app.ref}');event.stopPropagation()">Note</span>`
-    : '';
-
-  let noteHTML = '';
-  if (s>0&&!isDelivered) {
-    if (isShowNote) {
-      noteHTML = `<textarea id="note-input-${app.ref}" class="note-input" rows="2" placeholder="নোট লিখুন..." onblur="updateNote('${app.ref}',this.value)" onclick="event.stopPropagation()">${noteVal}</textarea>`;
-    } else if (noteVal) {
-      noteHTML = `<div class="note-content" onclick="toggleNote('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`;
+  const noteBtn=(s>0&&!isDelivered)?`<span class="note-btn" onclick="toggleNote('${app.ref}');event.stopPropagation()">Note</span>`:'';
+  let noteHTML='';
+  if(s>0&&!isDelivered){
+    if(isShowNote){
+      noteHTML=`<textarea id="note-input-${app.ref}" class="note-input" rows="2" placeholder="নোট লিখুন..." onblur="updateNote('${app.ref}',this.value)" onclick="event.stopPropagation()">${noteVal}</textarea>`;
+    } else if(noteVal){
+      noteHTML=`<div class="note-content" onclick="toggleNote('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`;
     }
   }
 
   return `
-    <div class="card-wrap" id="wrap-${app.ref}">
+    <div class="card-wrap ${isSelected?'selected':''}" id="wrap-${app.ref}">
       <div class="swipe-hint left-hint" id="hint-left-${app.ref}">Delivered</div>
       <div class="swipe-hint right-hint" id="hint-right-${app.ref}">Deu</div>
       <div class="card ${cls}" id="card-${app.ref}" data-ref="${app.ref}"
         ontouchstart="swipeStart(event,'${app.ref}');pressStart('${app.ref}')"
         ontouchmove="swipeMove(event,'${app.ref}');pressEnd('${app.ref}')"
         ontouchend="swipeEnd(event,'${app.ref}');pressEnd('${app.ref}')"
-        ontouchcancel="pressEnd('${app.ref}')">
-        <button class="star-btn" onclick="toggleStar('${app.ref}')">${starIcon}</button>
+        ontouchcancel="pressEnd('${app.ref}')"
+        onclick="handleTap('${app.ref}')">
+        <button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${starIcon}</button>
         <div class="name">${app.name}</div>
         <div class="info">
           📄 ${app.ref} &nbsp;|&nbsp;
@@ -335,16 +399,16 @@ function cardHTML(app) {
           <span class="status ${scls}">${app.status}</span>
           ${deuHTML}
           ${noteBtn}
-          ${showPhone?`<a class="phone-link" href="tel:${app.phone}">📞 ${app.phone}</a>`:''}
+          ${showPhone?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:''}
         </div>
         ${noteHTML}
       </div>
     </div>`;
 }
 
-let touchStartX={}, touchStartY={}, touching={};
-function swipeStart(e,ref) { touchStartX[ref]=e.touches[0].clientX; touchStartY[ref]=e.touches[0].clientY; touching[ref]=true; }
-function swipeMove(e,ref) {
+let touchStartX={},touchStartY={},touching={};
+function swipeStart(e,ref){touchStartX[ref]=e.touches[0].clientX;touchStartY[ref]=e.touches[0].clientY;touching[ref]=true;}
+function swipeMove(e,ref){
   if(!touching[ref]) return;
   const dx=e.touches[0].clientX-touchStartX[ref];
   const dy=e.touches[0].clientY-touchStartY[ref];
@@ -355,10 +419,10 @@ function swipeMove(e,ref) {
   card.style.transition='none'; card.style.transform=`translateX(${dx}px)`;
   const hl=document.getElementById('hint-left-'+ref);
   const hr=document.getElementById('hint-right-'+ref);
-  if(dx<-30&&hl) hl.style.opacity=Math.min(1,Math.abs(dx)/80); else if(hl) hl.style.opacity=0;
-  if(dx>30&&hr) hr.style.opacity=Math.min(1,dx/80); else if(hr) hr.style.opacity=0;
+  if(dx<-30&&hl)hl.style.opacity=Math.min(1,Math.abs(dx)/80);else if(hl)hl.style.opacity=0;
+  if(dx>30&&hr)hr.style.opacity=Math.min(1,dx/80);else if(hr)hr.style.opacity=0;
 }
-function swipeEnd(e,ref) {
+function swipeEnd(e,ref){
   if(!touching[ref]) return;
   touching[ref]=false;
   const dx=e.changedTouches[0].clientX-touchStartX[ref];
@@ -366,61 +430,49 @@ function swipeEnd(e,ref) {
   const hl=document.getElementById('hint-left-'+ref);
   const hr=document.getElementById('hint-right-'+ref);
   if(card){card.style.transition='transform 0.2s ease';card.style.transform='';}
-  if(hl) hl.style.opacity=0;
-  if(hr) hr.style.opacity=0;
-  if(dx<-80) {
-    delivered[ref]=!delivered[ref];
-    if(delivered[ref]) { showDeu[ref]=false; showNote[ref]=false; }
-    save(); render();
-  } else if(dx>80) {
-    if(!delivered[ref]) {
-      showDeu[ref]=!showDeu[ref];
-      if(showDeu[ref]) editingDeu[ref]=true;
-      save(); render();
-      if(showDeu[ref]) setTimeout(()=>{ const i=document.getElementById('deu-input-'+ref); if(i) i.focus(); },50);
-    }
-  }
+  if(hl)hl.style.opacity=0;
+  if(hr)hr.style.opacity=0;
+  if(selectMode) return;
+  if(dx<-80){delivered[ref]=!delivered[ref];if(delivered[ref]){showDeu[ref]=false;showNote[ref]=false;}save();render();}
+  else if(dx>80){if(!delivered[ref]){showDeu[ref]=!showDeu[ref];if(showDeu[ref])editingDeu[ref]=true;save();render();if(showDeu[ref])setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}}
 }
 
-function render() {
-  const q = (document.querySelector('.search-bar').value||'').toLowerCase();
-  let apps = allApps.filter(a => {
-    if (!matchesFilter(a)) return false;
-    if (q && !a.name.toLowerCase().includes(q) && !a.ref.toLowerCase().includes(q)) return false;
+function render(){
+  const q=(document.querySelector('.search-bar').value||'').toLowerCase();
+  let apps=allApps.filter(a=>{
+    if(!matchesFilter(a)) return false;
+    if(q&&!a.name.toLowerCase().includes(q)&&!a.ref.toLowerCase().includes(q)) return false;
     return true;
   });
-
-  const star2 = apps.filter(a => !delivered[a.ref]&&(stars[a.ref]||0)===2);
-  const star1 = apps.filter(a => !delivered[a.ref]&&(stars[a.ref]||0)===1);
-  const normal = apps.filter(a => !delivered[a.ref]&&(stars[a.ref]||0)===0);
-  const done = apps.filter(a => delivered[a.ref]);
-
-  let html = '';
+  const star2=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2);
+  const star1=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1);
+  const normal=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
+  const done=apps.filter(a=>delivered[a.ref]);
+  let html='';
   if(star2.length){html+='<div class="section-title">🔴 জরুরি</div>';star2.forEach(a=>html+=cardHTML(a));}
   if(star1.length){html+='<div class="section-title">⭐ গুরুত্বপূর্ণ</div>';star1.forEach(a=>html+=cardHTML(a));}
   if(normal.length){if(star1.length||star2.length)html+='<div class="section-title">সাধারণ</div>';normal.forEach(a=>html+=cardHTML(a));}
   if(done.length){html+='<div class="section-title">✓ Delivered</div>';done.forEach(a=>html+=cardHTML(a));}
   if(!html) html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
-
-  document.getElementById('list').innerHTML = html;
-  document.getElementById('cnt-urgent').textContent = String(counts.urgent).padStart(2,'0');
-  document.getElementById('cnt-important').textContent = String(counts.important).padStart(2,'0');
+  document.getElementById('list').innerHTML=html;
+  document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
+  document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
 }
 
-async function load() {
-  try {
-    const r = await fetch('data.json?t='+Date.now());
-    const d = await r.json();
-    document.getElementById('updated').textContent = 'আপডেট: '+d.updated;
-    allApps = d.applications;
+async function load(){
+  try{
+    const r=await fetch('data.json?t='+Date.now());
+    const d=await r.json();
+    document.getElementById('updated').textContent='আপডেট: '+d.updated;
+    allApps=d.applications;
     render();
-  } catch(e) {
-    document.getElementById('list').innerHTML = '<div class="loading">❌ লোড হয়নি</div>';
+  }catch(e){
+    document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';
   }
 }
 
 load();
-setInterval(load, 60000);
+setInterval(load,60000);
 </script>
 </body>
 </html>

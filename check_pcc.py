@@ -213,7 +213,7 @@ async def main():
                 save_rss(changes)
                 for c in changes:
                     send_telegram(
-                        f"<b>স্ট্যাটাস আপডেট:</b>\n\n"
+                        f"<b>স্ট্যাটাস:</b>\n\n"
                         f"<b>{c['name']}</b>\n"
                         f"📄 Ref: {c['ref']}\n"
                         f"📅 তারিখ: {c['date']}\n"

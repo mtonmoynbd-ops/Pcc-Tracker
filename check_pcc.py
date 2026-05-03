@@ -155,7 +155,7 @@ async def main():
                 status = app["status"]
                 new_statuses[ref] = status
                 num = int(status.split('/')[0]) if '/' in status else 0
-                if num == 4 and ref not in new_print_dates:
+                if num == 5 and ref not in new_print_dates:
                     new_print_dates[ref] = today_str
                     print(f"Print date recorded: {ref} → {today_str}")
                 if old_statuses.get(ref) and old_statuses.get(ref) != status:

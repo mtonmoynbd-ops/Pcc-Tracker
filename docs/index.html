@@ -9,20 +9,21 @@
   body { background: #0a1628; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 16px; overflow-x: hidden; }
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .header-left { display: flex; align-items: center; gap: 8px; }
-  .shield-btn { background: none; border: none; cursor: pointer; font-size: 22px; line-height: 1; padding: 0; }
-  h1 { font-size: 18px; color: #60a5fa; }
-  .web-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; cursor: pointer; text-decoration: none; }
-  .counts-wrap { display: flex; align-items: flex-start; gap: 8px; }
-  .reset-btn { width: 14px; height: 14px; border-radius: 50%; background: #0f1f3d; border: 1px solid #1e3a5f; color: #334155; font-size: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.3; margin-top: 2px; }
+  .shield-btn { background: none; border: none; cursor: pointer; font-size: 24px; line-height: 1; padding: 0; flex-shrink: 0; }
+  .title-block { display: flex; flex-direction: column; justify-content: center; }
+  h1 { font-size: 18px; color: #60a5fa; line-height: 1.2; }
+  .updated { font-size: 11px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+  .backup-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #475569; margin-left: 3px; vertical-align: middle; }
+  .backup-dot.ok { background: #34d399; }
+  .backup-dot.err { background: #ef4444; }
+  .web-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; text-decoration: none; }
+  .counts-wrap { display: flex; align-items: flex-start; gap: 6px; flex-shrink: 0; }
+  .reset-btn { width: 14px; height: 14px; border-radius: 50%; background: #0f1f3d; border: 1px solid #1e3a5f; color: #334155; font-size: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.3; margin-top: 2px; }
   .reset-btn.confirm { background: #7f1d1d; border-color: #ef4444; color: #ef4444; opacity: 1; }
   .counts { text-align: right; font-size: 11px; line-height: 1.7; }
   .counts .urgent { color: #ef4444; font-weight: 700; cursor: pointer; white-space: nowrap; }
   .counts .important { color: #f59e0b; font-weight: 700; cursor: pointer; white-space: nowrap; }
-  .updated { font-size: 11px; color: #475569; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .backup-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #475569; margin-left: 3px; vertical-align: middle; }
-  .backup-dot.ok { background: #34d399; }
-  .backup-dot.err { background: #ef4444; }
-  .search-bar { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; width: 100%; outline: none; margin-bottom: 8px; }
+  .search-bar { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; width: 100%; outline: none; margin-bottom: 8px; margin-top: 8px; }
   .filter-row { display: flex; gap: 6px; margin-bottom: 6px; overflow-x: auto; padding-bottom: 2px; align-items: center; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
@@ -40,7 +41,6 @@
   .cal-day { padding: 4px 2px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #94a3b8; position: relative; border: 1px solid transparent; min-height: 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .cal-day.has-file { color: #e2e8f0; font-weight: 700; background: #1e3a5f; border-color: #2563eb; cursor: pointer; }
   .cal-day.today { background: #1d4ed8; color: #fff; font-weight: 700; }
-  .cal-day.empty { color: #2d3f55; }
   .cal-dots { display: flex; gap: 2px; justify-content: center; margin-top: 2px; }
   .cal-dot { width: 4px; height: 4px; background: #60a5fa; border-radius: 50%; }
   .cal-dot.today-dot { background: #fff; }
@@ -68,32 +68,35 @@
   .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
   .date-modal-item .dm-info { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-  /* Police Modal */
-  .police-modal-section { margin-bottom: 14px; }
-  .police-modal-label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-  .police-add-row { display: flex; gap: 8px; margin-bottom: 10px; }
-  .police-add-input { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 7px 12px; color: #e2e8f0; font-size: 13px; outline: none; }
-  .police-add-btn { background: #7c3aed; border: none; color: #fff; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
-  .police-name-list { display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto; margin-bottom: 14px; }
-  .police-name-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; border-radius: 8px; padding: 8px 12px; }
-  .police-name-row span { font-size: 13px; color: #c4b5fd; }
-  .police-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px; line-height: 1; }
-  .police-filter-list { display: flex; flex-wrap: wrap; gap: 6px; }
-  .police-filter-pill { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #7c3aed; background: #1e1a3a; color: #c4b5fd; cursor: pointer; }
+  /* Police filter modal */
+  .police-filter-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .police-filter-pill { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #7c3aed; background: #1e1a3a; color: #c4b5fd; cursor: pointer; }
   .police-filter-pill.active { background: #4c1d95; color: #ede9fe; }
   .police-filter-all { border-color: #334155; background: #1e293b; color: #94a3b8; }
   .police-filter-all.active { background: #1e3a5f; color: #60a5fa; border-color: #2563eb; }
 
+  /* Client name management modal */
+  .client-add-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .client-add-input { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; }
+  .client-add-btn { background: #7c3aed; border: none; color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .client-name-list { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; }
+  .client-name-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; border-radius: 8px; padding: 10px 14px; }
+  .client-name-row span { font-size: 13px; color: #c4b5fd; }
+  .client-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 18px; line-height: 1; }
+
   /* Card pick modal */
-  .pick-list { display: flex; flex-direction: column; gap: 6px; }
-  .pick-item { background: #1e293b; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #c4b5fd; cursor: pointer; border: 1px solid #334155; }
-  .pick-item:hover { background: #2d1f5e; border-color: #7c3aed; }
-  .pick-none { color: #475569; font-size: 12px; text-align: center; padding: 8px; }
+  .pick-item { background: #1e293b; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #c4b5fd; cursor: pointer; border: 1px solid #334155; margin-bottom: 6px; }
+  .pick-item.active-pick { background: #2d1f5e; border-color: #7c3aed; }
+  .pick-none { color: #475569; font-size: 12px; text-align: center; padding: 12px; }
 
   /* Settings */
   .settings-info { font-size: 11px; color: #475569; margin-bottom: 12px; line-height: 1.6; }
   .settings-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; margin-bottom: 10px; }
   .settings-save-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+
+  /* Bottom client button */
+  .client-name-bottom-btn { width: 100%; margin-top: 20px; margin-bottom: 20px; padding: 12px; background: #0f1f3d; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .client-name-bottom-btn:hover { border-color: #a78bfa; color: #c4b5fd; }
 
   /* Cards */
   .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; }
@@ -108,13 +111,14 @@
   .card.star2 { border-color: #ef4444; border-width: 2px; }
   .card.delivered { opacity: 0.4; border-color: #334155; }
   .name { font-weight: 700; font-size: 15px; color: #f1f5f9; margin-bottom: 6px; padding-right: 40px; }
-  .info { font-size: 12px; color: #94a3b8; margin-bottom: 2px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
-  .cal-icon { display: inline-block; vertical-align: middle; }
-  .print-link { color: #a78bfa; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; font-size: 11px; }
-  .day-normal { color: #60a5fa; font-size: 11px; font-weight: 600; }
-  .day-warn-urgent { color: #ef4444; font-size: 11px; font-weight: 800; }
-  .day-warn-important { color: #f97316; font-size: 11px; font-weight: 800; }
-  .date-link { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; color: #94a3b8; }
+  .info { font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; padding-right: 36px; gap: 4px; }
+  .info-left { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; overflow: hidden; }
+  .cal-icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+  .day-normal { color: #60a5fa; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .day-warn-urgent { color: #ef4444; font-size: 12px; font-weight: 800; white-space: nowrap; }
+  .day-warn-important { color: #f97316; font-size: 12px; font-weight: 800; white-space: nowrap; }
+  .date-link { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; color: #94a3b8; white-space: nowrap; font-size: 12px; }
+  .print-link { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; color: #94a3b8; white-space: nowrap; font-size: 12px; flex-shrink: 0; }
   .bottom-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
   .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
   .s1,.s2 { background: #1e3a5f; color: #60a5fa; }
@@ -149,11 +153,11 @@
 <div class="header">
   <div class="header-left">
     <button class="shield-btn" onclick="openSettings()" title="Settings">🛡️</button>
-    <div>
+    <div class="title-block">
       <h1>PCC Tracker</h1>
       <div class="updated" id="updated">লোড হচ্ছে...<span class="backup-dot" id="backup-dot"></span></div>
     </div>
-    <a class="web-btn" href="https://pcc.police.gov.bd/ords/r/pcc/pcc/login_desktop" target="_blank" rel="external noopener" title="PCC সাইট">🌐</a>
+    <a class="web-btn" href="https://pcc.police.gov.bd/ords/r/pcc/pcc/login_desktop" target="_blank" rel="external noopener">🌐</a>
   </div>
   <div class="counts-wrap">
     <button class="reset-btn" id="reset-btn" onclick="resetCounts()">R</button>
@@ -172,7 +176,7 @@
   <button class="filter-btn" onclick="setFilter('4-6',this)">4-6</button>
   <button class="filter-btn" onclick="setFilter('7-9',this)">7-9</button>
   <button class="filter-btn" onclick="setFilter('draft',this)">Draft</button>
-  <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceModal()" title="পুলিশ ফিল্টার">
+  <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()" title="Client Filter">
     <span style="font-size:13px">🏷️</span>
   </button>
   <button class="icon-filter-btn" onclick="toggleCal()" title="ক্যালেন্ডার">
@@ -193,6 +197,12 @@
 </div>
 
 <div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
+
+<!-- Client Name Bottom Button -->
+<button class="client-name-bottom-btn" onclick="openClientModal()">
+  <span>🏷️</span> <span>Client's Name</span>
+</button>
+
 <div id="toast"></div>
 
 <div class="select-bar" id="select-bar">
@@ -224,30 +234,31 @@
   </div>
 </div>
 
-<!-- Police Modal -->
-<div class="modal" id="police-modal">
+<!-- Police Filter Modal -->
+<div class="modal" id="police-filter-modal">
   <div class="modal-box">
-    <div class="modal-title">🏷️ পুলিশ ট্যাগ<button class="modal-close" onclick="closePoliceModal()">✕</button></div>
-    <div class="police-modal-section">
-      <div class="police-modal-label">নাম যোগ করুন</div>
-      <div class="police-add-row">
-        <input class="police-add-input" id="police-add-input" type="text" placeholder="পুলিশের নাম লিখুন..." onkeydown="if(event.key==='Enter')addPoliceName()">
-        <button class="police-add-btn" onclick="addPoliceName()">+ যোগ</button>
-      </div>
-      <div class="police-name-list" id="police-name-list"></div>
-    </div>
-    <div class="police-modal-section">
-      <div class="police-modal-label">ফিল্টার করুন</div>
-      <div class="police-filter-list" id="police-filter-list"></div>
-    </div>
+    <div class="modal-title">🏷️ Client Filter<button class="modal-close" onclick="closePoliceFilterModal()">✕</button></div>
+    <div class="police-filter-list" id="police-filter-list"></div>
   </div>
 </div>
 
-<!-- Card Police Pick Modal -->
+<!-- Client Name Management Modal -->
+<div class="modal" id="client-modal">
+  <div class="modal-box">
+    <div class="modal-title">🏷️ Client's Name<button class="modal-close" onclick="closeClientModal()">✕</button></div>
+    <div class="client-add-row">
+      <input class="client-add-input" id="client-add-input" type="text" placeholder="নাম লিখুন..." onkeydown="if(event.key==='Enter')addClientName()">
+      <button class="client-add-btn" onclick="addClientName()">+ যোগ</button>
+    </div>
+    <div class="client-name-list" id="client-name-list"></div>
+  </div>
+</div>
+
+<!-- Card Pick Modal -->
 <div class="modal" id="pick-modal">
   <div class="modal-box">
-    <div class="modal-title"><span id="pick-modal-title">ট্যাগ সিলেক্ট করুন</span><button class="modal-close" onclick="closePickModal()">✕</button></div>
-    <div class="pick-list" id="pick-list"></div>
+    <div class="modal-title">🏷️ Client সিলেক্ট করুন<button class="modal-close" onclick="closePickModal()">✕</button></div>
+    <div id="pick-list"></div>
   </div>
 </div>
 
@@ -268,7 +279,7 @@
 
 <script>
 const calSVG = `<svg class="cal-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
-const printSVG = `<svg style="display:inline;vertical-align:middle" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
+const printSVG = `<svg class="cal-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
 
 const REPO_API = 'https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/contents/docs/userdata.json';
 
@@ -280,7 +291,7 @@ let showDeu = JSON.parse(localStorage.getItem('pcc_showdeu')||'{}');
 let notes = JSON.parse(localStorage.getItem('pcc_notes')||'{}');
 let blinkStopped = JSON.parse(localStorage.getItem('pcc_blink_stopped')||'{}');
 let policeTags = JSON.parse(localStorage.getItem('pcc_police')||'{}');
-let policeNames = JSON.parse(localStorage.getItem('pcc_police_names')||'[]');
+let clientNames = JSON.parse(localStorage.getItem('pcc_client_names')||'[]');
 let counts = JSON.parse(localStorage.getItem('pcc_counts')||'{"urgent":0,"important":0}');
 let history = JSON.parse(localStorage.getItem('pcc_history')||'{"urgent":[],"important":[]}');
 let showNote={}, editingDeu={};
@@ -290,7 +301,7 @@ let selected=new Set(), selectMode=false;
 let calDate=new Date(), backupTimer=null;
 let pickRef=null;
 
-function save() {
+function save(){
   localStorage.setItem('pcc_stars',JSON.stringify(stars));
   localStorage.setItem('pcc_delivered',JSON.stringify(delivered));
   localStorage.setItem('pcc_codes',JSON.stringify(codes));
@@ -298,7 +309,7 @@ function save() {
   localStorage.setItem('pcc_notes',JSON.stringify(notes));
   localStorage.setItem('pcc_blink_stopped',JSON.stringify(blinkStopped));
   localStorage.setItem('pcc_police',JSON.stringify(policeTags));
-  localStorage.setItem('pcc_police_names',JSON.stringify(policeNames));
+  localStorage.setItem('pcc_client_names',JSON.stringify(clientNames));
   localStorage.setItem('pcc_counts',JSON.stringify(counts));
   localStorage.setItem('pcc_history',JSON.stringify(history));
   scheduleBackup();
@@ -309,115 +320,98 @@ function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=s
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat'); if(!pat) return;
   setBkDot('...');
-  try {
-    const userData={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,policeNames,counts,history};
+  try{
+    const userData={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history};
     const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
-    let sha=null, existing={};
+    let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
     const merged={...userData};
-    if(existing.print_dates) merged.print_dates=existing.print_dates;
-    if(existing.script_updated) merged.script_updated=existing.script_updated;
+    if(existing.print_dates)merged.print_dates=existing.print_dates;
+    if(existing.script_updated)merged.script_updated=existing.script_updated;
     const content=btoa(unescape(encodeURIComponent(JSON.stringify(merged))));
     const putR=await fetch(REPO_API,{method:'PUT',headers:{'Authorization':`token ${pat}`,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify({message:'Auto-backup',content,...(sha?{sha}:{})})});
     setBkDot(putR.ok?'ok':'err');
-  } catch(e){setBkDot('err');}
+  }catch(e){setBkDot('err');}
 }
 function setBkDot(s){const el=document.getElementById('backup-dot');if(!el)return;el.className='backup-dot'+(s==='ok'?' ok':s==='err'?' err':'');}
 async function restoreFromBackup(){
   if(localStorage.getItem('pcc_stars')!==null) return;
-  try {
-    const r=await fetch('userdata.json?t='+Date.now()); if(!r.ok) return;
+  try{
+    const r=await fetch('userdata.json?t='+Date.now());if(!r.ok)return;
     const d=await r.json();
-    if(d.stars) stars=d.stars;
-    if(d.delivered) delivered=d.delivered;
-    if(d.codes) codes=d.codes;
-    if(d.showDeu) showDeu=d.showDeu;
-    if(d.notes) notes=d.notes;
-    if(d.blinkStopped) blinkStopped=d.blinkStopped;
-    if(d.policeTags) policeTags=d.policeTags;
-    if(d.policeNames) policeNames=d.policeNames;
-    if(d.counts) counts=d.counts;
-    if(d.history) history=d.history;
-    save(); showToast('✅ ডেটা পুনরুদ্ধার হয়েছে');
-  } catch(e){}
+    if(d.stars)stars=d.stars;if(d.delivered)delivered=d.delivered;if(d.codes)codes=d.codes;
+    if(d.showDeu)showDeu=d.showDeu;if(d.notes)notes=d.notes;if(d.blinkStopped)blinkStopped=d.blinkStopped;
+    if(d.policeTags)policeTags=d.policeTags;if(d.clientNames)clientNames=d.clientNames;
+    if(d.counts)counts=d.counts;if(d.history)history=d.history;
+    save();showToast('✅ ডেটা পুনরুদ্ধার হয়েছে');
+  }catch(e){}
 }
 
 // ── Settings ──────────────────────────────────────────────
-function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-modal').classList.add('open');}
+function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-status').textContent='';document.getElementById('settings-modal').classList.add('open');}
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 async function savePAT(){
   const pat=document.getElementById('pat-input').value.trim();
-  if(pat) localStorage.setItem('pcc_pat',pat); else localStorage.removeItem('pcc_pat');
+  if(pat)localStorage.setItem('pcc_pat',pat);else localStorage.removeItem('pcc_pat');
   document.getElementById('settings-status').textContent='Backup চলছে...';
   await doBackup();
-  document.getElementById('settings-status').textContent=pat?'✅ সংরক্ষিত':'PAT মুছে ফেলা হয়েছে';
+  document.getElementById('settings-status').textContent=pat?'✅ Backup সম্পন্ন':'PAT মুছে ফেলা হয়েছে';
 }
 
-// ── Police Modal ──────────────────────────────────────────
-function openPoliceModal(){
-  renderPoliceModal();
-  document.getElementById('police-modal').classList.add('open');
+// ── Police Filter Modal ───────────────────────────────────
+function openPoliceFilterModal(){
+  const list=document.getElementById('police-filter-list');
+  let html=`<span class="police-filter-pill police-filter-all ${!activePoliceFilter?'active':''}" onclick="setPoliceFilter(null)">সব</span>`;
+  clientNames.forEach(n=>{html+=`<span class="police-filter-pill ${activePoliceFilter===n?'active':''}" onclick="setPoliceFilter('${n}')">${n}</span>`;});
+  if(!clientNames.length)html+='<div style="color:#475569;font-size:12px;margin-top:8px">নিচের Client\'s Name বাটনে নাম যোগ করুন</div>';
+  list.innerHTML=html;
+  document.getElementById('police-filter-modal').classList.add('open');
 }
-function closePoliceModal(){document.getElementById('police-modal').classList.remove('open');}
-
-function renderPoliceModal(){
-  // Name list
-  const nameList=document.getElementById('police-name-list');
-  if(!policeNames.length){nameList.innerHTML='<div style="font-size:11px;color:#475569;padding:6px">কোনো নাম নেই</div>';}
-  else{nameList.innerHTML=policeNames.map(n=>`<div class="police-name-row"><span>${n}</span><button class="police-del-btn" onclick="deletePoliceName('${n}')">×</button></div>`).join('');}
-
-  // Filter pills
-  const filterList=document.getElementById('police-filter-list');
-  let pillsHTML=`<span class="police-filter-pill police-filter-all ${!activePoliceFilter?'active':''}" onclick="setPoliceFilter(null)">সব</span>`;
-  policeNames.forEach(n=>{pillsHTML+=`<span class="police-filter-pill ${activePoliceFilter===n?'active':''}" onclick="setPoliceFilter('${n}')">${n}</span>`;});
-  filterList.innerHTML=pillsHTML;
-
-  // Update button style
-  document.getElementById('police-filter-btn').classList.toggle('active', !!activePoliceFilter);
-}
-
-function addPoliceName(){
-  const inp=document.getElementById('police-add-input');
-  const name=inp.value.trim();
-  if(!name||policeNames.includes(name)) return;
-  policeNames.push(name);
-  inp.value='';
-  save(); renderPoliceModal();
-}
-
-function deletePoliceName(name){
-  policeNames=policeNames.filter(n=>n!==name);
-  // remove tag from cards
-  Object.keys(policeTags).forEach(ref=>{if(policeTags[ref]===name) delete policeTags[ref];});
-  if(activePoliceFilter===name) activePoliceFilter=null;
-  save(); renderPoliceModal(); render();
-}
-
+function closePoliceFilterModal(){document.getElementById('police-filter-modal').classList.remove('open');}
 function setPoliceFilter(name){
   activePoliceFilter=name;
-  renderPoliceModal();
+  document.getElementById('police-filter-btn').classList.toggle('active',!!name);
+  closePoliceFilterModal();
   render();
 }
 
-// ── Card police pick ───────────────────────────────────────
+// ── Client Management Modal ───────────────────────────────
+function openClientModal(){renderClientModal();document.getElementById('client-modal').classList.add('open');}
+function closeClientModal(){document.getElementById('client-modal').classList.remove('open');}
+function renderClientModal(){
+  const list=document.getElementById('client-name-list');
+  if(!clientNames.length){list.innerHTML='<div style="font-size:12px;color:#475569;text-align:center;padding:12px">কোনো নাম নেই। উপরে লিখে যোগ করুন।</div>';return;}
+  list.innerHTML=clientNames.map(n=>`<div class="client-name-row"><span>${n}</span><button class="client-del-btn" onclick="deleteClientName('${n}')">×</button></div>`).join('');
+}
+function addClientName(){
+  const inp=document.getElementById('client-add-input');
+  const name=inp.value.trim();
+  if(!name||clientNames.includes(name))return;
+  clientNames.push(name);inp.value='';
+  save();renderClientModal();
+}
+function deleteClientName(name){
+  clientNames=clientNames.filter(n=>n!==name);
+  Object.keys(policeTags).forEach(ref=>{if(policeTags[ref]===name)delete policeTags[ref];});
+  if(activePoliceFilter===name){activePoliceFilter=null;document.getElementById('police-filter-btn').classList.remove('active');}
+  save();renderClientModal();render();
+}
+
+// ── Card Pick Modal ───────────────────────────────────────
 function openPickModal(ref){
   pickRef=ref;
-  document.getElementById('pick-modal-title').textContent='🏷️ ট্যাগ সিলেক্ট করুন';
   const list=document.getElementById('pick-list');
-  if(!policeNames.length){list.innerHTML='<div class="pick-none">প্রথমে 🏷️ বাটনে ক্লিক করে নাম যোগ করুন</div>';document.getElementById('pick-modal').classList.add('open');return;}
-  let html='<div class="pick-item" style="color:#475569;border-color:#1e293b" onclick="assignPoliceTag(null)">— ট্যাগ সরান</div>';
-  policeNames.forEach(n=>{
-    const active=policeTags[ref]===n;
-    html+=`<div class="pick-item" style="${active?'background:#2d1f5e;border-color:#7c3aed':''}" onclick="assignPoliceTag('${n}')">${active?'✓ ':''} ${n}</div>`;
-  });
+  if(!clientNames.length){list.innerHTML='<div class="pick-none">নিচের Client\'s Name বাটনে নাম যোগ করুন</div>';document.getElementById('pick-modal').classList.add('open');return;}
+  let html=`<div class="pick-item" style="color:#475569;border-color:#1e293b" onclick="assignPoliceTag(null)">— ট্যাগ সরান</div>`;
+  clientNames.forEach(n=>{const active=policeTags[ref]===n;html+=`<div class="pick-item ${active?'active-pick':''}" onclick="assignPoliceTag('${n}')">${active?'✓ ':''}${n}</div>`;});
   list.innerHTML=html;
   document.getElementById('pick-modal').classList.add('open');
 }
 function closePickModal(){document.getElementById('pick-modal').classList.remove('open');pickRef=null;}
 function assignPoliceTag(name){
-  if(!pickRef) return;
-  if(name) policeTags[pickRef]=name; else delete policeTags[pickRef];
-  save(); closePickModal(); render();
+  if(!pickRef)return;
+  if(name)policeTags[pickRef]=name;else delete policeTags[pickRef];
+  save();closePickModal();render();
 }
 
 // ── Calendar ──────────────────────────────────────────────
@@ -429,21 +423,21 @@ function renderCal(){
   const y=calDate.getFullYear(),m=calDate.getMonth();
   document.getElementById('cal-title').textContent=mn[m]+' '+y;
   const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
-  const today=new Date(); today.setHours(0,0,0,0);
+  const today=new Date();today.setHours(0,0,0,0);
   const dc={};
   allApps.forEach(a=>{
-    if(!a.apply_date) return;
+    if(!a.apply_date)return;
     const p=a.apply_date.toUpperCase().split('-');
     const ms={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
     if(p.length===3){const dd=parseInt(p[0]),mo=ms[p[1]],yr=2000+parseInt(p[2]);if(mo===m&&yr===y)dc[dd]=(dc[dd]||0)+1;}
   });
   let html='';
-  for(let i=0;i<fd;i++) html+='<div class="cal-day"></div>';
+  for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';
   for(let d=1;d<=dim;d++){
     const isT=new Date(y,m,d).getTime()===today.getTime();
     const cnt=dc[d]||0,hasF=cnt>0;
     const ds=String(d).padStart(2,'0')+'-'+sm[m]+'-'+String(y).slice(2);
-    let cls='cal-day'+(isT?' today':hasF?' has-file':' empty');
+    let cls='cal-day'+(isT?' today':hasF?' has-file':'');
     let dots='';
     if(hasF){const n=Math.min(cnt,3),dc2=isT?'cal-dot today-dot':'cal-dot';for(let x=0;x<n;x++)dots+=`<span class="${dc2}"></span>`;if(cnt>3)dots+=`<span style="font-size:8px;color:${isT?'#fff':'#60a5fa'}">+</span>`;dots=`<div class="cal-dots">${dots}</div>`;}
     html+=`<div class="${cls}" ${hasF?`onclick="calDayClick('${ds}')"`:''}>${d}${dots}</div>`;
@@ -463,7 +457,7 @@ function copySelected(){
   const text=lines.join('\n');
   if(navigator.share)navigator.share({text});
   else navigator.clipboard.writeText(text).then(()=>showToast('✓ '+selected.size+'টি কপি')).catch(()=>showToast('✓ কপি হয়েছে'));
-  clearSelection(); render();
+  clearSelection();render();
 }
 
 // ── Filter ────────────────────────────────────────────────
@@ -471,12 +465,12 @@ function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.filter-btn'
 function matchesFilter(app){
   const num=parseInt((app.status||'').split('/')[0])||0;
   const isDraft=(app.status||'').toLowerCase().includes('draft');
-  if(activePoliceFilter&&policeTags[app.ref]!==activePoliceFilter) return false;
-  if(activeFilter==='all') return true;
-  if(activeFilter==='draft') return isDraft;
-  if(activeFilter==='1-3') return !isDraft&&num>=1&&num<=3;
-  if(activeFilter==='4-6') return !isDraft&&num>=4&&num<=6;
-  if(activeFilter==='7-9') return !isDraft&&num>=7&&num<=9;
+  if(activePoliceFilter&&policeTags[app.ref]!==activePoliceFilter)return false;
+  if(activeFilter==='all')return true;
+  if(activeFilter==='draft')return isDraft;
+  if(activeFilter==='1-3')return !isDraft&&num>=1&&num<=3;
+  if(activeFilter==='4-6')return !isDraft&&num>=4&&num<=6;
+  if(activeFilter==='7-9')return !isDraft&&num>=7&&num<=9;
   return true;
 }
 
@@ -503,7 +497,8 @@ function updateNote(ref,val){notes[ref]=val;save();render();}
 // ── Modals ────────────────────────────────────────────────
 function openDateModal(dateStr,prefix,sourceField){
   const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>printDates[a.ref]===dateStr);
-  document.getElementById('date-modal-title').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
+  const title=sourceField==='apply_date'?`📅 ${dateStr} — ${same.length}টি ফাইল`:`🖨️ Certificate Print Date: ${dateStr}`;
+  document.getElementById('date-modal-title').textContent=title;
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{const n=parseInt((a.status||'').split('/')[0])||0;const sc='s'+Math.min(n,10);return `<div class="date-modal-item"><div class="dm-name">${a.name}</div><div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px">${a.status}</span></div></div>`;}).join('');
   document.getElementById('date-modal').classList.add('open');
 }
@@ -536,22 +531,23 @@ function cardHTML(app){
   let dayClass='day-normal';
   if(days){if(s===2&&days>=5)dayClass='day-warn-urgent';else if(s===1&&days>=12)dayClass='day-warn-important';}
 
-  const printHTML=(printDate&&s>0&&!isDelivered)?`<span class="print-link" onclick="openDateModal('${printDate}','🖨️','print_date');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
-
   let deuHTML='';
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">"`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
 
   const noteBtn=(s>0&&!isDelivered)?`<span class="note-btn" onclick="toggleNote('${app.ref}');event.stopPropagation()">Note</span>`:'';
 
-  // Police tag — only for normal cards
   let policeHTML='';
   if(s===0&&!isDelivered){
     if(policeTag){policeHTML=`<span class="police-tag-badge" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`;}
-    else{policeHTML=`<span class="police-tag-btn" onclick="openPickModal('${app.ref}');event.stopPropagation()" title="ট্যাগ করুন">🏷️</span>`;}
+    else{policeHTML=`<span class="police-tag-btn" onclick="openPickModal('${app.ref}');event.stopPropagation()" title="Client ট্যাগ করুন">🏷️</span>`;}
   }
 
   let noteHTML='';
   if(s>0&&!isDelivered){if(isShowNote){noteHTML=`<textarea id="note-input-${app.ref}" class="note-input" rows="2" placeholder="নোট লিখুন..." onblur="updateNote('${app.ref}',this.value)" onclick="event.stopPropagation()">${noteVal}</textarea>`;}else if(noteVal){noteHTML=`<div class="note-content" onclick="toggleNote('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`;}}
+
+  // Info line — left side: ref+date+day, right side: print date
+  const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
+  const printSpan=(printDate&&s>0&&!isDelivered)?`<span class="print-link" onclick="openDateModal('${printDate}','🖨️','print_date');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
 
   return `
     <div class="card-wrap ${isSelected?'selected':''}" id="wrap-${app.ref}">
@@ -567,10 +563,8 @@ function cardHTML(app){
         <button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${starIcon}</button>
         <div class="name">${app.name}</div>
         <div class="info">
-          📄 ${app.ref} &nbsp;|&nbsp;
-          <span class="date-link" onclick="openDateModal('${app.apply_date}','📅','apply_date');event.stopPropagation()">${calSVG} ${app.apply_date}</span>
-          ${days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:''}
-          ${printHTML}
+          <span class="info-left">📄 ${app.ref} &nbsp;|&nbsp; <span class="date-link" onclick="openDateModal('${app.apply_date}','📅','apply_date');event.stopPropagation()">${calSVG} ${app.apply_date}</span> ${daySpan}</span>
+          ${printSpan}
         </div>
         <div class="bottom-row">
           <span class="status ${scls}${shouldBlink?' status-blink':''}">${app.status}</span>

@@ -30,8 +30,6 @@
   .icon-filter-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #2563eb; background: #1e3a5f; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; }
   .icon-filter-btn.police { border-color: #a78bfa; background: #1e1a3a; margin-left: auto; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
-
-  /* Calendar */
   .cal-box { display: none; background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
   .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .cal-nav { background: #1e293b; border: 1px solid #334155; color: #94a3b8; border-radius: 6px; padding: 2px 10px; cursor: pointer; font-size: 14px; }
@@ -44,8 +42,6 @@
   .cal-dots { display: flex; gap: 2px; justify-content: center; margin-top: 2px; }
   .cal-dot { width: 4px; height: 4px; background: #60a5fa; border-radius: 50%; }
   .cal-dot.today-dot { background: #fff; }
-
-  /* Modals */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; }
   .modal.open { display: flex; }
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 20px; width: 90%; max-width: 360px; max-height: 82vh; overflow-y: auto; }
@@ -62,8 +58,6 @@
   .timeline-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .timeline-status { font-size: 13px; font-weight: 700; }
   .timeline-date { font-size: 11px; color: #64748b; }
-
-  /* Police */
   .police-filter-list { display: flex; flex-wrap: wrap; gap: 8px; }
   .police-filter-pill { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #7c3aed; background: #1e1a3a; color: #c4b5fd; cursor: pointer; }
   .police-filter-pill.active { background: #4c1d95; color: #ede9fe; }
@@ -78,21 +72,15 @@
   .client-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 18px; }
   .pick-item { background: #1e293b; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #c4b5fd; cursor: pointer; border: 1px solid #334155; margin-bottom: 6px; }
   .pick-item.active-pick { background: #2d1f5e; border-color: #7c3aed; }
-
-  /* Settings */
   .settings-info { font-size: 11px; color: #475569; margin-bottom: 12px; line-height: 1.6; }
   .settings-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; margin-bottom: 10px; }
   .settings-save-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
-
-  /* Select bar */
   .select-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1f3d; border-top: 1px solid #1e3a5f; padding: 12px 16px; z-index: 50; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
   .select-bar.visible { display: flex; }
   .select-bar-info { font-size: 13px; color: #94a3b8; }
   .select-bar-info span { color: #60a5fa; font-weight: 700; }
   .sel-copy-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
   .sel-cancel-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
-
-  /* Bottom button */
   .client-name-bottom-btn { width: 100%; margin-top: 16px; margin-bottom: 20px; padding: 12px; background: #0f1f3d; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
   /* Cards */
@@ -107,43 +95,70 @@
   .card.star1 { border-color: #f59e0b; }
   .card.star2 { border-color: #ef4444; border-width: 2px; }
   .card.delivered { opacity: 0.4; border-color: #334155; }
+  .card-body { padding: 12px 14px; }
 
-  /* Forwarded bar — top */
-  .fwd-bar { width: 100%; height: 6px; background: #1e293b; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; transition: background 0.2s; position: relative; }
-  .fwd-bar.on { background: rgba(234,179,8,0.25); }
-  .fwd-bar-label { font-size: 9px; font-weight: 700; color: #78716c; letter-spacing: 0.5px; text-transform: uppercase; }
-  .fwd-bar.on .fwd-bar-label { color: #ca8a04; }
-  .fwd-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; transition: background 0.2s; }
-  .fwd-bar.on .fwd-dot { background: #eab308; box-shadow: 0 0 4px #eab308; }
+  /* Forwarded bar */
+  .fwd-bar {
+    width: 66%; margin: 0 auto 10px;
+    height: 3px; border-radius: 3px;
+    background: #1e293b;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    overflow: hidden;
+  }
+  .fwd-bar.on {
+    height: 18px;
+    background: rgba(120,53,15,0.45);
+    border-color: rgba(202,138,4,0.35);
+    border-radius: 6px;
+  }
+  .fwd-bar-label { display: none; font-size: 9px; color: #a16207; letter-spacing: 3px; font-weight: 700; text-transform: uppercase; }
+  .fwd-bar.on .fwd-bar-label { display: block; }
 
-  /* Card body */
-  .card-body { padding: 12px 14px 10px; }
+  /* Collected bar */
+  .col-bar {
+    width: 66%; margin: 10px auto 0;
+    height: 3px; border-radius: 3px;
+    background: #1e293b;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    overflow: hidden;
+  }
+  .col-bar.on {
+    height: 18px;
+    background: rgba(20,83,45,0.45);
+    border-color: rgba(34,197,94,0.25);
+    border-radius: 6px;
+  }
+  .col-bar-label { display: none; font-size: 9px; color: #15803d; letter-spacing: 3px; font-weight: 700; text-transform: uppercase; }
+  .col-bar.on .col-bar-label { display: block; }
+
   .name { font-weight: 700; font-size: 15px; color: #f1f5f9; margin-bottom: 5px; padding-right: 36px; cursor: pointer; }
-  .name:hover { color: #93c5fd; }
   .info { font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; gap: 4px; white-space: nowrap; overflow: hidden; }
   .info-left { display: flex; align-items: center; gap: 3px; overflow: hidden; flex-shrink: 1; min-width: 0; }
   .info-right { flex-shrink: 0; }
   .ref-icon { display: inline-block; vertical-align: middle; margin-right: 1px; flex-shrink: 0; }
   .cal-icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
   .date-link { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; color: #94a3b8; font-size: 12px; white-space: nowrap; }
-  .print-link { cursor: pointer; font-size: 12px; color: #94a3b8; white-space: nowrap; padding: 1px 6px; border: 1px solid #b45309; border-radius: 4px; background: rgba(180,83,9,0.1); }
+  .print-link { cursor: pointer; font-size: 12px; color: #94a3b8; white-space: nowrap; padding: 1px 5px; border: 1px solid #92400e; border-radius: 4px; background: rgba(120,53,15,0.15); }
   .day-normal { color: #60a5fa; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
   .day-warn-urgent { color: #ef4444; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
   .day-warn-important { color: #f97316; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
-  .bottom-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .bottom-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
   .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
   .s1,.s2 { background: #1e3a5f; color: #60a5fa; }
   .s3,.s4,.s5 { background: #1e3a5f; color: #f59e0b; }
   .s6,.s7 { background: #1e3a5f; color: #a78bfa; }
   .s8,.s9 { background: #1e3a5f; color: #34d399; }
-
-  /* Blink — only important, more eye-catching */
   @keyframes blink-imp {
-    0%,100% { opacity:1; box-shadow: 0 0 0 rgba(251,191,36,0); }
-    50% { opacity:0.15; box-shadow: 0 0 8px rgba(251,191,36,0.6); }
+    0%,100% { opacity:1; box-shadow:0 0 0 rgba(251,191,36,0); }
+    50% { opacity:0.1; box-shadow:0 0 10px rgba(251,191,36,0.7); }
   }
-  .status-blink { animation: blink-imp 1s ease-in-out infinite; }
-
+  .status-blink { animation: blink-imp 0.9s ease-in-out infinite; }
   .deu-text { color: #ef4444; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #3b0a0a; cursor: pointer; flex-shrink: 0; }
   .deu-input { background: none; border: none; border-bottom: 1px solid #ef4444; color: #ef4444; font-size: 13px; font-weight: 700; width: 60px; outline: none; text-align: center; flex-shrink: 0; }
   .note-btn { color: #64748b; font-size: 11px; cursor: pointer; padding: 2px 8px; border: 1px solid #334155; border-radius: 4px; background: #1e293b; flex-shrink: 0; }
@@ -152,17 +167,8 @@
   .note-content { font-size: 12px; color: #94a3b8; margin-top: 4px; cursor: pointer; }
   .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; resize: none; margin-top: 4px; }
   .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; flex-shrink: 0; }
-  .star-btn { position: absolute; top: 16px; right: 10px; background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.4; line-height: 1; z-index: 2; }
+  .star-btn { position: absolute; top: 20px; right: 10px; background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.4; line-height: 1; z-index: 2; }
   .star-btn:hover, .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
-
-  /* Collected bar — bottom */
-  .col-bar { width: 100%; height: 6px; background: #1e293b; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; transition: background 0.2s; }
-  .col-bar.on { background: rgba(34,197,94,0.2); }
-  .col-bar-label { font-size: 9px; font-weight: 700; color: #78716c; letter-spacing: 0.5px; text-transform: uppercase; }
-  .col-bar.on .col-bar-label { color: #16a34a; }
-  .col-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; transition: background 0.2s; }
-  .col-bar.on .col-dot { background: #22c55e; box-shadow: 0 0 4px #22c55e; }
-
   .section-title { font-size: 12px; color: #475569; margin: 12px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
   .loading { text-align: center; padding: 40px; color: #475569; }
   #toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
@@ -173,12 +179,6 @@
 <svg style="display:none">
   <symbol id="ico-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-  </symbol>
-  <symbol id="ico-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-  </symbol>
-  <symbol id="ico-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
   </symbol>
 </svg>
 
@@ -208,10 +208,10 @@
   <button class="filter-btn" onclick="setFilter('4-6',this)">4-6</button>
   <button class="filter-btn" onclick="setFilter('7-9',this)">7-9</button>
   <button class="filter-btn" onclick="setFilter('draft',this)">Draft</button>
-  <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()" title="Client Filter">
+  <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <span style="font-size:13px">🏷️</span>
   </button>
-  <button class="icon-filter-btn" onclick="toggleCal()" title="ক্যালেন্ডার">
+  <button class="icon-filter-btn" onclick="toggleCal()">
     <svg width="16" height="16"><use href="#ico-cal" stroke="#60a5fa"/></svg>
   </button>
 </div>
@@ -229,9 +229,7 @@
 </div>
 
 <div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
-
 <button class="client-name-bottom-btn" onclick="openClientModal()">🏷️ Client's Name</button>
-
 <div id="toast"></div>
 
 <div class="select-bar" id="select-bar">
@@ -242,7 +240,6 @@
   </div>
 </div>
 
-<!-- Count Modal -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title"><span id="modal-title-text"></span><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -255,7 +252,6 @@
   </div>
 </div>
 
-<!-- Date Modal -->
 <div class="modal" id="date-modal">
   <div class="modal-box">
     <div class="modal-title"><span id="date-modal-title"></span><button class="modal-close" onclick="closeDateModal()">✕</button></div>
@@ -263,7 +259,6 @@
   </div>
 </div>
 
-<!-- Timeline Modal -->
 <div class="modal" id="timeline-modal">
   <div class="modal-box">
     <div class="modal-title"><span id="timeline-modal-title"></span><button class="modal-close" onclick="closeTimelineModal()">✕</button></div>
@@ -271,7 +266,6 @@
   </div>
 </div>
 
-<!-- Police Filter Modal -->
 <div class="modal" id="police-filter-modal">
   <div class="modal-box">
     <div class="modal-title">🏷️ Client Filter<button class="modal-close" onclick="closePoliceFilterModal()">✕</button></div>
@@ -279,7 +273,6 @@
   </div>
 </div>
 
-<!-- Client Management Modal -->
 <div class="modal" id="client-modal">
   <div class="modal-box">
     <div class="modal-title">🏷️ Client's Name<button class="modal-close" onclick="closeClientModal()">✕</button></div>
@@ -291,7 +284,6 @@
   </div>
 </div>
 
-<!-- Pick Modal -->
 <div class="modal" id="pick-modal">
   <div class="modal-box">
     <div class="modal-title">🏷️ Client সিলেক্ট করুন<button class="modal-close" onclick="closePickModal()">✕</button></div>
@@ -299,7 +291,6 @@
   </div>
 </div>
 
-<!-- Settings Modal -->
 <div class="modal" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title">🛡️ Settings<button class="modal-close" onclick="closeSettings()">✕</button></div>
@@ -311,13 +302,13 @@
 </div>
 
 <script>
-const refSVG = `<svg class="ref-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
-const calSVG = `<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
-const printSVG = `<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
+const refSVG=`<svg class="ref-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+const calSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+const printSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
 
-const REPO_API = 'https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/contents/docs/userdata.json';
+const REPO_API='https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/contents/docs/userdata.json';
 
-let allApps=[], printDates={}, statusHistory={};
+let allApps=[],printDates={},statusHistory={};
 let stars=JSON.parse(localStorage.getItem('pcc_stars')||'{}');
 let delivered=JSON.parse(localStorage.getItem('pcc_delivered')||'{}');
 let codes=JSON.parse(localStorage.getItem('pcc_codes')||'{}');
@@ -331,11 +322,11 @@ let history=JSON.parse(localStorage.getItem('pcc_history')||'{"urgent":[],"impor
 let forwarded=JSON.parse(localStorage.getItem('pcc_forwarded')||'{}');
 let collected=JSON.parse(localStorage.getItem('pcc_collected')||'{}');
 let collectedDay=JSON.parse(localStorage.getItem('pcc_collected_day')||'{}');
-let showNote={}, editingDeu={};
-let resetConfirm=false, resetTimer=null;
-let modalType=null, activeFilter='all', activePoliceFilter=null;
-let selected=new Set(), selectMode=false;
-let calDate=new Date(), backupTimer=null, pickRef=null;
+let showNote={},editingDeu={};
+let resetConfirm=false,resetTimer=null;
+let modalType=null,activeFilter='all',activePoliceFilter=null;
+let selected=new Set(),selectMode=false;
+let calDate=new Date(),backupTimer=null,pickRef=null;
 
 function save(){
   localStorage.setItem('pcc_stars',JSON.stringify(stars));
@@ -354,7 +345,6 @@ function save(){
   scheduleBackup();
 }
 
-// ── Backup ────────────────────────────────────────────────
 function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=setTimeout(doBackup,30000);}
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;
@@ -388,7 +378,6 @@ async function restoreFromBackup(){
   }catch(e){}
 }
 
-// ── Settings ──────────────────────────────────────────────
 function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-status').textContent='';document.getElementById('settings-modal').classList.add('open');}
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 async function savePAT(){
@@ -399,7 +388,6 @@ async function savePAT(){
   document.getElementById('settings-status').textContent=pat?'✅ Backup সম্পন্ন':'PAT মুছে ফেলা হয়েছে';
 }
 
-// ── Calendar ──────────────────────────────────────────────
 function toggleCal(){const b=document.getElementById('cal-box');const h=b.style.display==='none'||b.style.display==='';b.style.display=h?'block':'none';if(h)renderCal();}
 function calNav(dir){calDate.setMonth(calDate.getMonth()+dir);renderCal();}
 function renderCal(){
@@ -426,7 +414,6 @@ function renderCal(){
 }
 function calDayClick(ds){const same=allApps.filter(a=>a.apply_date===ds);if(!same.length)return;document.getElementById('cal-box').style.display='none';openDateModal(ds,'📅','apply_date');}
 
-// ── Police ────────────────────────────────────────────────
 function openPoliceFilterModal(){
   const list=document.getElementById('police-filter-list');
   let html=`<span class="police-filter-pill police-filter-all ${!activePoliceFilter?'active':''}" onclick="setPoliceFilter(null)">সব</span>`;
@@ -456,57 +443,34 @@ function openPickModal(ref){
 function closePickModal(){document.getElementById('pick-modal').classList.remove('open');pickRef=null;}
 function assignPoliceTag(name){if(!pickRef)return;if(name)policeTags[pickRef]=name;else delete policeTags[pickRef];save();closePickModal();render();}
 
-// ── Timeline ──────────────────────────────────────────────
 function openTimelineModal(ref){
-  const app=allApps.find(a=>a.ref===ref);
-  if(!app)return;
+  const app=allApps.find(a=>a.ref===ref);if(!app)return;
   document.getElementById('timeline-modal-title').textContent=app.name;
   const hist=statusHistory[ref]||[];
-  const statusColors={
-    's1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b',
-    's6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399','s10':'#34d399'
-  };
+  const clr={'s1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b','s6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399'};
   if(!hist.length){document.getElementById('timeline-list').innerHTML='<div style="color:#475569;font-size:12px;text-align:center;padding:12px">কোনো ইতিহাস নেই</div>';document.getElementById('timeline-modal').classList.add('open');return;}
-  document.getElementById('timeline-list').innerHTML=hist.map((h,i)=>{
+  document.getElementById('timeline-list').innerHTML=hist.map(h=>{
     const num=parseInt((h.status||'').split('/')[0])||0;
     const sc='s'+Math.min(num,10);
-    const color=statusColors[sc]||'#94a3b8';
-    return `<div class="timeline-item">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div>
-        <span class="timeline-status" style="color:${color}">${h.status}</span>
-      </div>
-      <span class="timeline-date">${h.date}</span>
-    </div>`;
+    const color=clr[sc]||'#94a3b8';
+    return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${h.status}</span></div><span class="timeline-date">${h.date}</span></div>`;
   }).join('');
   document.getElementById('timeline-modal').classList.add('open');
 }
 function closeTimelineModal(){document.getElementById('timeline-modal').classList.remove('open');}
 
-// ── Multi-select ──────────────────────────────────────────
-function toggleSelect(ref){
-  if(selected.has(ref))selected.delete(ref);else selected.add(ref);
-  updateSelectBar();
-  const w=document.getElementById('wrap-'+ref);if(w)w.classList.toggle('selected',selected.has(ref));
-}
-function updateSelectBar(){
-  const bar=document.getElementById('select-bar');
-  if(selected.size>0){selectMode=true;bar.classList.add('visible');document.getElementById('sel-count').textContent=selected.size;}
-  else{selectMode=false;bar.classList.remove('visible');}
-}
-function clearSelection(){
-  selected.forEach(r=>{const w=document.getElementById('wrap-'+r);if(w)w.classList.remove('selected');});
-  selected.clear();selectMode=false;document.getElementById('select-bar').classList.remove('visible');
-}
+function toggleSelect(ref){if(selected.has(ref))selected.delete(ref);else selected.add(ref);updateSelectBar();const w=document.getElementById('wrap-'+ref);if(w)w.classList.toggle('selected',selected.has(ref));}
+function updateSelectBar(){const bar=document.getElementById('select-bar');if(selected.size>0){selectMode=true;bar.classList.add('visible');document.getElementById('sel-count').textContent=selected.size;}else{selectMode=false;bar.classList.remove('visible');}}
+function clearSelection(){selected.forEach(r=>{const w=document.getElementById('wrap-'+r);if(w)w.classList.remove('selected');});selected.clear();selectMode=false;document.getElementById('select-bar').classList.remove('visible');}
 function copySelected(){
   const lines=[];
   allApps.forEach(a=>{
     if(selected.has(a.ref)){
       lines.push(`${a.name} ${a.ref}`);
-      const num=parseInt((a.status||'').split('/')[0])||0;
-      if(num===2)blinkStopped[a.ref]=true;
+      const n=parseInt((a.status||'').split('/')[0])||0;
+      if(n===2)blinkStopped[a.ref]=true;
       const s=stars[a.ref]||0;
-      if(s>0){forwarded[a.ref]=true;}
+      if(s>0)forwarded[a.ref]=true;
     }
   });
   save();
@@ -516,7 +480,6 @@ function copySelected(){
   clearSelection();render();
 }
 
-// ── Filter ────────────────────────────────────────────────
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
 function matchesFilter(app){
   const num=parseInt((app.status||'').split('/')[0])||0;
@@ -530,10 +493,8 @@ function matchesFilter(app){
   return true;
 }
 
-// ── Helpers ───────────────────────────────────────────────
 function daysSince(ds,ref){
-  // If collected, return frozen day
-  if(collected[ref]&&collectedDay[ref]) return collectedDay[ref];
+  if(collected[ref]&&collectedDay[ref]!==undefined)return collectedDay[ref];
   try{
     const ms={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
     const p=ds.toUpperCase().split('-');if(p.length!==3)return null;
@@ -546,7 +507,6 @@ function daysSince(ds,ref){
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2000);}
 
-// ── Star ──────────────────────────────────────────────────
 function toggleStar(ref){
   const prev=stars[ref]||0;stars[ref]=(prev+1)%3;const next=stars[ref];
   const app=allApps.find(a=>a.ref===ref);const entry=app?`${app.name} ${ref}`:ref;
@@ -559,13 +519,8 @@ function toggleForwarded(ref){forwarded[ref]=!forwarded[ref];save();render();}
 function toggleCollected(ref){
   const wasOn=collected[ref];
   collected[ref]=!wasOn;
-  if(!wasOn){
-    // Freeze day count now
-    const app=allApps.find(a=>a.ref===ref);
-    if(app){const days=daysSince(app.apply_date,ref);collectedDay[ref]=days;}
-  } else {
-    delete collectedDay[ref];
-  }
+  if(!wasOn){const app=allApps.find(a=>a.ref===ref);if(app){collectedDay[ref]=daysSince(app.apply_date,ref);};}
+  else{delete collectedDay[ref];}
   save();render();
 }
 function startEditDeu(ref){editingDeu[ref]=true;render();setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}
@@ -573,17 +528,15 @@ function updateCode(ref,val){codes[ref]=val;editingDeu[ref]=false;save();render(
 function toggleNote(ref){if(showNote[ref]&&!notes[ref])showNote[ref]=false;else showNote[ref]=!showNote[ref];render();if(showNote[ref])setTimeout(()=>{const i=document.getElementById('note-input-'+ref);if(i)i.focus();},50);}
 function updateNote(ref,val){notes[ref]=val;save();render();}
 
-// ── Modals ────────────────────────────────────────────────
 function openDateModal(dateStr,prefix,sourceField){
   const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>printDates[a.ref]===dateStr);
-  const title=sourceField==='apply_date'?`📅 ${dateStr} — ${same.length}টি ফাইল`:`🖨️ ${dateStr}`;
-  document.getElementById('date-modal-title').textContent=title;
+  document.getElementById('date-modal-title').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
-    const num=parseInt((a.status||'').split('/')[0])||0;
-    const sc='s'+Math.min(num,10);
-    const statusText=sourceField==='print_date'?'(Printed)':a.status;
-    const statusStyle=sourceField==='print_date'?'color:#94a3b8':'';
-    return `<div class="date-modal-item"><div class="dm-name">${a.name}</div><div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${statusStyle}">${statusText}</span></div></div>`;
+    const n=parseInt((a.status||'').split('/')[0])||0;
+    const sc='s'+Math.min(n,10);
+    const txt=sourceField==='print_date'?'(Printed)':a.status;
+    const st=sourceField==='print_date'?'color:#64748b':'';
+    return `<div class="date-modal-item"><div class="dm-name">${a.name}</div><div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${st}">${txt}</span></div></div>`;
   }).join('');
   document.getElementById('date-modal').classList.add('open');
 }
@@ -593,7 +546,6 @@ function closeModal(){document.getElementById('modal').classList.remove('open');
 function adjustCount(delta){if(!modalType)return;counts[modalType]=Math.max(0,counts[modalType]+delta);document.getElementById('modal-count').textContent=counts[modalType];document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');save();}
 function resetCounts(){if(!resetConfirm){resetConfirm=true;document.getElementById('reset-btn').classList.add('confirm');resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);}else{clearTimeout(resetTimer);resetConfirm=false;counts={urgent:0,important:0};history={urgent:[],important:[]};save();render();document.getElementById('reset-btn').classList.remove('confirm');}}
 
-// ── Card HTML ─────────────────────────────────────────────
 function cardHTML(app){
   const s=stars[app.ref]||0;
   const isDelivered=delivered[app.ref]||false;
@@ -609,7 +561,6 @@ function cardHTML(app){
   const noteVal=notes[app.ref]||'';
   const isShowNote=showNote[app.ref];
   const isSelected=selected.has(app.ref);
-  // Blink only for Important (s===1), not Urgent
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
   const printDate=printDates[app.ref]||null;
   const policeTag=policeTags[app.ref]||'';
@@ -621,25 +572,16 @@ function cardHTML(app){
 
   let deuHTML='';
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
-
   const noteBtn=(s>0&&!isDelivered)?`<span class="note-btn" onclick="toggleNote('${app.ref}');event.stopPropagation()">Note</span>`:'';
-
   let policeHTML='';
-  if(s===0&&!isDelivered){
-    if(policeTag){policeHTML=`<span class="police-tag-badge" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`;}
-    else{policeHTML=`<span class="police-tag-btn" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️</span>`;}
-  }
-
+  if(s===0&&!isDelivered){if(policeTag){policeHTML=`<span class="police-tag-badge" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`;}else{policeHTML=`<span class="police-tag-btn" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️</span>`;}}
   let noteHTML='';
   if(s>0&&!isDelivered){if(isShowNote){noteHTML=`<textarea id="note-input-${app.ref}" class="note-input" rows="2" placeholder="নোট লিখুন..." onblur="updateNote('${app.ref}',this.value)" onclick="event.stopPropagation()">${noteVal}</textarea>`;}else if(noteVal){noteHTML=`<div class="note-content" onclick="toggleNote('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`;}}
-
-  const printHTML=(printDate&&s>0&&!isDelivered)?`<span class="print-link" onclick="openDateModal('${printDate}','🖨️','print_date');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
-
+  const printHTML=(printDate&&s>0&&!isDelivered)?`<span class="print-link" onclick="openDateModal('${printDate}','📅','print_date');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
   const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
 
-  // Forwarded & Collected bars — only for urgent/important
-  const fwdBar=(s>0&&!isDelivered)?`<div class="fwd-bar ${isFwd?'on':''}" onclick="toggleForwarded('${app.ref}');event.stopPropagation()"><span class="fwd-bar-label">Forwarded</span><span class="fwd-dot"></span></div>`:'';
-  const colBar=(s>0&&!isDelivered)?`<div class="col-bar ${isCol?'on':''}" onclick="toggleCollected('${app.ref}');event.stopPropagation()"><span class="col-bar-label">Collected</span><span class="col-dot"></span></div>`:'';
+  const fwdBar=(s>0&&!isDelivered)?`<div class="fwd-bar ${isFwd?'on':''}" onclick="toggleForwarded('${app.ref}');event.stopPropagation()"><span class="fwd-bar-label">Forwarded</span></div>`:'';
+  const colBar=(s>0&&!isDelivered)?`<div class="col-bar ${isCol?'on':''}" onclick="toggleCollected('${app.ref}');event.stopPropagation()"><span class="col-bar-label">Collected</span></div>`:'';
 
   return `
     <div class="card-wrap ${isSelected?'selected':''}" id="wrap-${app.ref}">
@@ -652,8 +594,8 @@ function cardHTML(app){
         ontouchend="swipeEnd(event,'${app.ref}');pressEnd('${app.ref}')"
         ontouchcancel="pressEnd('${app.ref}')"
         onclick="handleTap('${app.ref}')">
-        ${fwdBar}
         <div class="card-body">
+          ${fwdBar}
           <button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${starIcon}</button>
           <div class="name" onclick="${s>0?`openTimelineModal('${app.ref}');`:''}event.stopPropagation()">${app.name}</div>
           <div class="info">
@@ -662,19 +604,16 @@ function cardHTML(app){
           </div>
           <div class="bottom-row">
             <span class="status ${scls}${shouldBlink?' status-blink':''}">${app.status}</span>
-            ${deuHTML}
-            ${noteBtn}
-            ${policeHTML}
+            ${deuHTML}${noteBtn}${policeHTML}
             ${showPhone?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:''}
           </div>
           ${noteHTML}
+          ${colBar}
         </div>
-        ${colBar}
       </div>
     </div>`;
 }
 
-// ── Swipe & Press ─────────────────────────────────────────
 let touchStartX={},touchStartY={},touching={};
 function swipeStart(e,ref){touchStartX[ref]=e.touches[0].clientX;touchStartY[ref]=e.touches[0].clientY;touching[ref]=true;}
 function swipeMove(e,ref){
@@ -699,17 +638,11 @@ function swipeEnd(e,ref){
   if(dx<-80){delivered[ref]=!delivered[ref];if(delivered[ref]){showDeu[ref]=false;showNote[ref]=false;}save();render();}
   else if(dx>80){if(!delivered[ref]){showDeu[ref]=!showDeu[ref];if(showDeu[ref])editingDeu[ref]=true;save();render();if(showDeu[ref])setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}}
 }
-
 let pressTimer={};
-function pressStart(ref){pressTimer[ref]=setTimeout(()=>{
-  const app=allApps.find(a=>a.ref===ref);if(!app)return;
-  if(selectMode){toggleSelect(ref);return;}
-  toggleSelect(ref);
-},600);}
+function pressStart(ref){pressTimer[ref]=setTimeout(()=>{if(selectMode){toggleSelect(ref);return;}toggleSelect(ref);},600);}
 function pressEnd(ref){clearTimeout(pressTimer[ref]);}
 function handleTap(ref){if(selectMode)toggleSelect(ref);}
 
-// ── Render ────────────────────────────────────────────────
 function render(){
   const q=(document.querySelector('.search-bar').value||'').toLowerCase();
   let apps=allApps.filter(a=>{
@@ -732,7 +665,6 @@ function render(){
   document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
 }
 
-// ── Load ──────────────────────────────────────────────────
 async function load(){
   try{
     await restoreFromBackup();
@@ -740,16 +672,13 @@ async function load(){
     const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
     allApps=d.applications;
-    try{
-      const ur=await fetch('userdata.json?t='+Date.now());
-      if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}
-    }catch(e){}
+    try{const ur=await fetch('userdata.json?t='+Date.now());if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
     render();
   }catch(e){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
 }
 
 load();
-setInterval(load,300000); // 5 মিনিটে একবার refresh
+setInterval(load,300000);
 </script>
 </body>
 </html>

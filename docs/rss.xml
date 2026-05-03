@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Sat, 02 May 2026 23:29:24 +0000</lastBuildDate>
+<lastBuildDate>Sun, 03 May 2026 07:32:23 +0000</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>ALA UDDIN - 5/10</title>
+<title>MD DELOWAR HOSSAN - 8/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BFGT8R | Before: 4/10 - Now: 5/10</description>
-<pubDate>Sat, 02 May 2026 23:29:24 +0000</pubDate>
-<guid isPermaLink="false">1BFGT8R-5/10-202605022329</guid>
+<description>Ref: 1BFEXVK | Before: 7/10 - Now: 8/10</description>
+<pubDate>Sun, 03 May 2026 07:32:23 +0000</pubDate>
+<guid isPermaLink="false">1BFEXVK-8/10-202605030732</guid>
+</item><item>
+<title>SIFAT HOSSAIN - 8/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BFEXSW | Before: 7/10 - Now: 8/10</description>
+<pubDate>Sun, 03 May 2026 07:32:23 +0000</pubDate>
+<guid isPermaLink="false">1BFEXSW-8/10-202605030732</guid>
 </item>
 </channel>
 </rss>

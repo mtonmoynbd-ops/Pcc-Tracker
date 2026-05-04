@@ -86,58 +86,24 @@
   /* Cards */
   .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; }
   .card-wrap.selected .card { border-color: #2563eb !important; border-width: 2px !important; }
-  .sel-check { display: none; position: absolute; bottom: 22px; left: 10px; background: #2563eb; color: #fff; width: 18px; height: 18px; border-radius: 50%; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; z-index: 10; }
+  .sel-check { display: none; position: absolute; bottom: 10px; left: 10px; background: #2563eb; color: #fff; width: 18px; height: 18px; border-radius: 50%; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; z-index: 10; }
   .card-wrap.selected .sel-check { display: flex; }
   .swipe-hint { position: absolute; top: 0; bottom: 0; width: 100%; display: flex; align-items: center; border-radius: 12px; pointer-events: none; opacity: 0; transition: opacity 0.1s; }
   .swipe-hint.left-hint { background: #14532d; justify-content: flex-end; padding-right: 24px; color: #34d399; font-size: 13px; font-weight: 700; }
   .swipe-hint.right-hint { background: #3b0a0a; justify-content: flex-start; padding-left: 24px; color: #ef4444; font-size: 13px; font-weight: 700; }
-  .card { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 12px; overflow: hidden; position: relative; transition: transform 0.15s ease; user-select: none; }
+  .card { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 12px; padding: 14px; position: relative; transition: transform 0.15s ease, background 0.4s ease; user-select: none; }
   .card.star1 { border-color: #f59e0b; }
   .card.star2 { border-color: #ef4444; border-width: 2px; }
   .card.delivered { opacity: 0.4; border-color: #334155; }
-  .card-body { padding: 12px 14px; }
+  .card.collected-card { background: #071a10; }
 
-  /* Forwarded bar */
-  .fwd-bar {
-    width: 66%; margin: 0 auto 10px;
-    height: 3px; border-radius: 3px;
-    background: #1e293b;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
-    overflow: hidden;
-  }
-  .fwd-bar.on {
-    height: 18px;
-    background: rgba(120,53,15,0.45);
-    border-color: rgba(202,138,4,0.35);
-    border-radius: 6px;
-  }
-  .fwd-bar-label { display: none; font-size: 9px; color: #a16207; letter-spacing: 3px; font-weight: 700; text-transform: uppercase; }
-  .fwd-bar.on .fwd-bar-label { display: block; }
+  /* Stage button */
+  .stage-btn { position: absolute; top: 10px; right: 34px; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.03); border: 1px solid #1e3a5f; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: all 0.3s; color: #1e3a5f; font-size: 14px; line-height: 1; padding: 0; -webkit-tap-highlight-color: transparent; }
+  .stage-btn.fwd { border-color: #a16207; color: #eab308; box-shadow: 0 0 8px rgba(234,179,8,0.55); background: rgba(120,53,15,0.25); }
+  .stage-btn.col { border-color: #15803d; color: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.55); background: rgba(20,83,45,0.25); }
+  .stage-btn.pressing { transform: scale(0.88); opacity: 0.7; }
 
-  /* Collected bar */
-  .col-bar {
-    width: 66%; margin: 10px auto 0;
-    height: 3px; border-radius: 3px;
-    background: #1e293b;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
-    overflow: hidden;
-  }
-  .col-bar.on {
-    height: 18px;
-    background: rgba(20,83,45,0.45);
-    border-color: rgba(34,197,94,0.25);
-    border-radius: 6px;
-  }
-  .col-bar-label { display: none; font-size: 9px; color: #15803d; letter-spacing: 3px; font-weight: 700; text-transform: uppercase; }
-  .col-bar.on .col-bar-label { display: block; }
-
-  .name { font-weight: 700; font-size: 15px; color: #f1f5f9; margin-bottom: 5px; padding-right: 36px; cursor: pointer; }
+  .name { font-weight: 700; font-size: 15px; color: #f1f5f9; margin-bottom: 5px; padding-right: 58px; cursor: pointer; }
   .info { font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; gap: 4px; white-space: nowrap; overflow: hidden; }
   .info-left { display: flex; align-items: center; gap: 3px; overflow: hidden; flex-shrink: 1; min-width: 0; }
   .info-right { flex-shrink: 0; }
@@ -154,10 +120,7 @@
   .s3,.s4,.s5 { background: #1e3a5f; color: #f59e0b; }
   .s6,.s7 { background: #1e3a5f; color: #a78bfa; }
   .s8,.s9 { background: #1e3a5f; color: #34d399; }
-  @keyframes blink-imp {
-    0%,100% { opacity:1; box-shadow:0 0 0 rgba(251,191,36,0); }
-    50% { opacity:0.1; box-shadow:0 0 10px rgba(251,191,36,0.7); }
-  }
+  @keyframes blink-imp { 0%,100%{opacity:1;box-shadow:0 0 0 rgba(251,191,36,0)} 50%{opacity:0.1;box-shadow:0 0 10px rgba(251,191,36,0.7)} }
   .status-blink { animation: blink-imp 0.9s ease-in-out infinite; }
   .deu-text { color: #ef4444; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #3b0a0a; cursor: pointer; flex-shrink: 0; }
   .deu-input { background: none; border: none; border-bottom: 1px solid #ef4444; color: #ef4444; font-size: 13px; font-weight: 700; width: 60px; outline: none; text-align: center; flex-shrink: 0; }
@@ -167,7 +130,7 @@
   .note-content { font-size: 12px; color: #94a3b8; margin-top: 4px; cursor: pointer; }
   .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; resize: none; margin-top: 4px; }
   .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; flex-shrink: 0; }
-  .star-btn { position: absolute; top: 20px; right: 10px; background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.4; line-height: 1; z-index: 2; }
+  .star-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.4; line-height: 1; z-index: 2; }
   .star-btn:hover, .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
   .section-title { font-size: 12px; color: #475569; margin: 12px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
   .loading { text-align: center; padding: 40px; color: #475569; }
@@ -327,6 +290,7 @@ let resetConfirm=false,resetTimer=null;
 let modalType=null,activeFilter='all',activePoliceFilter=null;
 let selected=new Set(),selectMode=false;
 let calDate=new Date(),backupTimer=null,pickRef=null;
+let stageTimer={};
 
 function save(){
   localStorage.setItem('pcc_stars',JSON.stringify(stars));
@@ -345,6 +309,38 @@ function save(){
   scheduleBackup();
 }
 
+// ── Stage button (▲/▼) long press ─────────────────────────
+function stagePressStart(e,ref){
+  e.stopPropagation();
+  const btn=document.getElementById('sbtn-'+ref);
+  if(btn)btn.classList.add('pressing');
+  const isFwd=forwarded[ref]||false;
+  const isCol=collected[ref]||false;
+  const stage=isCol?2:isFwd?1:0;
+  const holdTime=stage===2?2000:600;
+  stageTimer[ref]=setTimeout(()=>{
+    if(btn)btn.classList.remove('pressing');
+    if(stage===0){
+      forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];
+      save();render();showToast('↑ Forwarded');
+    } else if(stage===1){
+      const app=allApps.find(a=>a.ref===ref);
+      collected[ref]=true;
+      if(app){collectedDay[ref]=daysSince(app.apply_date,ref);}
+      save();render();showToast('↓ Collected — Day count frozen');
+    } else {
+      forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];
+      save();render();showToast('↺ Reset');
+    }
+  },holdTime);
+}
+function stagePressEnd(ref){
+  clearTimeout(stageTimer[ref]);
+  const btn=document.getElementById('sbtn-'+ref);
+  if(btn)btn.classList.remove('pressing');
+}
+
+// ── Backup ─────────────────────────────────────────────────
 function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=setTimeout(doBackup,30000);}
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;
@@ -419,8 +415,7 @@ function openPoliceFilterModal(){
   let html=`<span class="police-filter-pill police-filter-all ${!activePoliceFilter?'active':''}" onclick="setPoliceFilter(null)">সব</span>`;
   clientNames.forEach(n=>{html+=`<span class="police-filter-pill ${activePoliceFilter===n?'active':''}" onclick="setPoliceFilter('${n}')">${n}</span>`;});
   if(!clientNames.length)html+='<div style="color:#475569;font-size:12px;margin-top:8px">Client\'s Name বাটনে নাম যোগ করুন</div>';
-  list.innerHTML=html;
-  document.getElementById('police-filter-modal').classList.add('open');
+  list.innerHTML=html;document.getElementById('police-filter-modal').classList.add('open');
 }
 function closePoliceFilterModal(){document.getElementById('police-filter-modal').classList.remove('open');}
 function setPoliceFilter(name){activePoliceFilter=name;document.getElementById('police-filter-btn').classList.toggle('active',!!name);closePoliceFilterModal();render();}
@@ -451,8 +446,7 @@ function openTimelineModal(ref){
   if(!hist.length){document.getElementById('timeline-list').innerHTML='<div style="color:#475569;font-size:12px;text-align:center;padding:12px">কোনো ইতিহাস নেই</div>';document.getElementById('timeline-modal').classList.add('open');return;}
   document.getElementById('timeline-list').innerHTML=hist.map(h=>{
     const num=parseInt((h.status||'').split('/')[0])||0;
-    const sc='s'+Math.min(num,10);
-    const color=clr[sc]||'#94a3b8';
+    const sc='s'+Math.min(num,10);const color=clr[sc]||'#94a3b8';
     return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${h.status}</span></div><span class="timeline-date">${h.date}</span></div>`;
   }).join('');
   document.getElementById('timeline-modal').classList.add('open');
@@ -470,7 +464,7 @@ function copySelected(){
       const n=parseInt((a.status||'').split('/')[0])||0;
       if(n===2)blinkStopped[a.ref]=true;
       const s=stars[a.ref]||0;
-      if(s>0)forwarded[a.ref]=true;
+      if(s>0&&!forwarded[a.ref]){forwarded[a.ref]=true;}
     }
   });
   save();
@@ -501,8 +495,7 @@ function daysSince(ds,ref){
     const d=parseInt(p[0]),m=ms[p[1]],y=2000+parseInt(p[2]);
     if(isNaN(d)||m===undefined||isNaN(y))return null;
     const aDate=new Date(y,m,d),today=new Date();today.setHours(0,0,0,0);
-    const diff=Math.floor((today-aDate)/86400000);
-    return diff>0?diff:null;
+    const diff=Math.floor((today-aDate)/86400000);return diff>0?diff:null;
   }catch{return null;}
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2000);}
@@ -515,14 +508,6 @@ function toggleStar(ref){
   else if(prev===2&&next===0){counts.urgent=Math.max(0,counts.urgent-1);history.urgent=history.urgent.filter(e=>e!==entry);}
   save();render();
 }
-function toggleForwarded(ref){forwarded[ref]=!forwarded[ref];save();render();}
-function toggleCollected(ref){
-  const wasOn=collected[ref];
-  collected[ref]=!wasOn;
-  if(!wasOn){const app=allApps.find(a=>a.ref===ref);if(app){collectedDay[ref]=daysSince(app.apply_date,ref);};}
-  else{delete collectedDay[ref];}
-  save();render();
-}
 function startEditDeu(ref){editingDeu[ref]=true;render();setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}
 function updateCode(ref,val){codes[ref]=val;editingDeu[ref]=false;save();render();}
 function toggleNote(ref){if(showNote[ref]&&!notes[ref])showNote[ref]=false;else showNote[ref]=!showNote[ref];render();if(showNote[ref])setTimeout(()=>{const i=document.getElementById('note-input-'+ref);if(i)i.focus();},50);}
@@ -532,8 +517,7 @@ function openDateModal(dateStr,prefix,sourceField){
   const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>printDates[a.ref]===dateStr);
   document.getElementById('date-modal-title').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
-    const n=parseInt((a.status||'').split('/')[0])||0;
-    const sc='s'+Math.min(n,10);
+    const n=parseInt((a.status||'').split('/')[0])||0;const sc='s'+Math.min(n,10);
     const txt=sourceField==='print_date'?'(Printed)':a.status;
     const st=sourceField==='print_date'?'color:#64748b':'';
     return `<div class="date-modal-item"><div class="dm-name">${a.name}</div><div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${st}">${txt}</span></div></div>`;
@@ -567,6 +551,12 @@ function cardHTML(app){
   const isFwd=forwarded[app.ref]||false;
   const isCol=collected[app.ref]||false;
 
+  // Stage button
+  const stage=isCol?2:isFwd?1:0;
+  const stageIcon=stage===0?'▴':stage===1?'▲':'▼';
+  const stageCls=stage===0?'':stage===1?'fwd':'col';
+  const stageBtn=(s>0&&!isDelivered)?`<button class="stage-btn ${stageCls}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'';
+
   let dayClass='day-normal';
   if(days){if(s===2&&days>=5)dayClass='day-warn-urgent';else if(s===1&&days>=12)dayClass='day-warn-important';}
 
@@ -580,36 +570,30 @@ function cardHTML(app){
   const printHTML=(printDate&&s>0&&!isDelivered)?`<span class="print-link" onclick="openDateModal('${printDate}','📅','print_date');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
   const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
 
-  const fwdBar=(s>0&&!isDelivered)?`<div class="fwd-bar ${isFwd?'on':''}" onclick="toggleForwarded('${app.ref}');event.stopPropagation()"><span class="fwd-bar-label">Forwarded</span></div>`:'';
-  const colBar=(s>0&&!isDelivered)?`<div class="col-bar ${isCol?'on':''}" onclick="toggleCollected('${app.ref}');event.stopPropagation()"><span class="col-bar-label">Collected</span></div>`:'';
-
   return `
     <div class="card-wrap ${isSelected?'selected':''}" id="wrap-${app.ref}">
       <div class="swipe-hint left-hint" id="hint-left-${app.ref}">Delivered</div>
       <div class="swipe-hint right-hint" id="hint-right-${app.ref}">Deu</div>
       <div class="sel-check">✓</div>
-      <div class="card ${cls}" id="card-${app.ref}" data-ref="${app.ref}"
+      <div class="card ${cls}${isCol?' collected-card':''}" id="card-${app.ref}" data-ref="${app.ref}"
         ontouchstart="swipeStart(event,'${app.ref}');pressStart('${app.ref}')"
         ontouchmove="swipeMove(event,'${app.ref}');pressEnd('${app.ref}')"
         ontouchend="swipeEnd(event,'${app.ref}');pressEnd('${app.ref}')"
         ontouchcancel="pressEnd('${app.ref}')"
         onclick="handleTap('${app.ref}')">
-        <div class="card-body">
-          ${fwdBar}
-          <button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${starIcon}</button>
-          <div class="name" onclick="${s>0?`openTimelineModal('${app.ref}');`:''}event.stopPropagation()">${app.name}</div>
-          <div class="info">
-            <span class="info-left">${refSVG} ${app.ref} &nbsp;|&nbsp; <span class="date-link" onclick="openDateModal('${app.apply_date}','📅','apply_date');event.stopPropagation()">${calSVG} ${app.apply_date}</span>&nbsp;${daySpan}</span>
-            <span class="info-right">${printHTML}</span>
-          </div>
-          <div class="bottom-row">
-            <span class="status ${scls}${shouldBlink?' status-blink':''}">${app.status}</span>
-            ${deuHTML}${noteBtn}${policeHTML}
-            ${showPhone?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:''}
-          </div>
-          ${noteHTML}
-          ${colBar}
+        ${stageBtn}
+        <button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${starIcon}</button>
+        <div class="name" onclick="${s>0?`openTimelineModal('${app.ref}');`:''}event.stopPropagation()">${app.name}</div>
+        <div class="info">
+          <span class="info-left">${refSVG} ${app.ref} &nbsp;|&nbsp; <span class="date-link" onclick="openDateModal('${app.apply_date}','📅','apply_date');event.stopPropagation()">${calSVG} ${app.apply_date}</span>&nbsp;${daySpan}</span>
+          <span class="info-right">${printHTML}</span>
         </div>
+        <div class="bottom-row">
+          <span class="status ${scls}${shouldBlink?' status-blink':''}">${app.status}</span>
+          ${deuHTML}${noteBtn}${policeHTML}
+          ${showPhone?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:''}
+        </div>
+        ${noteHTML}
       </div>
     </div>`;
 }

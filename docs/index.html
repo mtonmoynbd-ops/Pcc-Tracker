@@ -39,8 +39,11 @@
   .cal-day { padding: 4px 2px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #94a3b8; position: relative; border: 1px solid transparent; min-height: 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .cal-day.has-file { color: #e2e8f0; font-weight: 700; background: #1e3a5f; border-color: #2563eb; cursor: pointer; }
   .cal-day.today { background: #1d4ed8; color: #fff; font-weight: 700; }
-  .cal-dots { display: flex; gap: 2px; justify-content: center; margin-top: 2px; }
-  .cal-dot { width: 4px; height: 4px; background: #60a5fa; border-radius: 50%; }
+  .cal-dots { display: flex; gap: 2px; justify-content: center; margin-top: 2px; flex-wrap: wrap; }
+  .cal-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .cal-dot.normal { background: #60a5fa; }
+  .cal-dot.important { background: #f59e0b; }
+  .cal-dot.urgent { background: #ef4444; }
   .cal-dot.today-dot { background: #fff; }
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; }
   .modal.open { display: flex; }
@@ -60,8 +63,10 @@
   .timeline-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .timeline-status { font-size: 13px; font-weight: 700; }
   .timeline-date { font-size: 11px; color: #64748b; }
-  .cert-btn { width: 100%; margin-top: 14px; padding: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: #94a3b8; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
-  .cert-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+  /* Note modal */
+  .note-modal-textarea { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: #e2e8f0; font-size: 13px; outline: none; resize: none; margin-bottom: 10px; min-height: 100px; }
+  .note-modal-save { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .note-modal-clear { background: none; border: 1px solid #334155; color: #64748b; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-left: 8px; }
   .police-filter-list { display: flex; flex-wrap: wrap; gap: 8px; }
   .police-filter-pill { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #7c3aed; background: #1e1a3a; color: #c4b5fd; cursor: pointer; }
   .police-filter-pill.active { background: #4c1d95; color: #ede9fe; }
@@ -100,34 +105,24 @@
   .card.star2 { border-color: #ef4444; border-width: 2px; }
   .card.delivered { opacity: 0.4; border-color: #334155; }
   .card.collected-card { background: #071a10; }
-
-  /* Top row: stage btn + star btn aligned with name */
   .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
   .card-top-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-
-  /* Stage button — small, inline */
   .stage-btn { width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.03); border: 1px solid #1e3a5f; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: #1e3a5f; font-size: 11px; line-height: 1; padding: 0; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
   .stage-btn.fwd { border-color: #a16207; color: #eab308; box-shadow: 0 0 6px rgba(234,179,8,0.55); background: rgba(120,53,15,0.25); }
   .stage-btn.col { border-color: #15803d; color: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.55); background: rgba(20,83,45,0.25); }
   .stage-btn.pressing { transform: scale(0.85); opacity: 0.6; }
-
-  /* Star button — inline, same size as section star */
   .star-btn { background: none; border: none; cursor: pointer; font-size: 13px; opacity: 0.4; line-height: 1; padding: 0; flex-shrink: 0; }
   .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
-
   .name { font-weight: 700; font-size: 15px; color: #f1f5f9; flex: 1; cursor: pointer; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px; }
-  .info { font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; gap: 4px; white-space: nowrap; overflow: hidden; }
-  .info-left { display: flex; align-items: center; gap: 3px; overflow: hidden; flex-shrink: 1; min-width: 0; }
-  .info-right { flex-shrink: 0; }
+  .info { font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; gap: 3px; white-space: nowrap; overflow: hidden; }
   .ref-icon { display: inline-block; vertical-align: middle; margin-right: 1px; flex-shrink: 0; }
   .cal-icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
   .date-link { cursor: pointer; text-decoration: underline; text-decoration-style: dotted; color: #94a3b8; font-size: 12px; white-space: nowrap; }
-  .print-link { cursor: pointer; font-size: 12px; color: #94a3b8; white-space: nowrap; padding: 1px 5px; border: 1px solid #92400e; border-radius: 4px; background: rgba(120,53,15,0.15); }
   .day-normal { color: #60a5fa; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
   .day-warn-urgent { color: #ef4444; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
   .day-warn-important { color: #f97316; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
   .bottom-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
-  .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; cursor: pointer; }
   .s1,.s2 { background: #1e3a5f; color: #60a5fa; }
   .s3,.s4,.s5 { background: #1e3a5f; color: #f59e0b; }
   .s6,.s7 { background: #1e3a5f; color: #a78bfa; }
@@ -136,11 +131,10 @@
   .status-blink { animation: blink-imp 0.9s ease-in-out infinite; }
   .deu-text { color: #ef4444; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #3b0a0a; cursor: pointer; flex-shrink: 0; }
   .deu-input { background: none; border: none; border-bottom: 1px solid #ef4444; color: #ef4444; font-size: 13px; font-weight: 700; width: 60px; outline: none; text-align: center; flex-shrink: 0; }
-  .note-btn { color: #64748b; font-size: 11px; cursor: pointer; padding: 2px 8px; border: 1px solid #334155; border-radius: 4px; background: #1e293b; flex-shrink: 0; }
+  .print-badge { color: #94a3b8; font-size: 11px; cursor: pointer; padding: 2px 8px; border: 1px solid #334155; border-radius: 4px; background: #1e293b; flex-shrink: 0; white-space: nowrap; }
   .police-tag-badge { color: #c4b5fd; font-size: 11px; padding: 2px 8px; border: 1px solid #4c1d95; border-radius: 4px; background: #1e1a3a; cursor: pointer; flex-shrink: 0; }
   .police-tag-btn { color: #7c3aed; font-size: 13px; cursor: pointer; flex-shrink: 0; opacity: 0.5; }
-  .note-content { font-size: 12px; color: #94a3b8; margin-top: 4px; cursor: pointer; }
-  .note-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; resize: none; margin-top: 4px; }
+  .note-preview { font-size: 12px; color: #94a3b8; margin-top: 4px; cursor: pointer; }
   .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; flex-shrink: 0; }
   .section-title { font-size: 12px; color: #475569; margin: 12px 0 8px; text-transform: uppercase; letter-spacing: 1px; }
   .loading { text-align: center; padding: 40px; color: #475569; }
@@ -213,6 +207,7 @@
   </div>
 </div>
 
+<!-- Count Modal -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title"><span id="modal-title-text"></span><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -225,6 +220,7 @@
   </div>
 </div>
 
+<!-- Date Modal -->
 <div class="modal" id="date-modal">
   <div class="modal-box">
     <div class="modal-title"><span id="date-modal-title"></span><button class="modal-close" onclick="closeDateModal()">✕</button></div>
@@ -232,14 +228,27 @@
   </div>
 </div>
 
+<!-- Timeline Modal (status click) -->
 <div class="modal" id="timeline-modal">
   <div class="modal-box">
     <div class="modal-title"><span id="timeline-modal-title"></span><button class="modal-close" onclick="closeTimelineModal()">✕</button></div>
     <div id="timeline-list"></div>
-    <a id="cert-link" class="cert-btn" href="#" target="_blank" rel="external noopener" style="display:none">📜 Certificate দেখুন (PCC সাইটে)</a>
   </div>
 </div>
 
+<!-- Note Modal (name click) -->
+<div class="modal" id="note-modal">
+  <div class="modal-box">
+    <div class="modal-title"><span id="note-modal-title"></span><button class="modal-close" onclick="closeNoteModal()">✕</button></div>
+    <textarea class="note-modal-textarea" id="note-modal-textarea" placeholder="নোট লিখুন..."></textarea>
+    <div style="display:flex;gap:0">
+      <button class="note-modal-save" onclick="saveNoteModal()">সংরক্ষণ</button>
+      <button class="note-modal-clear" onclick="clearNoteModal()">মুছুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- Police Filter Modal -->
 <div class="modal" id="police-filter-modal">
   <div class="modal-box">
     <div class="modal-title">🏷️ Client Filter<button class="modal-close" onclick="closePoliceFilterModal()">✕</button></div>
@@ -247,6 +256,7 @@
   </div>
 </div>
 
+<!-- Client Management Modal -->
 <div class="modal" id="client-modal">
   <div class="modal-box">
     <div class="modal-title">🏷️ Client's Name<button class="modal-close" onclick="closeClientModal()">✕</button></div>
@@ -258,6 +268,7 @@
   </div>
 </div>
 
+<!-- Pick Modal -->
 <div class="modal" id="pick-modal">
   <div class="modal-box">
     <div class="modal-title">🏷️ Client সিলেক্ট করুন<button class="modal-close" onclick="closePickModal()">✕</button></div>
@@ -265,6 +276,7 @@
   </div>
 </div>
 
+<!-- Settings Modal -->
 <div class="modal" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title">🛡️ Settings<button class="modal-close" onclick="closeSettings()">✕</button></div>
@@ -281,7 +293,6 @@ const calSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" f
 const printSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
 
 const REPO_API='https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/contents/docs/userdata.json';
-const PCC_BASE='https://pcc.police.gov.bd/ords/r/pcc/pcc/login_desktop';
 
 let allApps=[],printDates={},statusHistory={};
 let stars=JSON.parse(localStorage.getItem('pcc_stars')||'{}');
@@ -303,6 +314,7 @@ let modalType=null,activeFilter='all',activePoliceFilter=null;
 let selected=new Set(),selectMode=false;
 let calDate=new Date(),backupTimer=null,pickRef=null;
 let stageTimer={};
+let noteModalRef=null;
 
 function save(){
   localStorage.setItem('pcc_stars',JSON.stringify(stars));
@@ -321,7 +333,7 @@ function save(){
   scheduleBackup();
 }
 
-function starIcon(s){ return s===2?'🔴':s===1?'⭐':''; }
+function getStarIcon(s){ return s===2?'🔴':s===1?'⭐':''; }
 
 // ── Stage button ──────────────────────────────────────────
 function stagePressStart(e,ref){
@@ -337,12 +349,12 @@ function stagePressStart(e,ref){
     if(stage===0){
       forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];
       save();render();showToast('↑ Forwarded');
-    } else if(stage===1){
+    }else if(stage===1){
       const app=allApps.find(a=>a.ref===ref);
       collected[ref]=true;
-      if(app){collectedDay[ref]=daysSince(app.apply_date,ref);}
+      if(app)collectedDay[ref]=daysSince(app.apply_date,ref);
       save();render();showToast('↓ Collected — Day count frozen');
-    } else {
+    }else{
       forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];
       save();render();showToast('↺ Reset');
     }
@@ -408,18 +420,43 @@ function renderCal(){
   document.getElementById('cal-title').textContent=mn[m]+' '+y;
   const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
   const today=new Date();today.setHours(0,0,0,0);
-  const dc={};
-  allApps.forEach(a=>{if(!a.apply_date)return;const p=a.apply_date.toUpperCase().split('-');const ms={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};if(p.length===3){const dd=parseInt(p[0]),mo=ms[p[1]],yr=2000+parseInt(p[2]);if(mo===m&&yr===y)dc[dd]=(dc[dd]||0)+1;}});
+  const msMap={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+
+  // Build per-day dot data: {day: [{type:'urgent'|'important'|'normal'}]}
+  const dayDots={};
+  allApps.forEach(a=>{
+    if(!a.apply_date)return;
+    const p=a.apply_date.toUpperCase().split('-');
+    if(p.length!==3)return;
+    const dd=parseInt(p[0]),mo=msMap[p[1]],yr=2000+parseInt(p[2]);
+    if(mo===m&&yr===y){
+      if(!dayDots[dd])dayDots[dd]=[];
+      const s=stars[a.ref]||0;
+      dayDots[dd].push(s===2?'urgent':s===1?'important':'normal');
+    }
+  });
+
   let html='';
   for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';
   for(let d=1;d<=dim;d++){
     const isT=new Date(y,m,d).getTime()===today.getTime();
-    const cnt=dc[d]||0,hasF=cnt>0;
+    const dots=dayDots[d]||[];
+    const hasF=dots.length>0;
     const ds=String(d).padStart(2,'0')+'-'+sm[m]+'-'+String(y).slice(2);
     let cls='cal-day'+(isT?' today':hasF?' has-file':'');
-    let dots='';
-    if(hasF){const n=Math.min(cnt,3),dc2=isT?'cal-dot today-dot':'cal-dot';for(let x=0;x<n;x++)dots+=`<span class="${dc2}"></span>`;if(cnt>3)dots+=`<span style="font-size:8px;color:${isT?'#fff':'#60a5fa'}">+</span>`;dots=`<div class="cal-dots">${dots}</div>`;}
-    html+=`<div class="${cls}" ${hasF?`onclick="calDayClick('${ds}')"`:''}>${d}${dots}</div>`;
+    let dotsHTML='';
+    if(hasF&&!isT){
+      // Show up to 3 colored dots
+      const shown=dots.slice(0,3);
+      const dotSpans=shown.map(t=>`<span class="cal-dot ${t}"></span>`).join('');
+      const plus=dots.length>3?`<span style="font-size:7px;color:#94a3b8">+</span>`:'';
+      dotsHTML=`<div class="cal-dots">${dotSpans}${plus}</div>`;
+    }else if(hasF&&isT){
+      const shown=dots.slice(0,3);
+      const dotSpans=shown.map(()=>`<span class="cal-dot today-dot"></span>`).join('');
+      dotsHTML=`<div class="cal-dots">${dotSpans}</div>`;
+    }
+    html+=`<div class="${cls}" ${hasF?`onclick="calDayClick('${ds}')"`:''}>${d}${dotsHTML}</div>`;
   }
   document.getElementById('cal-days').innerHTML=html;
 }
@@ -454,18 +491,14 @@ function openPickModal(ref){
 function closePickModal(){document.getElementById('pick-modal').classList.remove('open');pickRef=null;}
 function assignPoliceTag(name){if(!pickRef)return;if(name)policeTags[pickRef]=name;else delete policeTags[pickRef];save();closePickModal();render();}
 
-// ── Timeline ──────────────────────────────────────────────
+// ── Timeline (status click) ───────────────────────────────
 function openTimelineModal(ref){
   const app=allApps.find(a=>a.ref===ref);if(!app)return;
   const s=stars[ref]||0;
-  const si=starIcon(s);
+  const si=getStarIcon(s);
   document.getElementById('timeline-modal-title').textContent=(si?si+' ':'')+app.name;
   const hist=statusHistory[ref]||[];
   const clr={'s1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b','s6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399'};
-  const num=parseInt((app.status||'').split('/')[0])||0;
-  const certLink=document.getElementById('cert-link');
-  if(num>=9){certLink.style.display='flex';certLink.href=PCC_BASE;}
-  else{certLink.style.display='none';}
   if(!hist.length){document.getElementById('timeline-list').innerHTML='<div style="color:#475569;font-size:12px;text-align:center;padding:12px">কোনো ইতিহাস নেই</div>';document.getElementById('timeline-modal').classList.add('open');return;}
   document.getElementById('timeline-list').innerHTML=hist.map(h=>{
     const n2=parseInt((h.status||'').split('/')[0])||0;
@@ -476,14 +509,25 @@ function openTimelineModal(ref){
 }
 function closeTimelineModal(){document.getElementById('timeline-modal').classList.remove('open');}
 
-// Name click for normal 9/10 cards
-function openCertModal(ref){
-  const app=allApps.find(a=>a.ref===ref);if(!app)return;
-  document.getElementById('timeline-modal-title').textContent=app.name;
-  document.getElementById('timeline-list').innerHTML='<div style="color:#475569;font-size:12px;text-align:center;padding:8px">স্ট্যাটাস: '+app.status+'</div>';
-  const certLink=document.getElementById('cert-link');
-  certLink.style.display='flex';certLink.href=PCC_BASE;
-  document.getElementById('timeline-modal').classList.add('open');
+// ── Note Modal (name click) ───────────────────────────────
+function openNoteModal(ref){
+  noteModalRef=ref;
+  const app=allApps.find(a=>a.ref===ref);
+  const s=stars[ref]||0;
+  const si=getStarIcon(s);
+  document.getElementById('note-modal-title').textContent=(si?si+' ':'')+( app?app.name:ref)+' — নোট';
+  document.getElementById('note-modal-textarea').value=notes[ref]||'';
+  document.getElementById('note-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('note-modal-textarea').focus(),100);
+}
+function closeNoteModal(){document.getElementById('note-modal').classList.remove('open');noteModalRef=null;}
+function saveNoteModal(){
+  if(!noteModalRef)return;
+  notes[noteModalRef]=document.getElementById('note-modal-textarea').value.trim();
+  save();closeNoteModal();render();
+}
+function clearNoteModal(){
+  document.getElementById('note-modal-textarea').value='';
 }
 
 // ── Multi-select ──────────────────────────────────────────
@@ -544,10 +588,8 @@ function toggleStar(ref){
 }
 function startEditDeu(ref){editingDeu[ref]=true;render();setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}
 function updateCode(ref,val){codes[ref]=val;editingDeu[ref]=false;save();render();}
-function toggleNote(ref){if(showNote[ref]&&!notes[ref])showNote[ref]=false;else showNote[ref]=!showNote[ref];render();if(showNote[ref])setTimeout(()=>{const i=document.getElementById('note-input-'+ref);if(i)i.focus();},50);}
-function updateNote(ref,val){notes[ref]=val;save();render();}
 
-// ── Modals ────────────────────────────────────────────────
+// ── Date/Print Modals ─────────────────────────────────────
 function openDateModal(dateStr,prefix,sourceField){
   const same=sourceField==='apply_date'
     ?allApps.filter(a=>a.apply_date===dateStr)
@@ -559,7 +601,7 @@ function openDateModal(dateStr,prefix,sourceField){
     const txt=sourceField==='print_date'?'(Printed)':a.status;
     const st=sourceField==='print_date'?'color:#64748b':'';
     const s=stars[a.ref]||0;
-    const si=starIcon(s);
+    const si=getStarIcon(s);
     return `<div class="date-modal-item">
       <div class="dm-left">
         <div class="dm-name">${a.name}</div>
@@ -590,7 +632,6 @@ function cardHTML(app){
   const isEditing=editingDeu[app.ref];
   const days=(!isDelivered&&s>0)?daysSince(app.apply_date,app.ref):null;
   const noteVal=notes[app.ref]||'';
-  const isShowNote=showNote[app.ref];
   const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
   const printDate=printDates[app.ref]||null;
@@ -605,21 +646,28 @@ function cardHTML(app){
   let dayClass='day-normal';
   if(days){if(s===2&&days>=5)dayClass='day-warn-urgent';else if(s===1&&days>=12)dayClass='day-warn-important';}
 
-  // Stage btn — only urgent/important
   const stageBtn=(s>0&&!isDelivered)?`<button class="stage-btn ${stageCls}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'';
 
   let deuHTML='';
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
-  const noteBtn=(s>0&&!isDelivered)?`<span class="note-btn" onclick="toggleNote('${app.ref}');event.stopPropagation()">Note</span>`:'';
-  let policeHTML='';
-  if(s===0&&!isDelivered){if(policeTag){policeHTML=`<span class="police-tag-badge" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`;}else{policeHTML=`<span class="police-tag-btn" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️</span>`;}}
-  let noteHTML='';
-  if(s>0&&!isDelivered){if(isShowNote){noteHTML=`<textarea id="note-input-${app.ref}" class="note-input" rows="2" placeholder="নোট লিখুন..." onblur="updateNote('${app.ref}',this.value)" onclick="event.stopPropagation()">${noteVal}</textarea>`;}else if(noteVal){noteHTML=`<div class="note-content" onclick="toggleNote('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`;}}
-  const printHTML=(printDate&&s>0&&!isDelivered)?`<span class="print-link" onclick="openDateModal('${printDate}','📅','print_date');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
-  const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
 
-  // Name click: timeline for urgent/important, cert for normal 9/10
-  const nameClick=s>0?`openTimelineModal('${app.ref}');event.stopPropagation()`:(num>=9?`openCertModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()');
+  let policeHTML='';
+  if(s===0&&!isDelivered){
+    if(policeTag){policeHTML=`<span class="police-tag-badge" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`;}
+    else{policeHTML=`<span class="police-tag-btn" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️</span>`;}
+  }
+
+  // Print date badge in bottom row
+  const printBadge=(printDate&&s>0&&!isDelivered)?`<span class="print-badge" onclick="openDateModal('${printDate}','📅','print_date');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
+
+  // Note preview (no separate note button — use name click)
+  const notePreview=(s>0&&!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`:'';
+
+  // Name click: urgent/important → note modal, status click → timeline
+  const nameClick=(s>0)?`openNoteModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
+  const statusClick=(s>0)?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
+
+  const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
 
   return `
     <div class="card-wrap ${isSelected?'selected':''}" id="wrap-${app.ref}">
@@ -640,15 +688,16 @@ function cardHTML(app){
           </div>
         </div>
         <div class="info">
-          <span class="info-left">${refSVG} ${app.ref} &nbsp;|&nbsp; <span class="date-link" onclick="openDateModal('${app.apply_date}','📅','apply_date');event.stopPropagation()">${calSVG} ${app.apply_date}</span>&nbsp;${daySpan}</span>
-          <span class="info-right">${printHTML}</span>
+          ${refSVG} ${app.ref} &nbsp;|&nbsp; <span class="date-link" onclick="openDateModal('${app.apply_date}','📅','apply_date');event.stopPropagation()">${calSVG} ${app.apply_date}</span>&nbsp;${daySpan}
         </div>
         <div class="bottom-row">
-          <span class="status ${scls}${shouldBlink?' status-blink':''}">${app.status}</span>
-          ${deuHTML}${noteBtn}${policeHTML}
+          <span class="status ${scls}${shouldBlink?' status-blink':''}" onclick="${statusClick}">${app.status}</span>
+          ${deuHTML}
+          ${printBadge}
+          ${policeHTML}
           ${showPhone?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:''}
         </div>
-        ${noteHTML}
+        ${notePreview}
       </div>
     </div>`;
 }
@@ -675,7 +724,7 @@ function swipeEnd(e,ref){
   if(card){card.style.transition='transform 0.2s ease';card.style.transform='';}
   if(hl)hl.style.opacity=0;if(hr)hr.style.opacity=0;
   if(selectMode)return;
-  if(dx<-80){delivered[ref]=!delivered[ref];if(delivered[ref]){showDeu[ref]=false;showNote[ref]=false;}save();render();}
+  if(dx<-80){delivered[ref]=!delivered[ref];if(delivered[ref]){showDeu[ref]=false;}save();render();}
   else if(dx>80){if(!delivered[ref]){showDeu[ref]=!showDeu[ref];if(showDeu[ref])editingDeu[ref]=true;save();render();if(showDeu[ref])setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}}
 }
 let pressTimer={};

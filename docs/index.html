@@ -50,11 +50,22 @@
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 20px; width: 90%; max-width: 360px; max-height: 82vh; overflow-y: auto; }
   .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
   .modal-close { background: none; border: none; color: #64748b; font-size: 20px; cursor: pointer; }
-  .modal-adj { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-  .adj-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 18px; cursor: pointer; }
-  .adj-num { font-size: 22px; font-weight: 700; min-width: 40px; text-align: center; }
-  .modal-list { font-size: 12px; color: #64748b; line-height: 2; border-top: 1px solid #1e3a5f; padding-top: 10px; }
-  .modal-list-item { color: #94a3b8; }
+
+  /* Count modal top row */
+  .count-modal-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .modal-adj { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .adj-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .adj-num { font-size: 20px; font-weight: 700; min-width: 32px; text-align: center; }
+  .modal-add-row { display: flex; gap: 6px; flex: 1; }
+  .modal-add-input { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; min-width: 0; }
+  .modal-add-btn { background: #1d4ed8; border: none; color: #fff; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+
+  .modal-list { font-size: 12px; color: #64748b; border-top: 1px solid #1e3a5f; padding-top: 10px; }
+  .modal-list-item { color: #94a3b8; display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #0f1f3d; }
+  .modal-list-item span { flex: 1; font-size: 12px; }
+  .modal-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 15px; padding: 0 4px; flex-shrink: 0; opacity: 0.6; }
+  .modal-del-btn:hover { opacity: 1; }
+
   .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .date-modal-item .dm-left { flex: 1; }
   .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
@@ -63,7 +74,6 @@
   .timeline-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .timeline-status { font-size: 13px; font-weight: 700; }
   .timeline-date { font-size: 11px; color: #64748b; }
-  /* Note modal */
   .note-modal-textarea { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: #e2e8f0; font-size: 13px; outline: none; resize: none; margin-bottom: 10px; min-height: 100px; }
   .note-modal-save { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .note-modal-clear { background: none; border: 1px solid #334155; color: #64748b; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-left: 8px; }
@@ -91,8 +101,6 @@
   .sel-copy-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
   .sel-cancel-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; }
   .client-name-bottom-btn { width: 100%; margin-top: 16px; margin-bottom: 20px; padding: 12px; background: #0f1f3d; border: 1px solid #334155; border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-
-  /* Cards */
   .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; }
   .card-wrap.selected .card { border-color: #2563eb !important; border-width: 2px !important; }
   .sel-check { display: none; position: absolute; bottom: 10px; left: 10px; background: #2563eb; color: #fff; width: 18px; height: 18px; border-radius: 50%; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; z-index: 10; }
@@ -211,10 +219,16 @@
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title"><span id="modal-title-text"></span><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="modal-adj">
-      <button class="adj-btn" onclick="adjustCount(-1)">−</button>
-      <div class="adj-num" id="modal-count">0</div>
-      <button class="adj-btn" onclick="adjustCount(1)">+</button>
+    <div class="count-modal-top">
+      <div class="modal-adj">
+        <button class="adj-btn" onclick="adjustCount(-1)">−</button>
+        <div class="adj-num" id="modal-count">0</div>
+        <button class="adj-btn" onclick="adjustCount(1)">+</button>
+      </div>
+      <div class="modal-add-row">
+        <input class="modal-add-input" id="modal-add-input" type="text" placeholder="নাম রেফ..." onkeydown="if(event.key==='Enter')addModalEntry()">
+        <button class="modal-add-btn" onclick="addModalEntry()">+ যোগ</button>
+      </div>
     </div>
     <div class="modal-list" id="modal-list"></div>
   </div>
@@ -228,7 +242,7 @@
   </div>
 </div>
 
-<!-- Timeline Modal (status click) -->
+<!-- Timeline Modal -->
 <div class="modal" id="timeline-modal">
   <div class="modal-box">
     <div class="modal-title"><span id="timeline-modal-title"></span><button class="modal-close" onclick="closeTimelineModal()">✕</button></div>
@@ -236,12 +250,12 @@
   </div>
 </div>
 
-<!-- Note Modal (name click) -->
+<!-- Note Modal -->
 <div class="modal" id="note-modal">
   <div class="modal-box">
     <div class="modal-title"><span id="note-modal-title"></span><button class="modal-close" onclick="closeNoteModal()">✕</button></div>
     <textarea class="note-modal-textarea" id="note-modal-textarea" placeholder="নোট লিখুন..."></textarea>
-    <div style="display:flex;gap:0">
+    <div style="display:flex">
       <button class="note-modal-save" onclick="saveNoteModal()">সংরক্ষণ</button>
       <button class="note-modal-clear" onclick="clearNoteModal()">মুছুন</button>
     </div>
@@ -333,38 +347,24 @@ function save(){
   scheduleBackup();
 }
 
-function getStarIcon(s){ return s===2?'🔴':s===1?'⭐':''; }
+function getStarIcon(s){return s===2?'🔴':s===1?'⭐':'';}
 
 // ── Stage button ──────────────────────────────────────────
 function stagePressStart(e,ref){
   e.stopPropagation();
   const btn=document.getElementById('sbtn-'+ref);
   if(btn)btn.classList.add('pressing');
-  const isCol=collected[ref]||false;
-  const isFwd=forwarded[ref]||false;
+  const isCol=collected[ref]||false,isFwd=forwarded[ref]||false;
   const stage=isCol?2:isFwd?1:0;
   const holdTime=stage===2?2000:600;
   stageTimer[ref]=setTimeout(()=>{
     if(btn)btn.classList.remove('pressing');
-    if(stage===0){
-      forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];
-      save();render();showToast('↑ Forwarded');
-    }else if(stage===1){
-      const app=allApps.find(a=>a.ref===ref);
-      collected[ref]=true;
-      if(app)collectedDay[ref]=daysSince(app.apply_date,ref);
-      save();render();showToast('↓ Collected — Day count frozen');
-    }else{
-      forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];
-      save();render();showToast('↺ Reset');
-    }
+    if(stage===0){forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↑ Forwarded');}
+    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);save();render();showToast('↓ Collected');}
+    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↺ Reset');}
   },holdTime);
 }
-function stagePressEnd(ref){
-  clearTimeout(stageTimer[ref]);
-  const btn=document.getElementById('sbtn-'+ref);
-  if(btn)btn.classList.remove('pressing');
-}
+function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
 
 // ── Backup ────────────────────────────────────────────────
 function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=setTimeout(doBackup,30000);}
@@ -421,8 +421,6 @@ function renderCal(){
   const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
   const today=new Date();today.setHours(0,0,0,0);
   const msMap={JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
-
-  // Build per-day dot data: {day: [{type:'urgent'|'important'|'normal'}]}
   const dayDots={};
   allApps.forEach(a=>{
     if(!a.apply_date)return;
@@ -435,7 +433,6 @@ function renderCal(){
       dayDots[dd].push(s===2?'urgent':s===1?'important':'normal');
     }
   });
-
   let html='';
   for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';
   for(let d=1;d<=dim;d++){
@@ -445,16 +442,11 @@ function renderCal(){
     const ds=String(d).padStart(2,'0')+'-'+sm[m]+'-'+String(y).slice(2);
     let cls='cal-day'+(isT?' today':hasF?' has-file':'');
     let dotsHTML='';
-    if(hasF&&!isT){
-      // Show up to 3 colored dots
+    if(hasF){
       const shown=dots.slice(0,3);
-      const dotSpans=shown.map(t=>`<span class="cal-dot ${t}"></span>`).join('');
+      const dotSpans=isT?shown.map(()=>`<span class="cal-dot today-dot"></span>`).join(''):shown.map(t=>`<span class="cal-dot ${t}"></span>`).join('');
       const plus=dots.length>3?`<span style="font-size:7px;color:#94a3b8">+</span>`:'';
       dotsHTML=`<div class="cal-dots">${dotSpans}${plus}</div>`;
-    }else if(hasF&&isT){
-      const shown=dots.slice(0,3);
-      const dotSpans=shown.map(()=>`<span class="cal-dot today-dot"></span>`).join('');
-      dotsHTML=`<div class="cal-dots">${dotSpans}</div>`;
     }
     html+=`<div class="${cls}" ${hasF?`onclick="calDayClick('${ds}')"`:''}>${d}${dotsHTML}</div>`;
   }
@@ -491,11 +483,59 @@ function openPickModal(ref){
 function closePickModal(){document.getElementById('pick-modal').classList.remove('open');pickRef=null;}
 function assignPoliceTag(name){if(!pickRef)return;if(name)policeTags[pickRef]=name;else delete policeTags[pickRef];save();closePickModal();render();}
 
-// ── Timeline (status click) ───────────────────────────────
+// ── Count Modal ───────────────────────────────────────────
+function openModal(type){
+  modalType=type;
+  const color=type==='urgent'?'#ef4444':'#f59e0b';
+  document.getElementById('modal-title-text').textContent=type==='urgent'?'🔴 Urgent':'⭐ Important';
+  document.getElementById('modal-count').textContent=counts[type];
+  document.getElementById('modal-add-input').value='';
+  renderModalList();
+  document.getElementById('modal').classList.add('open');
+}
+function renderModalList(){
+  if(!modalType)return;
+  const list=history[modalType];
+  if(!list.length){document.getElementById('modal-list').innerHTML='<div style="color:#475569;padding:8px 0">কোনো রেকর্ড নেই</div>';return;}
+  document.getElementById('modal-list').innerHTML=list.map((e,i)=>
+    `<div class="modal-list-item"><span>• ${e}</span><button class="modal-del-btn" onclick="removeModalEntry(${i})">×</button></div>`
+  ).join('');
+}
+function addModalEntry(){
+  if(!modalType)return;
+  const inp=document.getElementById('modal-add-input');
+  const val=inp.value.trim();
+  if(!val)return;
+  if(!history[modalType].includes(val)){
+    history[modalType].push(val);
+    counts[modalType]++;
+    document.getElementById('modal-count').textContent=counts[modalType];
+    document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');
+    save();renderModalList();
+  }
+  inp.value='';
+}
+function removeModalEntry(idx){
+  if(!modalType)return;
+  history[modalType].splice(idx,1);
+  counts[modalType]=Math.max(0,counts[modalType]-1);
+  document.getElementById('modal-count').textContent=counts[modalType];
+  document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');
+  save();renderModalList();
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');modalType=null;}
+function adjustCount(delta){
+  if(!modalType)return;
+  counts[modalType]=Math.max(0,counts[modalType]+delta);
+  document.getElementById('modal-count').textContent=counts[modalType];
+  document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');
+  save();
+}
+
+// ── Timeline ──────────────────────────────────────────────
 function openTimelineModal(ref){
   const app=allApps.find(a=>a.ref===ref);if(!app)return;
-  const s=stars[ref]||0;
-  const si=getStarIcon(s);
+  const s=stars[ref]||0;const si=getStarIcon(s);
   document.getElementById('timeline-modal-title').textContent=(si?si+' ':'')+app.name;
   const hist=statusHistory[ref]||[];
   const clr={'s1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b','s6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399'};
@@ -509,26 +549,19 @@ function openTimelineModal(ref){
 }
 function closeTimelineModal(){document.getElementById('timeline-modal').classList.remove('open');}
 
-// ── Note Modal (name click) ───────────────────────────────
+// ── Note Modal ────────────────────────────────────────────
 function openNoteModal(ref){
   noteModalRef=ref;
   const app=allApps.find(a=>a.ref===ref);
-  const s=stars[ref]||0;
-  const si=getStarIcon(s);
+  const s=stars[ref]||0;const si=getStarIcon(s);
   document.getElementById('note-modal-title').textContent=(si?si+' ':'')+( app?app.name:ref)+' — নোট';
   document.getElementById('note-modal-textarea').value=notes[ref]||'';
   document.getElementById('note-modal').classList.add('open');
   setTimeout(()=>document.getElementById('note-modal-textarea').focus(),100);
 }
 function closeNoteModal(){document.getElementById('note-modal').classList.remove('open');noteModalRef=null;}
-function saveNoteModal(){
-  if(!noteModalRef)return;
-  notes[noteModalRef]=document.getElementById('note-modal-textarea').value.trim();
-  save();closeNoteModal();render();
-}
-function clearNoteModal(){
-  document.getElementById('note-modal-textarea').value='';
-}
+function saveNoteModal(){if(!noteModalRef)return;notes[noteModalRef]=document.getElementById('note-modal-textarea').value.trim();save();closeNoteModal();render();}
+function clearNoteModal(){document.getElementById('note-modal-textarea').value='';}
 
 // ── Multi-select ──────────────────────────────────────────
 function toggleSelect(ref){if(selected.has(ref))selected.delete(ref);else selected.add(ref);updateSelectBar();const w=document.getElementById('wrap-'+ref);if(w)w.classList.toggle('selected',selected.has(ref));}
@@ -589,36 +622,26 @@ function toggleStar(ref){
 function startEditDeu(ref){editingDeu[ref]=true;render();setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}
 function updateCode(ref,val){codes[ref]=val;editingDeu[ref]=false;save();render();}
 
-// ── Date/Print Modals ─────────────────────────────────────
 function openDateModal(dateStr,prefix,sourceField){
-  const same=sourceField==='apply_date'
-    ?allApps.filter(a=>a.apply_date===dateStr)
-    :allApps.filter(a=>printDates[a.ref]===dateStr);
+  const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>printDates[a.ref]===dateStr);
   document.getElementById('date-modal-title').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
     const n=parseInt((a.status||'').split('/')[0])||0;
     const sc='s'+Math.min(n,10);
     const txt=sourceField==='print_date'?'(Printed)':a.status;
     const st=sourceField==='print_date'?'color:#64748b':'';
-    const s=stars[a.ref]||0;
-    const si=getStarIcon(s);
-    return `<div class="date-modal-item">
-      <div class="dm-left">
-        <div class="dm-name">${a.name}</div>
-        <div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${st}">${txt}</span></div>
-      </div>
-      ${si?`<span class="dm-star">${si}</span>`:''}
-    </div>`;
+    const s=stars[a.ref]||0;const si=getStarIcon(s);
+    return `<div class="date-modal-item"><div class="dm-left"><div class="dm-name">${a.name}</div><div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${st}">${txt}</span></div></div>${si?`<span class="dm-star">${si}</span>`:''}</div>`;
   }).join('');
   document.getElementById('date-modal').classList.add('open');
 }
 function closeDateModal(){document.getElementById('date-modal').classList.remove('open');}
-function openModal(type){modalType=type;document.getElementById('modal-title-text').textContent=type==='urgent'?'🔴 Urgent':'⭐ Important';document.getElementById('modal-count').textContent=counts[type];const list=history[type];document.getElementById('modal-list').innerHTML=list.length?list.map(e=>`<div class="modal-list-item">• ${e}</div>`).join(''):'<div style="color:#475569">কোনো রেকর্ড নেই</div>';document.getElementById('modal').classList.add('open');}
-function closeModal(){document.getElementById('modal').classList.remove('open');modalType=null;}
-function adjustCount(delta){if(!modalType)return;counts[modalType]=Math.max(0,counts[modalType]+delta);document.getElementById('modal-count').textContent=counts[modalType];document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');save();}
-function resetCounts(){if(!resetConfirm){resetConfirm=true;document.getElementById('reset-btn').classList.add('confirm');resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);}else{clearTimeout(resetTimer);resetConfirm=false;counts={urgent:0,important:0};history={urgent:[],important:[]};save();render();document.getElementById('reset-btn').classList.remove('confirm');}}
 
-// ── Card HTML ─────────────────────────────────────────────
+function resetCounts(){
+  if(!resetConfirm){resetConfirm=true;document.getElementById('reset-btn').classList.add('confirm');resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);}
+  else{clearTimeout(resetTimer);resetConfirm=false;counts={urgent:0,important:0};history={urgent:[],important:[]};save();render();document.getElementById('reset-btn').classList.remove('confirm');}
+}
+
 function cardHTML(app){
   const s=stars[app.ref]||0;
   const isDelivered=delivered[app.ref]||false;
@@ -638,7 +661,6 @@ function cardHTML(app){
   const policeTag=policeTags[app.ref]||'';
   const isFwd=forwarded[app.ref]||false;
   const isCol=collected[app.ref]||false;
-
   const stage=isCol?2:isFwd?1:0;
   const stageIcon=stage===0?'▴':stage===1?'▲':'▼';
   const stageCls=stage===0?'':stage===1?'fwd':'col';
@@ -652,21 +674,12 @@ function cardHTML(app){
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
 
   let policeHTML='';
-  if(s===0&&!isDelivered){
-    if(policeTag){policeHTML=`<span class="police-tag-badge" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`;}
-    else{policeHTML=`<span class="police-tag-btn" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️</span>`;}
-  }
+  if(s===0&&!isDelivered){if(policeTag){policeHTML=`<span class="police-tag-badge" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`;}else{policeHTML=`<span class="police-tag-btn" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️</span>`;}}
 
-  // Print date badge in bottom row
   const printBadge=(printDate&&s>0&&!isDelivered)?`<span class="print-badge" onclick="openDateModal('${printDate}','📅','print_date');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
-
-  // Note preview (no separate note button — use name click)
   const notePreview=(s>0&&!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`:'';
-
-  // Name click: urgent/important → note modal, status click → timeline
   const nameClick=(s>0)?`openNoteModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
   const statusClick=(s>0)?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
-
   const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
 
   return `
@@ -682,19 +695,12 @@ function cardHTML(app){
         onclick="handleTap('${app.ref}')">
         <div class="card-top">
           <div class="name" onclick="${nameClick}">${app.name}</div>
-          <div class="card-top-right">
-            ${stageBtn}
-            <button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${si}</button>
-          </div>
+          <div class="card-top-right">${stageBtn}<button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${si}</button></div>
         </div>
-        <div class="info">
-          ${refSVG} ${app.ref} &nbsp;|&nbsp; <span class="date-link" onclick="openDateModal('${app.apply_date}','📅','apply_date');event.stopPropagation()">${calSVG} ${app.apply_date}</span>&nbsp;${daySpan}
-        </div>
+        <div class="info">${refSVG} ${app.ref} &nbsp;|&nbsp; <span class="date-link" onclick="openDateModal('${app.apply_date}','📅','apply_date');event.stopPropagation()">${calSVG} ${app.apply_date}</span>&nbsp;${daySpan}</div>
         <div class="bottom-row">
           <span class="status ${scls}${shouldBlink?' status-blink':''}" onclick="${statusClick}">${app.status}</span>
-          ${deuHTML}
-          ${printBadge}
-          ${policeHTML}
+          ${deuHTML}${printBadge}${policeHTML}
           ${showPhone?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:''}
         </div>
         ${notePreview}
@@ -702,7 +708,6 @@ function cardHTML(app){
     </div>`;
 }
 
-// ── Swipe & Press ─────────────────────────────────────────
 let touchStartX={},touchStartY={},touching={};
 function swipeStart(e,ref){touchStartX[ref]=e.touches[0].clientX;touchStartY[ref]=e.touches[0].clientY;touching[ref]=true;}
 function swipeMove(e,ref){
@@ -732,7 +737,6 @@ function pressStart(ref){pressTimer[ref]=setTimeout(()=>{if(selectMode){toggleSe
 function pressEnd(ref){clearTimeout(pressTimer[ref]);}
 function handleTap(ref){if(selectMode)toggleSelect(ref);}
 
-// ── Render ────────────────────────────────────────────────
 function render(){
   const q=(document.querySelector('.search-bar').value||'').toLowerCase();
   let apps=allApps.filter(a=>{

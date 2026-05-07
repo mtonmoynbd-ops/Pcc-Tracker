@@ -52,7 +52,6 @@
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 20px; width: 90%; max-width: 360px; max-height: 82vh; overflow-y: auto; }
   .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
   .modal-close { background: none; border: none; color: #64748b; font-size: 20px; cursor: pointer; }
-  /* Count modal */
   .count-top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
   .adj-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .adj-num { font-size: 18px; font-weight: 700; min-width: 28px; text-align: center; flex-shrink: 0; }
@@ -63,9 +62,7 @@
   .modal-list-item { color: #94a3b8; display: flex; align-items: center; gap: 4px; padding: 5px 0; border-bottom: 1px solid #0f2040; }
   .modal-list-item span { flex: 1; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .m-order-btn { background: none; border: none; color: #475569; cursor: pointer; font-size: 12px; padding: 0 2px; flex-shrink: 0; }
-  .m-order-btn:hover { color: #94a3b8; }
   .modal-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 14px; padding: 0 2px; flex-shrink: 0; opacity: 0.6; }
-  .modal-del-btn:hover { opacity: 1; }
   .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .date-modal-item .dm-left { flex: 1; }
   .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
@@ -219,7 +216,6 @@
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title"><span id="modal-title-text"></span><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <!-- Row 1: adj + input + add -->
     <div class="count-top">
       <button class="adj-btn" onclick="adjustCount(-1)">−</button>
       <div class="adj-num" id="modal-count">0</div>
@@ -325,10 +321,10 @@ let resetConfirm=false,resetTimer=null;
 let modalType=null,activeFilter='all',activePoliceFilter=null;
 let selected=new Set(),selectMode=false;
 let calDate=new Date(),backupTimer=null,pickRef=null;
-let stageTimer={};
-let noteModalRef=null;
+let stageTimer={},noteModalRef=null;
 
-function save(){
+// ── Save — দুটো আলাদা function ───────────────────────────
+function saveLocal(){
   localStorage.setItem('pcc_stars',JSON.stringify(stars));
   localStorage.setItem('pcc_delivered',JSON.stringify(delivered));
   localStorage.setItem('pcc_codes',JSON.stringify(codes));
@@ -342,8 +338,8 @@ function save(){
   localStorage.setItem('pcc_forwarded',JSON.stringify(forwarded));
   localStorage.setItem('pcc_collected',JSON.stringify(collected));
   localStorage.setItem('pcc_collected_day',JSON.stringify(collectedDay));
-  scheduleBackup();
 }
+function save(){ saveLocal(); scheduleBackup(); }
 
 function getStarIcon(s){return s===2?'🔴':s===1?'⭐':'';}
 
@@ -365,7 +361,7 @@ function stagePressStart(e,ref){
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
 
 // ── Backup ────────────────────────────────────────────────
-function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=setTimeout(doBackup,30000);}
+function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=setTimeout(doBackup,5000);}
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;
   setBkDot('...');
@@ -384,18 +380,28 @@ async function doBackup(){
   }catch(e){setBkDot('err');}
 }
 function setBkDot(s){const el=document.getElementById('backup-dot');if(!el)return;el.className='backup-dot'+(s==='ok'?' ok':s==='err'?' err':'');}
-async function restoreFromBackup(){
-  if(localStorage.getItem('pcc_stars')!==null)return;
+
+// ── Restore — সবসময় চলবে, localStorage overwrite করবে ──
+async function syncFromCloud(){
   try{
-    const r=await fetch('userdata.json?t='+Date.now());if(!r.ok)return;
+    const r=await fetch('userdata.json?t='+Date.now());if(!r.ok)return false;
     const d=await r.json();
-    if(d.stars)stars=d.stars;if(d.delivered)delivered=d.delivered;if(d.codes)codes=d.codes;
-    if(d.showDeu)showDeu=d.showDeu;if(d.notes)notes=d.notes;if(d.blinkStopped)blinkStopped=d.blinkStopped;
-    if(d.policeTags)policeTags=d.policeTags;if(d.clientNames)clientNames=d.clientNames;
-    if(d.counts)counts=d.counts;if(d.history)history=d.history;
-    if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;
-    save();showToast('✅ ডেটা পুনরুদ্ধার হয়েছে');
-  }catch(e){}
+    if(d.stars)stars=d.stars;
+    if(d.delivered)delivered=d.delivered;
+    if(d.codes)codes=d.codes;
+    if(d.showDeu)showDeu=d.showDeu;
+    if(d.notes)notes=d.notes;
+    if(d.blinkStopped)blinkStopped=d.blinkStopped;
+    if(d.policeTags)policeTags=d.policeTags;
+    if(d.clientNames)clientNames=d.clientNames;
+    if(d.counts)counts=d.counts;
+    if(d.history)history=d.history;
+    if(d.forwarded)forwarded=d.forwarded;
+    if(d.collected)collected=d.collected;
+    if(d.collectedDay)collectedDay=d.collectedDay;
+    saveLocal(); // backup trigger না করে শুধু localStorage update
+    return true;
+  }catch(e){return false;}
 }
 
 function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-status').textContent='';document.getElementById('settings-modal').classList.add('open');}
@@ -422,14 +428,9 @@ function renderCal(){
   const dayDots={};
   allApps.forEach(a=>{
     if(!a.apply_date)return;
-    const p=a.apply_date.toUpperCase().split('-');
-    if(p.length!==3)return;
+    const p=a.apply_date.toUpperCase().split('-');if(p.length!==3)return;
     const dd=parseInt(p[0]),mo=msMap[p[1]],yr=2000+parseInt(p[2]);
-    if(mo===m&&yr===y){
-      if(!dayDots[dd])dayDots[dd]=[];
-      const s=stars[a.ref]||0;
-      dayDots[dd].push(s===2?'urgent':s===1?'important':'normal');
-    }
+    if(mo===m&&yr===y){if(!dayDots[dd])dayDots[dd]=[];const s=stars[a.ref]||0;dayDots[dd].push(s===2?'urgent':s===1?'important':'normal');}
   });
   let html='';
   for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';
@@ -439,12 +440,7 @@ function renderCal(){
     const ds=String(d).padStart(2,'0')+'-'+sm[m]+'-'+String(y).slice(2);
     let cls='cal-day'+(isT?' today':hasF?' has-file':'');
     let dotsHTML='';
-    if(hasF){
-      const shown=dots.slice(0,3);
-      const dotSpans=isT?shown.map(()=>`<span class="cal-dot today-dot"></span>`).join(''):shown.map(t=>`<span class="cal-dot ${t}"></span>`).join('');
-      const plus=dots.length>3?`<span style="font-size:7px;color:#94a3b8">+</span>`:'';
-      dotsHTML=`<div class="cal-dots">${dotSpans}${plus}</div>`;
-    }
+    if(hasF){const shown=dots.slice(0,3);const dotSpans=isT?shown.map(()=>`<span class="cal-dot today-dot"></span>`).join(''):shown.map(t=>`<span class="cal-dot ${t}"></span>`).join('');const plus=dots.length>3?`<span style="font-size:7px;color:#94a3b8">+</span>`:'';dotsHTML=`<div class="cal-dots">${dotSpans}${plus}</div>`;}
     html+=`<div class="${cls}" ${hasF?`onclick="calDayClick('${ds}')"`:''}>${d}${dotsHTML}</div>`;
   }
   document.getElementById('cal-days').innerHTML=html;
@@ -504,37 +500,27 @@ function renderModalList(){
 }
 function moveEntry(idx,dir){
   if(!modalType)return;
-  const list=history[modalType];
-  const newIdx=idx+dir;
+  const list=history[modalType];const newIdx=idx+dir;
   if(newIdx<0||newIdx>=list.length)return;
   [list[idx],list[newIdx]]=[list[newIdx],list[idx]];
   save();renderModalList();
 }
 function addModalEntry(){
   if(!modalType)return;
-  const inp=document.getElementById('modal-add-input');
-  const val=inp.value.trim();if(!val)return;
-  if(!history[modalType].includes(val)){
-    history[modalType].push(val);
-    counts[modalType]++;
-    document.getElementById('modal-count').textContent=counts[modalType];
-    document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');
-    save();renderModalList();
-  }
+  const inp=document.getElementById('modal-add-input');const val=inp.value.trim();if(!val)return;
+  if(!history[modalType].includes(val)){history[modalType].push(val);counts[modalType]++;document.getElementById('modal-count').textContent=counts[modalType];document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');save();renderModalList();}
   inp.value='';
 }
 function removeModalEntry(idx){
   if(!modalType)return;
-  history[modalType].splice(idx,1);
-  counts[modalType]=Math.max(0,counts[modalType]-1);
+  history[modalType].splice(idx,1);counts[modalType]=Math.max(0,counts[modalType]-1);
   document.getElementById('modal-count').textContent=counts[modalType];
   document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');
   save();renderModalList();
 }
 function copyModalList(){
   if(!modalType)return;
-  const list=history[modalType];
-  if(!list.length){showToast('কোনো রেকর্ড নেই');return;}
+  const list=history[modalType];if(!list.length){showToast('কোনো রেকর্ড নেই');return;}
   const text=list.join('\n');
   if(navigator.share)navigator.share({text});
   else navigator.clipboard.writeText(text).then(()=>showToast('✓ লিস্ট কপি হয়েছে')).catch(()=>showToast('✓ কপি হয়েছে'));
@@ -557,8 +543,7 @@ function openTimelineModal(ref){
   const clr={'s1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b','s6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399'};
   if(!hist.length){document.getElementById('timeline-list').innerHTML='<div style="color:#475569;font-size:12px;text-align:center;padding:12px">কোনো ইতিহাস নেই</div>';document.getElementById('timeline-modal').classList.add('open');return;}
   document.getElementById('timeline-list').innerHTML=hist.map(h=>{
-    const n2=parseInt((h.status||'').split('/')[0])||0;
-    const sc='s'+Math.min(n2,10);const color=clr[sc]||'#94a3b8';
+    const n2=parseInt((h.status||'').split('/')[0])||0;const sc='s'+Math.min(n2,10);const color=clr[sc]||'#94a3b8';
     return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${h.status}</span></div><span class="timeline-date">${h.date}</span></div>`;
   }).join('');
   document.getElementById('timeline-modal').classList.add('open');
@@ -568,8 +553,7 @@ function closeTimelineModal(){document.getElementById('timeline-modal').classLis
 // ── Note Modal ────────────────────────────────────────────
 function openNoteModal(ref){
   noteModalRef=ref;
-  const app=allApps.find(a=>a.ref===ref);
-  const s=stars[ref]||0;const si=getStarIcon(s);
+  const app=allApps.find(a=>a.ref===ref);const s=stars[ref]||0;const si=getStarIcon(s);
   document.getElementById('note-modal-title').textContent=(si?si+' ':'')+( app?app.name:ref)+' — নোট';
   document.getElementById('note-modal-textarea').value=notes[ref]||'';
   document.getElementById('note-modal').classList.add('open');
@@ -588,10 +572,8 @@ function copySelected(){
   allApps.forEach(a=>{
     if(selected.has(a.ref)){
       lines.push(`${a.name} ${a.ref}`);
-      const n=parseInt((a.status||'').split('/')[0])||0;
-      if(n===2)blinkStopped[a.ref]=true;
-      const s=stars[a.ref]||0;
-      if(s>0&&!forwarded[a.ref])forwarded[a.ref]=true;
+      const n=parseInt((a.status||'').split('/')[0])||0;if(n===2)blinkStopped[a.ref]=true;
+      const s=stars[a.ref]||0;if(s>0&&!forwarded[a.ref])forwarded[a.ref]=true;
     }
   });
   save();
@@ -642,41 +624,32 @@ function openDateModal(dateStr,prefix,sourceField){
   const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>printDates[a.ref]===dateStr);
   document.getElementById('date-modal-title').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
-    const n=parseInt((a.status||'').split('/')[0])||0;
-    const sc='s'+Math.min(n,10);
-    const txt=sourceField==='print_date'?'(Printed)':a.status;
-    const st=sourceField==='print_date'?'color:#64748b':'';
+    const n=parseInt((a.status||'').split('/')[0])||0;const sc='s'+Math.min(n,10);
+    const txt=sourceField==='print_date'?'(Printed)':a.status;const st=sourceField==='print_date'?'color:#64748b':'';
     const s=stars[a.ref]||0;const si=getStarIcon(s);
     return `<div class="date-modal-item"><div class="dm-left"><div class="dm-name">${a.name}</div><div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${st}">${txt}</span></div></div>${si?`<span class="dm-star">${si}</span>`:''}</div>`;
   }).join('');
   document.getElementById('date-modal').classList.add('open');
 }
 function closeDateModal(){document.getElementById('date-modal').classList.remove('open');}
-
 function resetCounts(){
   if(!resetConfirm){resetConfirm=true;document.getElementById('reset-btn').classList.add('confirm');resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);}
   else{clearTimeout(resetTimer);resetConfirm=false;counts={urgent:0,important:0};history={urgent:[],important:[]};save();render();document.getElementById('reset-btn').classList.remove('confirm');}
 }
 
+// ── Card HTML ─────────────────────────────────────────────
 function cardHTML(app){
-  const s=stars[app.ref]||0;
-  const isDelivered=delivered[app.ref]||false;
+  const s=stars[app.ref]||0;const isDelivered=delivered[app.ref]||false;
   const si=s===2?'🔴':s===1?'⭐':'☆';
   const cls=isDelivered?'delivered':s===2?'star2':s===1?'star1':'';
-  const num=parseInt((app.status||'').split('/')[0])||0;
-  const scls='s'+Math.min(num,10);
+  const num=parseInt((app.status||'').split('/')[0])||0;const scls='s'+Math.min(num,10);
   const showPhone=s>0&&app.phone;
-  const hasDeu=!isDelivered&&showDeu[app.ref];
-  const deuVal=codes[app.ref]||'';
-  const isEditing=editingDeu[app.ref];
+  const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const days=(!isDelivered&&s>0)?daysSince(app.apply_date,app.ref):null;
-  const noteVal=notes[app.ref]||'';
-  const isSelected=selected.has(app.ref);
+  const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
-  const printDate=printDates[app.ref]||null;
-  const policeTag=policeTags[app.ref]||'';
-  const isFwd=forwarded[app.ref]||false;
-  const isCol=collected[app.ref]||false;
+  const printDate=printDates[app.ref]||null;const policeTag=policeTags[app.ref]||'';
+  const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
   const stage=isCol?2:isFwd?1:0;
   const stageIcon=stage===0?'▴':stage===1?'▲':'▼';
   const stageCls=stage===0?'':stage===1?'fwd':'col';
@@ -724,6 +697,7 @@ function cardHTML(app){
     </div>`;
 }
 
+// ── Swipe & Press ─────────────────────────────────────────
 let touchStartX={},touchStartY={},touching={};
 function swipeStart(e,ref){touchStartX[ref]=e.touches[0].clientX;touchStartY[ref]=e.touches[0].clientY;touching[ref]=true;}
 function swipeMove(e,ref){
@@ -753,6 +727,7 @@ function pressStart(ref){pressTimer[ref]=setTimeout(()=>{if(selectMode){toggleSe
 function pressEnd(ref){clearTimeout(pressTimer[ref]);}
 function handleTap(ref){if(selectMode)toggleSelect(ref);}
 
+// ── Render ────────────────────────────────────────────────
 function render(){
   const q=(document.querySelector('.search-bar').value||'').toLowerCase();
   let apps=allApps.filter(a=>{
@@ -773,19 +748,16 @@ function render(){
   document.getElementById('list').innerHTML=html;
   document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
   document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
-
-  // Draft blink
   const hasDraft=allApps.some(a=>(a.status||'').toLowerCase().includes('draft'));
   const draftBtn=document.getElementById('draft-btn');
-  if(draftBtn){
-    if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');
-    else draftBtn.classList.remove('draft-blink');
-  }
+  if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
 }
 
+// ── Load — প্রতিবার cloud থেকে sync ──────────────────────
 async function load(){
   try{
-    await restoreFromBackup();
+    // প্রথমে cloud থেকে userdata sync
+    await syncFromCloud();
     const r=await fetch('data.json?t='+Date.now());
     const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
@@ -796,7 +768,7 @@ async function load(){
 }
 
 load();
-setInterval(load,30000); // ৩০ সেকেন্ডে refresh — cross-app sync
+setInterval(load,30000); // ৩০ সেকেন্ডে refresh + sync
 </script>
 </body>
 </html>

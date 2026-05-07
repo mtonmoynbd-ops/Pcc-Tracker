@@ -27,6 +27,8 @@
   .filter-row { display: flex; gap: 6px; margin-bottom: 6px; overflow-x: auto; padding-bottom: 2px; align-items: center; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
+  @keyframes blink-draft { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .filter-btn.draft-blink { animation: blink-draft 1.2s ease-in-out infinite; border-color: #f59e0b; color: #f59e0b; }
   .icon-filter-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #2563eb; background: #1e3a5f; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; }
   .icon-filter-btn.police { border-color: #a78bfa; background: #1e1a3a; margin-left: auto; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
@@ -48,24 +50,22 @@
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; }
   .modal.open { display: flex; }
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 20px; width: 90%; max-width: 360px; max-height: 82vh; overflow-y: auto; }
-  .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
   .modal-close { background: none; border: none; color: #64748b; font-size: 20px; cursor: pointer; }
-
-  /* Count modal top row */
-  .count-modal-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-  .modal-adj { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .adj-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .adj-num { font-size: 20px; font-weight: 700; min-width: 32px; text-align: center; }
-  .modal-add-row { display: flex; gap: 6px; flex: 1; }
-  .modal-add-input { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 6px 10px; color: #e2e8f0; font-size: 12px; outline: none; min-width: 0; }
-  .modal-add-btn { background: #1d4ed8; border: none; color: #fff; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
-
-  .modal-list { font-size: 12px; color: #64748b; border-top: 1px solid #1e3a5f; padding-top: 10px; }
-  .modal-list-item { color: #94a3b8; display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #0f1f3d; }
-  .modal-list-item span { flex: 1; font-size: 12px; }
-  .modal-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 15px; padding: 0 4px; flex-shrink: 0; opacity: 0.6; }
+  /* Count modal */
+  .count-top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .adj-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .adj-num { font-size: 18px; font-weight: 700; min-width: 28px; text-align: center; flex-shrink: 0; }
+  .modal-add-input { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 5px 8px; color: #e2e8f0; font-size: 12px; outline: none; min-width: 0; }
+  .modal-add-btn { background: #1d4ed8; border: none; color: #fff; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .modal-copy-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; flex-shrink: 0; }
+  .modal-list { font-size: 12px; color: #64748b; border-top: 1px solid #1e3a5f; padding-top: 8px; max-height: 260px; overflow-y: auto; }
+  .modal-list-item { color: #94a3b8; display: flex; align-items: center; gap: 4px; padding: 5px 0; border-bottom: 1px solid #0f2040; }
+  .modal-list-item span { flex: 1; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .m-order-btn { background: none; border: none; color: #475569; cursor: pointer; font-size: 12px; padding: 0 2px; flex-shrink: 0; }
+  .m-order-btn:hover { color: #94a3b8; }
+  .modal-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 14px; padding: 0 2px; flex-shrink: 0; opacity: 0.6; }
   .modal-del-btn:hover { opacity: 1; }
-
   .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .date-modal-item .dm-left { flex: 1; }
   .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
@@ -182,7 +182,7 @@
   <button class="filter-btn" onclick="setFilter('1-3',this)">1-3</button>
   <button class="filter-btn" onclick="setFilter('4-6',this)">4-6</button>
   <button class="filter-btn" onclick="setFilter('7-9',this)">7-9</button>
-  <button class="filter-btn" onclick="setFilter('draft',this)">Draft</button>
+  <button class="filter-btn" id="draft-btn" onclick="setFilter('draft',this)">Draft</button>
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <span style="font-size:13px">🏷️</span>
   </button>
@@ -219,16 +219,14 @@
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title"><span id="modal-title-text"></span><button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="count-modal-top">
-      <div class="modal-adj">
-        <button class="adj-btn" onclick="adjustCount(-1)">−</button>
-        <div class="adj-num" id="modal-count">0</div>
-        <button class="adj-btn" onclick="adjustCount(1)">+</button>
-      </div>
-      <div class="modal-add-row">
-        <input class="modal-add-input" id="modal-add-input" type="text" placeholder="নাম রেফ..." onkeydown="if(event.key==='Enter')addModalEntry()">
-        <button class="modal-add-btn" onclick="addModalEntry()">+ যোগ</button>
-      </div>
+    <!-- Row 1: adj + input + add -->
+    <div class="count-top">
+      <button class="adj-btn" onclick="adjustCount(-1)">−</button>
+      <div class="adj-num" id="modal-count">0</div>
+      <button class="adj-btn" onclick="adjustCount(1)">+</button>
+      <input class="modal-add-input" id="modal-add-input" type="text" placeholder="নাম রেফ..." onkeydown="if(event.key==='Enter')addModalEntry()">
+      <button class="modal-add-btn" onclick="addModalEntry()">+</button>
+      <button class="modal-copy-btn" onclick="copyModalList()" title="সব কপি">📋</button>
     </div>
     <div class="modal-list" id="modal-list"></div>
   </div>
@@ -437,8 +435,7 @@ function renderCal(){
   for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';
   for(let d=1;d<=dim;d++){
     const isT=new Date(y,m,d).getTime()===today.getTime();
-    const dots=dayDots[d]||[];
-    const hasF=dots.length>0;
+    const dots=dayDots[d]||[];const hasF=dots.length>0;
     const ds=String(d).padStart(2,'0')+'-'+sm[m]+'-'+String(y).slice(2);
     let cls='cal-day'+(isT?' today':hasF?' has-file':'');
     let dotsHTML='';
@@ -486,7 +483,6 @@ function assignPoliceTag(name){if(!pickRef)return;if(name)policeTags[pickRef]=na
 // ── Count Modal ───────────────────────────────────────────
 function openModal(type){
   modalType=type;
-  const color=type==='urgent'?'#ef4444':'#f59e0b';
   document.getElementById('modal-title-text').textContent=type==='urgent'?'🔴 Urgent':'⭐ Important';
   document.getElementById('modal-count').textContent=counts[type];
   document.getElementById('modal-add-input').value='';
@@ -496,16 +492,28 @@ function openModal(type){
 function renderModalList(){
   if(!modalType)return;
   const list=history[modalType];
-  if(!list.length){document.getElementById('modal-list').innerHTML='<div style="color:#475569;padding:8px 0">কোনো রেকর্ড নেই</div>';return;}
+  if(!list.length){document.getElementById('modal-list').innerHTML='<div style="color:#475569;padding:8px 0;font-size:12px">কোনো রেকর্ড নেই</div>';return;}
   document.getElementById('modal-list').innerHTML=list.map((e,i)=>
-    `<div class="modal-list-item"><span>• ${e}</span><button class="modal-del-btn" onclick="removeModalEntry(${i})">×</button></div>`
+    `<div class="modal-list-item">
+      <button class="m-order-btn" onclick="moveEntry(${i},-1)" ${i===0?'style="opacity:0.2;pointer-events:none"':''}>▲</button>
+      <button class="m-order-btn" onclick="moveEntry(${i},1)" ${i===list.length-1?'style="opacity:0.2;pointer-events:none"':''}>▼</button>
+      <span title="${e}">• ${e}</span>
+      <button class="modal-del-btn" onclick="removeModalEntry(${i})">×</button>
+    </div>`
   ).join('');
+}
+function moveEntry(idx,dir){
+  if(!modalType)return;
+  const list=history[modalType];
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=list.length)return;
+  [list[idx],list[newIdx]]=[list[newIdx],list[idx]];
+  save();renderModalList();
 }
 function addModalEntry(){
   if(!modalType)return;
   const inp=document.getElementById('modal-add-input');
-  const val=inp.value.trim();
-  if(!val)return;
+  const val=inp.value.trim();if(!val)return;
   if(!history[modalType].includes(val)){
     history[modalType].push(val);
     counts[modalType]++;
@@ -522,6 +530,14 @@ function removeModalEntry(idx){
   document.getElementById('modal-count').textContent=counts[modalType];
   document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');
   save();renderModalList();
+}
+function copyModalList(){
+  if(!modalType)return;
+  const list=history[modalType];
+  if(!list.length){showToast('কোনো রেকর্ড নেই');return;}
+  const text=list.join('\n');
+  if(navigator.share)navigator.share({text});
+  else navigator.clipboard.writeText(text).then(()=>showToast('✓ লিস্ট কপি হয়েছে')).catch(()=>showToast('✓ কপি হয়েছে'));
 }
 function closeModal(){document.getElementById('modal').classList.remove('open');modalType=null;}
 function adjustCount(delta){
@@ -757,6 +773,14 @@ function render(){
   document.getElementById('list').innerHTML=html;
   document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
   document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
+
+  // Draft blink
+  const hasDraft=allApps.some(a=>(a.status||'').toLowerCase().includes('draft'));
+  const draftBtn=document.getElementById('draft-btn');
+  if(draftBtn){
+    if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');
+    else draftBtn.classList.remove('draft-blink');
+  }
 }
 
 async function load(){
@@ -772,7 +796,7 @@ async function load(){
 }
 
 load();
-setInterval(load,300000);
+setInterval(load,30000); // ৩০ সেকেন্ডে refresh — cross-app sync
 </script>
 </body>
 </html>

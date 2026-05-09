@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'data.json'
+  workflow_dispatch:
 
 jobs:
   notify:

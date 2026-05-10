@@ -10,43 +10,15 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Install dependencies
-        run: pip install google-auth requests
-
-      - name: Send FCM Notification
-        env:
-          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Send OneSignal Notification
         run: |
-          python3 << 'EOF'
-          import json, os
-          import google.auth.transport.requests
-          from google.oauth2 import service_account
-          import requests
-
-          sa_info = json.loads(os.environ['SERVICE_ACCOUNT'])
-          credentials = service_account.Credentials.from_service_account_info(
-              sa_info,
-              scopes=['https://www.googleapis.com/auth/firebase.messaging']
-          )
-          credentials.refresh(google.auth.transport.requests.Request())
-          token = credentials.token
-
-          url = "https://fcm.googleapis.com/v1/projects/pcctracker-cfb43/messages:send"
-          headers = {
-              "Authorization": f"Bearer {token}",
-              "Content-Type": "application/json"
-          }
-          data = {
-              "message": {
-                  "topic": "pcc_updates",
-                  "notification": {
-                      "title": "PCC আপডেট!",
-                      "body": "ট্র্যাকারে নতুন পরিবর্তন হয়েছে।"
-                  }
-              }
-          }
-          r = requests.post(url, headers=headers, json=data)
-          print(r.status_code, r.text)
-          EOF
+          curl -X POST \
+          "https://api.onesignal.com/notifications" \
+          -H "Authorization: Key ${{ secrets.ONESIGNAL_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "app_id": "${{ secrets.ONESIGNAL_APP_ID }}",
+            "included_segments": ["All"],
+            "contents": {"en": "PCC Tracker-এ পরিবর্তন হয়েছে!"},
+            "headings": {"en": "PCC আপডেট!"}
+          }'

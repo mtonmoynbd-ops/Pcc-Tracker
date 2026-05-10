@@ -14,5 +14,7 @@ jobs:
         run: |
           curl -d "PCC Tracker-এ পরিবর্তন হয়েছে!" \
           -H "Title: PCC আপডেট!" \
+          -H "Priority: urgent" \
+          -H "Tags: bell" \
           -H "Click: https://mtonmoynbd-ops.github.io/Pcc-Tracker/" \
           ntfy.sh/pcc_tracker_tonmoy

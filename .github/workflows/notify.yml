@@ -16,5 +16,5 @@ jobs:
           -H "Title: PCC আপডেট!" \
           -H "Priority: urgent" \
           -H "Tags: bell" \
-          -H "Click: https://mtonmoynbd-ops.github.io/Pcc-Tracker/" \
+          -H "Click: intent:#Intent;package=com.pcctracker.app;end" \
           ntfy.sh/pcc_tracker_tonmoy

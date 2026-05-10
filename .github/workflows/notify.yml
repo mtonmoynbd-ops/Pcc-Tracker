@@ -10,15 +10,9 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send OneSignal Notification
+      - name: Send Notification
         run: |
-          curl -X POST \
-          "https://api.onesignal.com/notifications" \
-          -H "Authorization: Key ${{ secrets.ONESIGNAL_API_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "app_id": "${{ secrets.ONESIGNAL_APP_ID }}",
-            "included_segments": ["All"],
-            "contents": {"en": "PCC Tracker-এ পরিবর্তন হয়েছে!"},
-            "headings": {"en": "PCC আপডেট!"}
-          }'
+          curl -d "PCC Tracker-এ পরিবর্তন হয়েছে!" \
+          -H "Title: PCC আপডেট!" \
+          -H "Click: https://mtonmoynbd-ops.github.io/Pcc-Tracker/" \
+          ntfy.sh/pcc_tracker_tonmoy

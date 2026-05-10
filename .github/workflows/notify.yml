@@ -3,7 +3,7 @@ name: PCC Notification
 on:
   push:
     paths:
-      - 'pcc_state.json'
+      - 'docs/data.json'
   workflow_dispatch:
 
 jobs:

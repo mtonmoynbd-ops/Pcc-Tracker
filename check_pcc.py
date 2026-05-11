@@ -162,7 +162,9 @@ async def main():
             new_history = dict(old_history)
             changes = []
             new_files = []
-            today_str = datetime.now().strftime("%d-%b-%Y")
+            from datetime import datetime, timezone, timedelta
+BD_TZ = timezone(timedelta(hours=6))
+today_str = datetime.now(BD_TZ).strftime("%d-%b-%Y")
 
             for app in applications:
                 ref = app["ref"]

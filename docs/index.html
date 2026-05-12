@@ -32,13 +32,15 @@
   .icon-filter-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #2563eb; background: #1e3a5f; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; }
   .icon-filter-btn.police { border-color: #a78bfa; background: #1e1a3a; margin-left: auto; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
+
+  /* Calendar */
   .cal-box { display: none; background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
   .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   .cal-nav { background: #1e293b; border: 1px solid #334155; color: #94a3b8; border-radius: 6px; padding: 2px 10px; cursor: pointer; font-size: 14px; }
   .cal-title { font-size: 13px; font-weight: 700; color: #f1f5f9; }
   .cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; text-align: center; font-size: 11px; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
   .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; text-align: center; }
-  .cal-day { padding: 2px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #94a3b8; position: relative; border: 1px solid transparent; min-height: 36px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 3px; }
+  .cal-day { padding: 2px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #94a3b8; border: 1px solid transparent; min-height: 36px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 3px; }
   .cal-day.has-file { color: #e2e8f0; font-weight: 700; background: #1e3a5f; border-color: #2563eb; cursor: pointer; }
   .cal-day.today { background: #1d4ed8; color: #fff; font-weight: 700; }
   .cal-dots { display: flex; gap: 1px; justify-content: center; margin-top: 2px; flex-wrap: wrap; max-width: 32px; }
@@ -47,8 +49,12 @@
   .cal-dot.important { background: #f59e0b; }
   .cal-dot.urgent { background: #ef4444; }
   .cal-dot.today-dot { background: #fff; }
+
+  /* Section */
   .section-row { display: flex; align-items: center; margin: 12px 0 8px; }
   .section-title { font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* Modals */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
   .modal.open { display: flex; }
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 18px; width: 100%; max-width: 360px; max-height: 82vh; overflow-y: auto; }
@@ -60,26 +66,36 @@
   .modal-add-input { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 5px 8px; color: #e2e8f0; font-size: 12px; outline: none; min-width: 0; }
   .modal-add-btn { background: #1d4ed8; border: none; color: #fff; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; flex-shrink: 0; }
   .modal-copy-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; flex-shrink: 0; }
-  .modal-list { font-size: 12px; color: #64748b; border-top: 1px solid #1e3a5f; padding-top: 8px; max-height: 200px; overflow-y: auto; }
+  .modal-list { font-size: 12px; border-top: 1px solid #1e3a5f; padding-top: 8px; max-height: 200px; overflow-y: auto; }
   .modal-list-item { color: #94a3b8; display: flex; align-items: center; gap: 4px; padding: 5px 0; border-bottom: 1px solid #0f2040; }
   .modal-list-item span { flex: 1; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .m-order-btn { background: none; border: none; color: #475569; cursor: pointer; font-size: 12px; padding: 0 2px; flex-shrink: 0; }
   .modal-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 14px; padding: 0 2px; flex-shrink: 0; opacity: 0.6; }
+
+  /* Date modal */
   .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .date-modal-item .dm-left { flex: 1; }
   .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
   .date-modal-item .dm-info { font-size: 11px; color: #64748b; margin-top: 2px; }
   .dm-star { font-size: 13px; flex-shrink: 0; margin-left: 8px; }
+
+  /* Print date picker */
   .print-edit-box { background: #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid #2563eb; }
   .print-edit-label { font-size: 11px; color: #60a5fa; margin-bottom: 8px; font-weight: 600; }
   .print-date-picker { width: 100%; background: #0f1f3d; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; color: #e2e8f0; font-size: 14px; outline: none; }
   .print-date-save { background: #1d4ed8; border: none; color: #fff; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; margin-top: 10px; width: 100%; }
+
+  /* Timeline */
   .timeline-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .timeline-status { font-size: 13px; font-weight: 700; }
   .timeline-date { font-size: 11px; color: #64748b; }
+
+  /* Note modal */
   .note-modal-textarea { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: #e2e8f0; font-size: 13px; outline: none; resize: none; margin-bottom: 10px; min-height: 80px; }
   .note-modal-save { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .note-modal-clear { background: none; border: 1px solid #334155; color: #64748b; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-left: 8px; }
+
+  /* Police */
   .police-filter-list { display: flex; flex-wrap: wrap; gap: 8px; }
   .police-filter-pill { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #7c3aed; background: #1e1a3a; color: #c4b5fd; cursor: pointer; }
   .police-filter-pill.active { background: #4c1d95; color: #ede9fe; }
@@ -97,6 +113,8 @@
   .settings-info { font-size: 11px; color: #475569; margin-bottom: 12px; line-height: 1.6; }
   .settings-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; margin-bottom: 10px; }
   .settings-save-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+
+  /* Select bar */
   .select-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1f3d; border-top: 1px solid #1e3a5f; padding: 12px 16px; z-index: 50; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
   .select-bar.visible { display: flex; }
   .select-bar-info { font-size: 13px; color: #94a3b8; }
@@ -108,7 +126,7 @@
   /* Cards */
   .card-wrap { position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; }
   .card-wrap.selected .card { border-color: #2563eb !important; border-width: 2px !important; }
-  .sel-check { display: none; position: absolute; bottom: 10px; left: 10px; background: #2563eb; color: #fff; width: 18px; height: 18px; border-radius: 50%; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; z-index: 10; }
+  .sel-check { display: none; position: absolute; bottom: 12px; left: 10px; background: #2563eb; color: #fff; width: 18px; height: 18px; border-radius: 50%; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; z-index: 10; }
   .card-wrap.selected .sel-check { display: flex; }
   .swipe-hint { position: absolute; top: 0; bottom: 0; width: 100%; display: flex; align-items: center; border-radius: 12px; pointer-events: none; opacity: 0; transition: opacity 0.1s; }
   .swipe-hint.left-hint { background: #14532d; justify-content: flex-end; padding-right: 24px; color: #34d399; font-size: 13px; font-weight: 700; }
@@ -150,24 +168,9 @@
   .note-preview { font-size: 12px; color: #94a3b8; margin-top: 4px; cursor: pointer; }
   .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; flex-shrink: 0; }
 
-  /* Normal card expand toggle — bottom bar */
-  .expand-toggle {
-    width: 60%; margin: 8px auto 0;
-    height: 3px; border-radius: 3px;
-    background: #1e293b;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.25s ease;
-    border: 1px solid transparent;
-  }
-  .expand-toggle:hover { background: #2d3f58; }
-  .expand-toggle.open {
-    height: 16px; border-radius: 6px;
-    background: rgba(30,58,95,0.6);
-    border-color: rgba(96,165,250,0.2);
-  }
-  .expand-toggle-label { display: none; font-size: 9px; color: #475569; letter-spacing: 2px; font-weight: 600; text-transform: uppercase; }
-  .expand-toggle.open .expand-toggle-label { display: block; }
+  /* Expand toggle — thin invisible line at bottom of normal cards */
+  .expand-toggle { width: 40%; margin: 8px auto 0; height: 2px; border-radius: 2px; background: #1e293b; cursor: pointer; transition: background 0.25s ease; display: block; border: none; }
+  .expand-toggle.open { background: rgba(96,165,250,0.35); }
 
   .loading { text-align: center; padding: 40px; color: #475569; }
   #toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
@@ -329,6 +332,8 @@ const calSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" f
 const printSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
 
 const REPO_API='https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/contents/docs/userdata.json';
+const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS_UP=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 let allApps=[],printDates={},statusHistory={};
 let stars=JSON.parse(localStorage.getItem('pcc_stars')||'{}');
@@ -353,8 +358,28 @@ let selected=new Set(),selectMode=false;
 let calDate=new Date(),backupTimer=null,pickRef=null;
 let stageTimer={},noteModalRef=null;
 
-const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const MONTHS_UP=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+// ── Date helpers ──────────────────────────────────────────
+function toInputDate(str){
+  try{
+    if(!str)return '';
+    const p=str.toUpperCase().split('-');
+    if(p.length!==3)return '';
+    const dd=String(parseInt(p[0])).padStart(2,'0');
+    const mo=MONTHS_UP.indexOf(p[1].substring(0,3));
+    if(mo<0)return '';
+    let yr=parseInt(p[2]);
+    if(yr<100)yr=2000+yr; // fix: 26→2026
+    return `${yr}-${String(mo+1).padStart(2,'0')}-${dd}`;
+  }catch{return '';}
+}
+function fromInputDate(str){
+  try{
+    if(!str)return '';
+    const[y,mo,d]=str.split('-');
+    return String(parseInt(d)).padStart(2,'0')+'-'+MONTHS_SHORT[parseInt(mo)-1]+'-'+String(y).slice(2);
+  }catch{return '';}
+}
+function getEffectivePrintDate(ref){ return manualPrintDates[ref]||printDates[ref]||null; }
 
 // ── Save ──────────────────────────────────────────────────
 function saveLocal(){
@@ -375,51 +400,6 @@ function saveLocal(){
   localStorage.setItem('pcc_expanded_normal',JSON.stringify([...expandedNormal]));
 }
 function save(){ saveLocal(); scheduleBackup(); }
-
-function getStarIcon(s){return s===2?'🔴':s===1?'⭐':'';}
-function getEffectivePrintDate(ref){ return manualPrintDates[ref]||printDates[ref]||null; }
-
-// ── Date helpers ──────────────────────────────────────────
-// DD-MMM-YY → YYYY-MM-DD (for input[type=date])
-// Fixes: 26 → 2026, not 4026
-function toInputDate(str){
-  try{
-    if(!str)return '';
-    const p=str.toUpperCase().split('-');
-    if(p.length!==3)return '';
-    const dd=String(parseInt(p[0])).padStart(2,'0');
-    const mo=MONTHS_UP.indexOf(p[1].substring(0,3));
-    if(mo<0)return '';
-    let yr=parseInt(p[2]);
-    if(yr<100)yr=2000+yr;
-    return `${yr}-${String(mo+1).padStart(2,'0')}-${dd}`;
-  }catch{return '';}
-}
-
-// YYYY-MM-DD → DD-MMM-YY
-function fromInputDate(str){
-  try{
-    if(!str)return '';
-    const[y,mo,d]=str.split('-');
-    return String(parseInt(d)).padStart(2,'0')+'-'+MONTHS_SHORT[parseInt(mo)-1]+'-'+String(y).slice(2);
-  }catch{return '';}
-}
-
-// ── Stage button ──────────────────────────────────────────
-function stagePressStart(e,ref){
-  e.stopPropagation();
-  const btn=document.getElementById('sbtn-'+ref);
-  if(btn)btn.classList.add('pressing');
-  const isCol=collected[ref]||false,isFwd=forwarded[ref]||false;
-  const stage=isCol?2:isFwd?1:0;
-  stageTimer[ref]=setTimeout(()=>{
-    if(btn)btn.classList.remove('pressing');
-    if(stage===0){forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↑ Forwarded');}
-    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);save();render();showToast('↓ Collected');}
-    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↺ Reset');}
-  },stage===2?2000:600);
-}
-function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
 
 // ── Backup ────────────────────────────────────────────────
 function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=setTimeout(doBackup,5000);}
@@ -455,6 +435,7 @@ async function syncFromCloud(){
   }catch(e){}
 }
 
+// ── Settings ──────────────────────────────────────────────
 function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-status').textContent='';document.getElementById('settings-modal').classList.add('open');}
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 async function savePAT(){
@@ -464,6 +445,22 @@ async function savePAT(){
   await doBackup();
   document.getElementById('settings-status').textContent=pat?'✅ Backup সম্পন্ন':'PAT মুছে ফেলা হয়েছে';
 }
+
+// ── Stage button ──────────────────────────────────────────
+function stagePressStart(e,ref){
+  e.stopPropagation();
+  const btn=document.getElementById('sbtn-'+ref);
+  if(btn)btn.classList.add('pressing');
+  const isCol=collected[ref]||false,isFwd=forwarded[ref]||false;
+  const stage=isCol?2:isFwd?1:0;
+  stageTimer[ref]=setTimeout(()=>{
+    if(btn)btn.classList.remove('pressing');
+    if(stage===0){forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↑ Forwarded');}
+    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);save();render();showToast('↓ Collected');}
+    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↺ Reset');}
+  },stage===2?2000:600);
+}
+function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
 
 // ── Calendar ──────────────────────────────────────────────
 function toggleCal(){const b=document.getElementById('cal-box');const h=b.style.display==='none'||b.style.display==='';b.style.display=h?'block':'none';if(h)renderCal();}
@@ -522,6 +519,7 @@ function openDateModal(dateStr,prefix,sourceField,editRef){
     editEl.innerHTML='';
   }
 
+  const getStarIcon=s=>s===2?'🔴':s===1?'⭐':'';
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
     const n=parseInt((a.status||'').split('/')[0])||0;const sc='s'+Math.min(n,10);
     const txt=sourceField==='print_date'?'(Printed)':a.status;
@@ -551,7 +549,7 @@ function closeDateModal(){document.getElementById('date-modal').classList.remove
 // ── Timeline ──────────────────────────────────────────────
 function openTimelineModal(ref){
   const app=allApps.find(a=>a.ref===ref);if(!app)return;
-  const s=stars[ref]||0;const si=getStarIcon(s);
+  const s=stars[ref]||0;const si=s===2?'🔴':s===1?'⭐':'';
   document.getElementById('timeline-modal-title').textContent=(si?si+' ':'')+app.name;
   const hist=statusHistory[ref]||[];
   const clr={'s1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b','s6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399'};
@@ -567,7 +565,7 @@ function closeTimelineModal(){document.getElementById('timeline-modal').classLis
 // ── Card Note Modal ───────────────────────────────────────
 function openNoteModal(ref){
   noteModalRef=ref;
-  const app=allApps.find(a=>a.ref===ref);const s=stars[ref]||0;const si=getStarIcon(s);
+  const app=allApps.find(a=>a.ref===ref);const s=stars[ref]||0;const si=s===2?'🔴':s===1?'⭐':'';
   document.getElementById('note-modal-title').textContent=(si?si+' ':'')+( app?app.name:ref)+' — নোট';
   document.getElementById('note-modal-textarea').value=notes[ref]||'';
   document.getElementById('note-modal').classList.add('open');
@@ -581,7 +579,7 @@ function openPoliceFilterModal(){
   const list=document.getElementById('police-filter-list');
   let html=`<span class="police-filter-pill police-filter-all ${!activePoliceFilter?'active':''}" onclick="setPoliceFilter(null)">সব</span>`;
   clientNames.forEach(n=>{html+=`<span class="police-filter-pill ${activePoliceFilter===n?'active':''}" onclick="setPoliceFilter('${n}')">${n}</span>`;});
-  if(!clientNames.length)html+='<div style="color:#475569;font-size:12px;margin-top:8px">Client\'s Name বাটনে নাম যোগ করুন</div>';
+  if(!clientNames.length)html+='<div style="color:#475569;font-size:12px;margin-top:8px">নিচের Client\'s Name বাটনে নাম যোগ করুন</div>';
   list.innerHTML=html;document.getElementById('police-filter-modal').classList.add('open');
 }
 function closePoliceFilterModal(){document.getElementById('police-filter-modal').classList.remove('open');}
@@ -597,7 +595,7 @@ function addClientName(){const inp=document.getElementById('client-add-input');c
 function deleteClientName(name){clientNames=clientNames.filter(n=>n!==name);Object.keys(policeTags).forEach(ref=>{if(policeTags[ref]===name)delete policeTags[ref];});if(activePoliceFilter===name){activePoliceFilter=null;document.getElementById('police-filter-btn').classList.remove('active');}save();renderClientModal();render();}
 function openPickModal(ref){
   pickRef=ref;const list=document.getElementById('pick-list');
-  if(!clientNames.length){list.innerHTML='<div class="pick-item" style="color:#475569">Client\'s Name বাটনে নাম যোগ করুন</div>';document.getElementById('pick-modal').classList.add('open');return;}
+  if(!clientNames.length){list.innerHTML='<div class="pick-item" style="color:#475569">নিচের Client\'s Name বাটনে নাম যোগ করুন</div>';document.getElementById('pick-modal').classList.add('open');return;}
   let html=`<div class="pick-item" style="color:#475569;border-color:#1e293b" onclick="assignPoliceTag(null)">— ট্যাগ সরান</div>`;
   clientNames.forEach(n=>{const active=policeTags[ref]===n;html+=`<div class="pick-item ${active?'active-pick':''}" onclick="assignPoliceTag('${n}')">${active?'✓ ':''}${n}</div>`;});
   list.innerHTML=html;document.getElementById('pick-modal').classList.add('open');
@@ -646,6 +644,7 @@ function copySelected(){
   clearSelection();render();
 }
 
+// ── Filter ────────────────────────────────────────────────
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
 function matchesFilter(app){
   const num=parseInt((app.status||'').split('/')[0])||0;
@@ -669,7 +668,6 @@ function daysSince(ds,ref){
   }catch{return null;}
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2200);}
-
 function toggleStar(ref){
   const prev=stars[ref]||0;stars[ref]=(prev+1)%3;const next=stars[ref];
   const app=allApps.find(a=>a.ref===ref);const entry=app?`${app.name} ${ref}`:ref;
@@ -680,11 +678,7 @@ function toggleStar(ref){
 }
 function startEditDeu(ref){editingDeu[ref]=true;render();setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}
 function updateCode(ref,val){codes[ref]=val;editingDeu[ref]=false;save();render();}
-function toggleExpandNormal(ref){
-  if(expandedNormal.has(ref))expandedNormal.delete(ref);
-  else expandedNormal.add(ref);
-  saveLocal();render();
-}
+function toggleExpandNormal(ref){if(expandedNormal.has(ref))expandedNormal.delete(ref);else expandedNormal.add(ref);saveLocal();render();}
 
 // ── Card HTML ─────────────────────────────────────────────
 function cardHTML(app){
@@ -725,16 +719,13 @@ function cardHTML(app){
   const showPrint=showDetails&&printDate&&!isDelivered;
   const printBadge=showPrint?`<span class="print-badge" onclick="openDateModal('${printDate}','📅','print_date','${app.ref}');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
   const notePreview=(s>0&&!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`:'';
-  const nameClick=showDetails?`openNoteModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
+  const nameClick=`${s>0?`openNoteModal('${app.ref}');`:''}event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
   const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:'';
 
-  // Expand toggle — bottom center bar, only for normal cards
-  const expandToggle=(s===0&&!isDelivered)?`
-    <div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()">
-      <span class="expand-toggle-label">${isExpanded?'▲ বন্ধ করুন':'▼ বিস্তারিত'}</span>
-    </div>`:'';
+  // Expand toggle — thin invisible line at bottom, only normal cards
+  const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
 
   return `
     <div class="card-wrap ${isSelected?'selected':''}" id="wrap-${app.ref}">

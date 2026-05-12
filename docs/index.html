@@ -32,6 +32,8 @@
   .icon-filter-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #2563eb; background: #1e3a5f; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; }
   .icon-filter-btn.police { border-color: #a78bfa; background: #1e1a3a; margin-left: auto; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
+  /* Today date button — replaces calendar icon */
+  .today-date-btn { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid #1d4ed8; background: rgba(29,78,216,0.18); color: #60a5fa; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 
   /* Calendar */
   .cal-box { display: none; background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
@@ -74,12 +76,9 @@
   .m-order-btn { background: none; border: none; color: #475569; cursor: pointer; font-size: 12px; padding: 0 2px; flex-shrink: 0; }
   .modal-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 14px; padding: 0 2px; flex-shrink: 0; opacity: 0.6; }
 
-  /* Date modal */
-  .date-modal-header { padding: 8px 0 10px; border-bottom: 1px solid #1e3a5f; margin-bottom: 4px; }
-  .date-modal-date-line { font-size: 14px; font-weight: 700; color: #60a5fa; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-  .date-modal-date-line:hover { color: #93c5fd; }
-  .date-modal-date-line .edit-hint { font-size: 10px; color: #334155; font-weight: 400; }
-  .date-picker-inline { margin-top: 8px; display: none; }
+  /* Date modal — clean */
+  .date-modal-date-line { font-size: 14px; font-weight: 700; color: #60a5fa; cursor: pointer; display: flex; align-items: center; gap: 6px; flex: 1; }
+  .date-picker-inline { display: none; margin-top: 8px; }
   .date-picker-inline input[type=date] { background: #1e293b; border: 1px solid #2563eb; border-radius: 6px; padding: 7px 10px; color: #e2e8f0; font-size: 13px; outline: none; width: 100%; }
   .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .date-modal-item .dm-left { flex: 1; }
@@ -96,6 +95,14 @@
   .note-modal-textarea { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: #e2e8f0; font-size: 13px; outline: none; resize: none; margin-bottom: 10px; min-height: 80px; }
   .note-modal-save { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .note-modal-clear { background: none; border: 1px solid #334155; color: #64748b; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-left: 8px; }
+
+  /* Custom confirm */
+  .confirm-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 14px; padding: 20px; width: 100%; max-width: 260px; }
+  .confirm-msg { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin-bottom: 16px; }
+  .confirm-sub { font-size: 12px; color: #60a5fa; font-weight: 600; margin-top: 4px; }
+  .confirm-btns { display: flex; gap: 8px; justify-content: flex-end; }
+  .confirm-cancel { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+  .confirm-ok { background: #1d4ed8; border: none; color: #fff; padding: 7px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
 
   /* Police */
   .police-filter-list { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -115,6 +122,29 @@
   .settings-info { font-size: 11px; color: #475569; margin-bottom: 12px; line-height: 1.6; }
   .settings-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; margin-bottom: 10px; }
   .settings-save-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+
+  /* Archive modal */
+  .arch-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .arch-tab { flex: 1; padding: 7px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid #334155; background: #1e293b; color: #64748b; cursor: pointer; }
+  .arch-tab.active { background: #1e3a5f; color: #60a5fa; border-color: #2563eb; }
+  .arch-section { background: #1e293b; border-radius: 10px; padding: 12px; margin-bottom: 10px; border: 1px solid #334155; }
+  .arch-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .arch-month-label { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+  .arch-date-range { font-size: 11px; color: #64748b; }
+  .arch-copy-btn { background: #0f1f3d; border: 1px solid #334155; color: #94a3b8; padding: 4px 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 11px; }
+  .arch-copy-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+  .arch-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .arch-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .arch-badge.urgent { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+  .arch-badge.important { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+  .arch-badge.normal { background: rgba(96,165,250,0.1); color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
+  .arch-badge.total { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+  .arch-list { display: flex; flex-direction: column; gap: 3px; max-height: 200px; overflow-y: auto; }
+  .arch-item { display: flex; align-items: center; gap: 6px; padding: 4px 0; border-bottom: 1px solid rgba(30,41,59,0.8); font-size: 11px; }
+  .arch-item-star { flex-shrink: 0; font-size: 10px; }
+  .arch-item-name { flex: 1; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .arch-item-ref { color: #475569; flex-shrink: 0; }
+  .arch-item-date { color: #475569; flex-shrink: 0; }
 
   /* Select bar */
   .select-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1f3d; border-top: 1px solid #1e3a5f; padding: 12px 16px; z-index: 50; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
@@ -169,20 +199,9 @@
   .police-tag-btn { color: #7c3aed; font-size: 13px; cursor: pointer; flex-shrink: 0; opacity: 0.5; }
   .note-preview { font-size: 12px; color: #94a3b8; margin-top: 4px; cursor: pointer; }
   .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; flex-shrink: 0; }
-
-  /* Expand toggle — star-color, super thin, barely visible */
-  .expand-toggle {
-    width: 36%; margin: 7px auto 0;
-    height: 1px; border-radius: 2px;
-    background: rgba(255,255,255,0.07);
-    cursor: pointer; display: block; border: none;
-    transition: background 0.2s, height 0.15s;
-  }
-  .expand-toggle.open {
-    background: rgba(250,204,21,0.55);
-    height: 2px;
-  }
-
+  /* Expand toggle — star-like color, ultra thin */
+  .expand-toggle { width: 36%; margin: 7px auto 0; height: 1px; border-radius: 2px; background: rgba(250,204,21,0.12); cursor: pointer; display: block; border: none; transition: background 0.2s, height 0.15s; }
+  .expand-toggle.open { background: rgba(250,204,21,0.6); height: 2px; }
   .loading { text-align: center; padding: 40px; color: #475569; }
   #toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
 </style>
@@ -192,6 +211,12 @@
 <svg style="display:none">
   <symbol id="ico-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+  </symbol>
+  <symbol id="ico-archive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+  </symbol>
+  <symbol id="ico-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
   </symbol>
 </svg>
 
@@ -224,8 +249,9 @@
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <span style="font-size:13px">🏷️</span>
   </button>
-  <button class="icon-filter-btn" onclick="toggleCal()">
-    <svg width="16" height="16"><use href="#ico-cal" stroke="#60a5fa"/></svg>
+  <button class="today-date-btn" id="today-date-btn" onclick="toggleCal()"></button>
+  <button class="icon-filter-btn" onclick="openArchive()" style="border-color:#475569;background:#1e293b">
+    <svg width="16" height="16"><use href="#ico-archive" stroke="#60a5fa"/></svg>
   </button>
 </div>
 
@@ -253,6 +279,17 @@
   </div>
 </div>
 
+<!-- Custom Confirm Modal -->
+<div class="modal" id="confirm-modal">
+  <div class="confirm-box">
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="confirm-cancel" onclick="confirmCancel()">বাতিল</button>
+      <button class="confirm-ok" onclick="confirmOk()">হ্যাঁ</button>
+    </div>
+  </div>
+</div>
+
 <!-- Count Modal -->
 <div class="modal" id="modal">
   <div class="modal-box">
@@ -269,14 +306,13 @@
   </div>
 </div>
 
-<!-- Date Modal — clean version -->
+<!-- Date Modal -->
 <div class="modal" id="date-modal">
   <div class="modal-box">
-    <div class="modal-title" style="flex-direction:column;align-items:flex-start;gap:4px">
-      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+    <div class="modal-title" style="flex-direction:column;align-items:stretch;gap:0">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <div class="date-modal-date-line" id="date-modal-date-line" onclick="toggleInlinePicker()">
           <span id="date-modal-date-text"></span>
-          <span class="edit-hint" id="date-picker-hint"></span>
         </div>
         <button class="modal-close" onclick="closeDateModal()">✕</button>
       </div>
@@ -305,6 +341,21 @@
       <button class="note-modal-save" onclick="saveNoteModal()">সংরক্ষণ</button>
       <button class="note-modal-clear" onclick="document.getElementById('note-modal-textarea').value=''">মুছুন</button>
     </div>
+  </div>
+</div>
+
+<!-- Archive Modal -->
+<div class="modal" id="archive-modal">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-title">
+      <span>📦 আর্কাইভ</span>
+      <button class="modal-close" onclick="closeArchive()">✕</button>
+    </div>
+    <div class="arch-tabs">
+      <button class="arch-tab active" id="arch-tab-month" onclick="setArchTab('month')">মাস অনুযায়ী</button>
+      <button class="arch-tab" id="arch-tab-reset" onclick="setArchTab('reset')">রিসেট অনুযায়ী</button>
+    </div>
+    <div id="arch-content"></div>
   </div>
 </div>
 
@@ -351,6 +402,7 @@
 const refSVG=`<svg class="ref-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
 const calSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
 const printSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
+const copySVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
 
 const REPO_API='https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/contents/docs/userdata.json';
 const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -372,26 +424,37 @@ let collected=JSON.parse(localStorage.getItem('pcc_collected')||'{}');
 let collectedDay=JSON.parse(localStorage.getItem('pcc_collected_day')||'{}');
 let manualPrintDates=JSON.parse(localStorage.getItem('pcc_manual_print_dates')||'{}');
 let expandedNormal=new Set(JSON.parse(localStorage.getItem('pcc_expanded_normal')||'[]'));
+let resetArchive=JSON.parse(localStorage.getItem('pcc_reset_archive')||'[]');
 let editingDeu={};
 let resetConfirm=false,resetTimer=null;
 let modalType=null,activeFilter='all',activePoliceFilter=null;
 let selected=new Set(),selectMode=false;
 let calDate=new Date(),backupTimer=null,pickRef=null;
 let stageTimer={},noteModalRef=null;
-// date modal state
 let dateModalSourceField=null,dateModalDateStr=null,dateModalEditRef=null;
+let archTab='month';
+let cachedMonthArchive=[];
+
+// ── Custom Confirm ────────────────────────────────────────
+let confirmResolve=null;
+function showConfirm(mainText,subText=''){
+  return new Promise(resolve=>{
+    confirmResolve=resolve;
+    document.getElementById('confirm-msg').innerHTML=`<div style="font-weight:600;margin-bottom:${subText?6:0}px">${mainText}</div>${subText?`<div class="confirm-sub">${subText}</div>`:''}`;
+    document.getElementById('confirm-modal').classList.add('open');
+  });
+}
+function confirmOk(){document.getElementById('confirm-modal').classList.remove('open');if(confirmResolve)confirmResolve(true);confirmResolve=null;}
+function confirmCancel(){document.getElementById('confirm-modal').classList.remove('open');if(confirmResolve)confirmResolve(false);confirmResolve=null;}
 
 // ── Date helpers ──────────────────────────────────────────
 function toInputDate(str){
   try{
     if(!str)return '';
-    const p=str.toUpperCase().split('-');
-    if(p.length!==3)return '';
+    const p=str.toUpperCase().split('-');if(p.length!==3)return '';
     const dd=String(parseInt(p[0])).padStart(2,'0');
-    const mo=MONTHS_UP.indexOf(p[1].substring(0,3));
-    if(mo<0)return '';
-    let yr=parseInt(p[2]);
-    if(yr<100)yr=2000+yr;
+    const mo=MONTHS_UP.indexOf(p[1].substring(0,3));if(mo<0)return '';
+    let yr=parseInt(p[2]);if(yr<100)yr=2000+yr;
     return `${yr}-${String(mo+1).padStart(2,'0')}-${dd}`;
   }catch{return '';}
 }
@@ -402,10 +465,20 @@ function fromInputDate(str){
     return String(parseInt(d)).padStart(2,'0')+'-'+MONTHS_SHORT[parseInt(mo)-1]+'-'+String(y).slice(2);
   }catch{return '';}
 }
-function getEffectivePrintDate(ref){ return manualPrintDates[ref]||printDates[ref]||null; }
+function getEffectivePrintDate(ref){return manualPrintDates[ref]||printDates[ref]||null;}
+function getDisplayApps(){return allApps.filter(a=>a.status!=='10/10');}
+function todayStr(){const d=new Date();return String(d.getDate()).padStart(2,'0')+'-'+MONTHS_SHORT[d.getMonth()]+'-'+String(d.getFullYear()).slice(2);}
+function updateTodayBtn(){const el=document.getElementById('today-date-btn');if(!el)return;const d=new Date();el.textContent=`${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;}
 
-// display apps = exclude 10/10 from main list
-function getDisplayApps(){ return allApps.filter(a=>a.status!=='10/10'); }
+// Status trimming for timeline
+function trimStatus(s){
+  if(!s)return '';
+  const m=s.match(/\d+\/\d+/);if(m)return m[0];
+  const low=s.toLowerCase();
+  if(low.includes('pending for payment'))return 'Pending For Payment';
+  if(low.includes('draft'))return 'Draft';
+  return s.length>25?s.substring(0,25)+'…':s;
+}
 
 // ── Save ──────────────────────────────────────────────────
 function saveLocal(){
@@ -424,8 +497,9 @@ function saveLocal(){
   localStorage.setItem('pcc_collected_day',JSON.stringify(collectedDay));
   localStorage.setItem('pcc_manual_print_dates',JSON.stringify(manualPrintDates));
   localStorage.setItem('pcc_expanded_normal',JSON.stringify([...expandedNormal]));
+  localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
 }
-function save(){ saveLocal(); scheduleBackup(); }
+function save(){saveLocal();scheduleBackup();}
 
 // ── Backup ────────────────────────────────────────────────
 function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=setTimeout(doBackup,5000);}
@@ -433,7 +507,7 @@ async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;
   setBkDot('...');
   try{
-    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,manualPrintDates};
+    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,manualPrintDates,resetArchive};
     const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
     let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
@@ -457,9 +531,11 @@ async function syncFromCloud(){
     if(d.counts)counts=d.counts;if(d.history)history=d.history;
     if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;
     if(d.manualPrintDates)manualPrintDates=d.manualPrintDates;
+    if(d.resetArchive)resetArchive=d.resetArchive;
     saveLocal();
   }catch(e){}
 }
+
 function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-status').textContent='';document.getElementById('settings-modal').classList.add('open');}
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 async function savePAT(){
@@ -473,8 +549,7 @@ async function savePAT(){
 // ── Stage button ──────────────────────────────────────────
 function stagePressStart(e,ref){
   e.stopPropagation();
-  const btn=document.getElementById('sbtn-'+ref);
-  if(btn)btn.classList.add('pressing');
+  const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.add('pressing');
   const isCol=collected[ref]||false,isFwd=forwarded[ref]||false;
   const stage=isCol?2:isFwd?1:0;
   stageTimer[ref]=setTimeout(()=>{
@@ -486,7 +561,7 @@ function stagePressStart(e,ref){
 }
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
 
-// ── Calendar — uses allApps (including 10/10) ─────────────
+// ── Calendar ──────────────────────────────────────────────
 function toggleCal(){const b=document.getElementById('cal-box');const h=b.style.display==='none'||b.style.display==='';b.style.display=h?'block':'none';if(h)renderCal();}
 function calNav(dir){calDate.setMonth(calDate.getMonth()+dir);renderCal();}
 function renderCal(){
@@ -497,15 +572,13 @@ function renderCal(){
   const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
   const today=new Date();today.setHours(0,0,0,0);
   const dayDots={};
-  // সব app — 10/10 সহ calendar-এ দেখাবে
   allApps.forEach(a=>{
     if(!a.apply_date)return;
     const p=a.apply_date.toUpperCase().split('-');if(p.length!==3)return;
     const dd=parseInt(p[0]),mo=MONTHS_UP.indexOf(p[1]),yr=2000+parseInt(p[2]);
     if(mo>=0&&mo===m&&yr===y){
       if(!dayDots[dd])dayDots[dd]=[];
-      const s=stars[a.ref]||0;
-      const isDone=a.status==='10/10';
+      const s=stars[a.ref]||0;const isDone=a.status==='10/10';
       dayDots[dd].push(isDone?'done':s===2?'urgent':s===1?'important':'normal');
     }
   });
@@ -528,42 +601,20 @@ function renderCal(){
   document.getElementById('cal-days').innerHTML=html;
 }
 function calDayClick(ds){
-  // calendar click uses allApps (including 10/10)
-  const same=allApps.filter(a=>a.apply_date===ds);
-  if(!same.length)return;
+  const same=allApps.filter(a=>a.apply_date===ds);if(!same.length)return;
   document.getElementById('cal-box').style.display='none';
   openDateModal(ds,'📅','apply_date',null);
 }
 
-// ── Date Modal — clean, clickable title ───────────────────
+// ── Date Modal ────────────────────────────────────────────
 function openDateModal(dateStr,prefix,sourceField,editRef){
-  dateModalSourceField=sourceField;
-  dateModalDateStr=dateStr;
-  dateModalEditRef=editRef;
-
-  // Use allApps for calendar source, displayApps for print_date
-  const same=sourceField==='apply_date'
-    ?allApps.filter(a=>a.apply_date===dateStr)
-    :allApps.filter(a=>getEffectivePrintDate(a.ref)===dateStr);
-
-  const dateTextEl=document.getElementById('date-modal-date-text');
-  const hintEl=document.getElementById('date-picker-hint');
-  const pickerWrap=document.getElementById('date-picker-inline');
+  dateModalSourceField=sourceField;dateModalDateStr=dateStr;dateModalEditRef=editRef;
+  const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>getEffectivePrintDate(a.ref)===dateStr);
   const dateLine=document.getElementById('date-modal-date-line');
-
-  dateTextEl.textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
-
-  if(sourceField==='print_date'){
-    hintEl.textContent='✏️ ট্যাপ করে পরিবর্তন';
-    dateLine.style.cursor='pointer';
-    pickerWrap.style.display='none';
-    document.getElementById('inline-date-picker').value=toInputDate(dateStr);
-  } else {
-    hintEl.textContent='';
-    dateLine.style.cursor='default';
-    pickerWrap.style.display='none';
-  }
-
+  const pickerWrap=document.getElementById('date-picker-inline');
+  document.getElementById('date-modal-date-text').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
+  if(sourceField==='print_date'){dateLine.style.cursor='pointer';pickerWrap.style.display='none';document.getElementById('inline-date-picker').value=toInputDate(dateStr);}
+  else{dateLine.style.cursor='default';pickerWrap.style.display='none';}
   const getStarIcon=s=>s===2?'🔴':s===1?'⭐':'';
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
     const n=parseInt((a.status||'').split('/')[0])||0;const sc='s'+Math.min(n,10);
@@ -575,43 +626,28 @@ function openDateModal(dateStr,prefix,sourceField,editRef){
       <div class="dm-left">
         <div class="dm-name">${a.name}</div>
         <div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${st}">${txt}</span></div>
-      </div>
-      ${si?`<span class="dm-star">${si}</span>`:''}
+      </div>${si?`<span class="dm-star">${si}</span>`:''}
     </div>`;
   }).join('');
   document.getElementById('date-modal').classList.add('open');
 }
-
 function toggleInlinePicker(){
   if(dateModalSourceField!=='print_date')return;
   const wrap=document.getElementById('date-picker-inline');
-  const isVisible=wrap.style.display==='block';
-  wrap.style.display=isVisible?'none':'block';
-  if(!isVisible){
-    const inp=document.getElementById('inline-date-picker');
-    inp.value=toInputDate(dateModalDateStr);
-    try{inp.showPicker();}catch(e){}
-  }
+  const isV=wrap.style.display==='block';
+  wrap.style.display=isV?'none':'block';
+  if(!isV){try{document.getElementById('inline-date-picker').showPicker();}catch(e){}}
 }
-
-function confirmInlineDateChange(val){
+async function confirmInlineDateChange(val){
   if(!val)return;
-  const newDate=fromInputDate(val);
-  if(!newDate)return;
-  if(!confirm(`তারিখ পরিবর্তন করবেন?\n${dateModalDateStr} → ${newDate}`))return;
-  if(dateModalEditRef){
-    manualPrintDates[dateModalEditRef]=newDate;
-  } else {
-    allApps.forEach(a=>{if(getEffectivePrintDate(a.ref)===dateModalDateStr)manualPrintDates[a.ref]=newDate;});
-  }
+  const newDate=fromInputDate(val);if(!newDate)return;
+  const ok=await showConfirm('তারিখ পরিবর্তন করবেন?',`${dateModalDateStr} → ${newDate}`);
+  if(!ok){document.getElementById('inline-date-picker').value=toInputDate(dateModalDateStr);return;}
+  if(dateModalEditRef){manualPrintDates[dateModalEditRef]=newDate;}
+  else{allApps.forEach(a=>{if(getEffectivePrintDate(a.ref)===dateModalDateStr)manualPrintDates[a.ref]=newDate;});}
   save();closeDateModal();render();showToast('✅ '+newDate);
 }
-
-function closeDateModal(){
-  document.getElementById('date-modal').classList.remove('open');
-  document.getElementById('date-picker-inline').style.display='none';
-  dateModalSourceField=null;dateModalDateStr=null;dateModalEditRef=null;
-}
+function closeDateModal(){document.getElementById('date-modal').classList.remove('open');document.getElementById('date-picker-inline').style.display='none';dateModalSourceField=null;dateModalDateStr=null;dateModalEditRef=null;}
 
 // ── Timeline ──────────────────────────────────────────────
 function openTimelineModal(ref){
@@ -622,14 +658,15 @@ function openTimelineModal(ref){
   const clr={'s1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b','s6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399','s10':'#34d399'};
   if(!hist.length){document.getElementById('timeline-list').innerHTML='<div style="color:#475569;font-size:12px;text-align:center;padding:12px">কোনো ইতিহাস নেই</div>';document.getElementById('timeline-modal').classList.add('open');return;}
   document.getElementById('timeline-list').innerHTML=hist.map(h=>{
+    const cleaned=trimStatus(h.status);
     const n2=parseInt((h.status||'').split('/')[0])||0;const sc='s'+Math.min(n2,10);const color=clr[sc]||'#94a3b8';
-    return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${h.status}</span></div><span class="timeline-date">${h.date}</span></div>`;
+    return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${cleaned}</span></div><span class="timeline-date">${h.date}</span></div>`;
   }).join('');
   document.getElementById('timeline-modal').classList.add('open');
 }
 function closeTimelineModal(){document.getElementById('timeline-modal').classList.remove('open');}
 
-// ── Card Note Modal ───────────────────────────────────────
+// ── Note Modal ────────────────────────────────────────────
 function openNoteModal(ref){
   noteModalRef=ref;
   const app=allApps.find(a=>a.ref===ref);const s=stars[ref]||0;const si=s===2?'🔴':s===1?'⭐':'';
@@ -640,6 +677,91 @@ function openNoteModal(ref){
 }
 function closeNoteModal(){document.getElementById('note-modal').classList.remove('open');noteModalRef=null;}
 function saveNoteModal(){if(!noteModalRef)return;notes[noteModalRef]=document.getElementById('note-modal-textarea').value.trim();save();closeNoteModal();render();}
+
+// ── Archive ───────────────────────────────────────────────
+function openArchive(){renderArchiveContent(archTab);document.getElementById('archive-modal').classList.add('open');}
+function closeArchive(){document.getElementById('archive-modal').classList.remove('open');}
+function setArchTab(tab){
+  archTab=tab;
+  document.getElementById('arch-tab-month').classList.toggle('active',tab==='month');
+  document.getElementById('arch-tab-reset').classList.toggle('active',tab==='reset');
+  renderArchiveContent(tab);
+}
+function generateMonthArchive(){
+  const groups={};
+  allApps.forEach(a=>{
+    if(!a.apply_date)return;
+    const p=a.apply_date.toUpperCase().split('-');if(p.length!==3)return;
+    const mo=MONTHS_UP.indexOf(p[1]);if(mo<0)return;
+    const yr=2000+parseInt(p[2]);
+    const key=`${yr}-${String(mo).padStart(2,'0')}`;
+    const label=MONTHS_SHORT[mo]+' '+yr;
+    if(!groups[key])groups[key]={label,urgent:[],important:[],normal:[]};
+    const s=stars[a.ref]||0;
+    if(s===2)groups[key].urgent.push(a);
+    else if(s===1)groups[key].important.push(a);
+    else groups[key].normal.push(a);
+  });
+  return Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([,v])=>v);
+}
+function copyMonthArchive(i){
+  const m=cachedMonthArchive[i];if(!m)return;
+  const items=[...m.urgent,...m.important,...m.normal];
+  navigator.clipboard.writeText(items.map(a=>`${a.name}  ${a.ref}  ${a.apply_date}`).join('\n')).then(()=>showToast('✓ কপি হয়েছে'));
+}
+function copyResetArchive(i){
+  const r=resetArchive[i];if(!r)return;
+  const items=[...r.urgentItems,...r.importantItems];
+  navigator.clipboard.writeText(items.map(a=>`${a.name}  ${a.ref}  ${a.applyDate}`).join('\n')).then(()=>showToast('✓ কপি হয়েছে'));
+}
+function renderArchiveContent(tab){
+  const el=document.getElementById('arch-content');
+  if(tab==='month'){
+    cachedMonthArchive=generateMonthArchive();
+    if(!cachedMonthArchive.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো ডেটা নেই</div>';return;}
+    el.innerHTML=cachedMonthArchive.map((m,i)=>{
+      const total=m.urgent.length+m.important.length+m.normal.length;
+      const allItems=[...m.urgent,...m.important,...m.normal];
+      return `<div class="arch-section">
+        <div class="arch-header">
+          <span class="arch-month-label">${m.label}</span>
+          <button class="arch-copy-btn" onclick="copyMonthArchive(${i})">${copySVG} কপি</button>
+        </div>
+        <div class="arch-badges">
+          ${m.urgent.length?`<span class="arch-badge urgent">🔴 ${m.urgent.length}</span>`:''}
+          ${m.important.length?`<span class="arch-badge important">⭐ ${m.important.length}</span>`:''}
+          ${m.normal.length?`<span class="arch-badge normal">📄 ${m.normal.length}</span>`:''}
+          <span class="arch-badge total">মোট ${total}</span>
+        </div>
+        <div class="arch-list">
+          ${allItems.map(a=>{const s=stars[a.ref]||0;const si=s===2?'🔴':s===1?'⭐':'·';return `<div class="arch-item"><span class="arch-item-star">${si}</span><span class="arch-item-name">${a.name}</span><span class="arch-item-ref">${a.ref}</span><span class="arch-item-date">${a.apply_date}</span></div>`;}).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    if(!resetArchive.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো রিসেট রেকর্ড নেই</div>';return;}
+    el.innerHTML=resetArchive.map((r,i)=>{
+      const allItems=[...r.urgentItems,...r.importantItems];
+      return `<div class="arch-section">
+        <div class="arch-header">
+          <div>
+            <div class="arch-month-label">${r.resetDate}</div>
+            ${r.fromDate?`<div class="arch-date-range">${r.fromDate} → ${r.resetDate}</div>`:''}
+          </div>
+          <button class="arch-copy-btn" onclick="copyResetArchive(${i})">${copySVG} কপি</button>
+        </div>
+        <div class="arch-badges">
+          ${r.urgentCount?`<span class="arch-badge urgent">🔴 ${r.urgentCount}</span>`:''}
+          ${r.importantCount?`<span class="arch-badge important">⭐ ${r.importantCount}</span>`:''}
+          <span class="arch-badge total">মোট ${allItems.length}</span>
+        </div>
+        <div class="arch-list">
+          ${allItems.map(a=>{const si=a.type==='urgent'?'🔴':'⭐';return `<div class="arch-item"><span class="arch-item-star">${si}</span><span class="arch-item-name">${a.name}</span><span class="arch-item-ref">${a.ref}</span><span class="arch-item-date">${a.applyDate}</span></div>`;}).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
 
 // ── Police ────────────────────────────────────────────────
 function openPoliceFilterModal(){
@@ -680,24 +802,53 @@ function openModal(type){
 }
 function renderModalList(){
   if(!modalType)return;
-  const list=history[modalType];
+  const list=[...history[modalType]].reverse(); // latest first
   if(!list.length){document.getElementById('modal-list').innerHTML='<div style="color:#475569;padding:8px 0;font-size:12px">কোনো রেকর্ড নেই</div>';return;}
-  document.getElementById('modal-list').innerHTML=list.map((e,i)=>
-    `<div class="modal-list-item">
+  const orig=history[modalType];
+  document.getElementById('modal-list').innerHTML=list.map((e,ri)=>{
+    const i=orig.length-1-ri; // original index
+    return `<div class="modal-list-item">
       <button class="m-order-btn" onclick="moveEntry(${i},-1)" ${i===0?'style="opacity:0.2;pointer-events:none"':''}>▲</button>
-      <button class="m-order-btn" onclick="moveEntry(${i},1)" ${i===list.length-1?'style="opacity:0.2;pointer-events:none"':''}>▼</button>
+      <button class="m-order-btn" onclick="moveEntry(${i},1)" ${i===orig.length-1?'style="opacity:0.2;pointer-events:none"':''}>▼</button>
       <span title="${e}">• ${e}</span>
       <button class="modal-del-btn" onclick="removeModalEntry(${i})">×</button>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
 }
 function moveEntry(idx,dir){if(!modalType)return;const list=history[modalType];const ni=idx+dir;if(ni<0||ni>=list.length)return;[list[idx],list[ni]]=[list[ni],list[idx]];save();renderModalList();}
 function addModalEntry(){if(!modalType)return;const inp=document.getElementById('modal-add-input');const val=inp.value.trim();if(!val)return;if(!history[modalType].includes(val)){history[modalType].push(val);counts[modalType]++;document.getElementById('modal-count').textContent=counts[modalType];document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');save();renderModalList();}inp.value='';}
 function removeModalEntry(idx){if(!modalType)return;history[modalType].splice(idx,1);counts[modalType]=Math.max(0,counts[modalType]-1);document.getElementById('modal-count').textContent=counts[modalType];document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');save();renderModalList();}
-function copyModalList(){if(!modalType)return;const list=history[modalType];if(!list.length){showToast('কোনো রেকর্ড নেই');return;}const text=list.join('\n');if(navigator.share)navigator.share({text});else navigator.clipboard.writeText(text).then(()=>showToast('✓ লিস্ট কপি হয়েছে'));}
+function copyModalList(){if(!modalType)return;const list=history[modalType];if(!list.length){showToast('কোনো রেকর্ড নেই');return;}const text=[...list].reverse().join('\n');if(navigator.share)navigator.share({text});else navigator.clipboard.writeText(text).then(()=>showToast('✓ লিস্ট কপি হয়েছে'));}
 function closeModal(){document.getElementById('modal').classList.remove('open');modalType=null;}
 function adjustCount(delta){if(!modalType)return;counts[modalType]=Math.max(0,counts[modalType]+delta);document.getElementById('modal-count').textContent=counts[modalType];document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');save();}
-function resetCounts(){if(!resetConfirm){resetConfirm=true;document.getElementById('reset-btn').classList.add('confirm');resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);}else{clearTimeout(resetTimer);resetConfirm=false;counts={urgent:0,important:0};history={urgent:[],important:[]};save();render();document.getElementById('reset-btn').classList.remove('confirm');}}
+
+async function resetCounts(){
+  if(!resetConfirm){
+    resetConfirm=true;
+    document.getElementById('reset-btn').classList.add('confirm');
+    resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);
+  } else {
+    clearTimeout(resetTimer);resetConfirm=false;
+    document.getElementById('reset-btn').classList.remove('confirm');
+    // Save snapshot to archive before resetting
+    const urgentItems=allApps.filter(a=>(stars[a.ref]||0)===2).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,type:'urgent'}));
+    const importantItems=allApps.filter(a=>(stars[a.ref]||0)===1).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,type:'important'}));
+    if(urgentItems.length||importantItems.length){
+      const allItems=[...urgentItems,...importantItems];
+      const dates=allItems.map(a=>a.applyDate).filter(Boolean);
+      let fromDate='';
+      if(dates.length){
+        // find earliest apply_date
+        const parsed=dates.map(d=>toInputDate(d)).filter(Boolean).sort();
+        if(parsed.length)fromDate=fromInputDate(parsed[0]);
+      }
+      resetArchive.unshift({id:Date.now(),resetDate:todayStr(),fromDate,urgentItems,importantItems,urgentCount:urgentItems.length,importantCount:importantItems.length});
+      localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
+    }
+    counts={urgent:0,important:0};history={urgent:[],important:[]};
+    save();render();
+  }
+}
 
 // ── Multi-select ──────────────────────────────────────────
 function toggleSelect(ref){if(selected.has(ref))selected.delete(ref);else selected.add(ref);updateSelectBar();const w=document.getElementById('wrap-'+ref);if(w)w.classList.toggle('selected',selected.has(ref));}
@@ -836,7 +987,7 @@ function swipeMove(e,ref){
   if(dx<-30&&hl)hl.style.opacity=Math.min(1,Math.abs(dx)/80);else if(hl)hl.style.opacity=0;
   if(dx>30&&hr)hr.style.opacity=Math.min(1,dx/80);else if(hr)hr.style.opacity=0;
 }
-function swipeEnd(e,ref){
+async function swipeEnd(e,ref){
   if(!touching[ref])return;touching[ref]=false;
   const dx=e.changedTouches[0].clientX-touchStartX[ref];
   const card=document.getElementById('card-'+ref);
@@ -844,8 +995,17 @@ function swipeEnd(e,ref){
   if(card){card.style.transition='transform 0.2s ease';card.style.transform='';}
   if(hl)hl.style.opacity=0;if(hr)hr.style.opacity=0;
   if(selectMode)return;
-  if(dx<-80){delivered[ref]=!delivered[ref];if(delivered[ref])showDeu[ref]=false;save();render();}
-  else if(dx>80){if(!delivered[ref]){showDeu[ref]=!showDeu[ref];if(showDeu[ref])editingDeu[ref]=true;save();render();if(showDeu[ref])setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}}
+  if(dx<-80){
+    const s=stars[ref]||0;
+    if(s>0&&!delivered[ref]){
+      const ok=await showConfirm('Delivered হিসেবে চিহ্নিত করবেন?');
+      if(!ok)return;
+    }
+    delivered[ref]=!delivered[ref];if(delivered[ref])showDeu[ref]=false;
+    save();render();
+  } else if(dx>80){
+    if(!delivered[ref]){showDeu[ref]=!showDeu[ref];if(showDeu[ref])editingDeu[ref]=true;save();render();if(showDeu[ref])setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}
+  }
 }
 let pressTimer={};
 function pressStart(ref){pressTimer[ref]=setTimeout(()=>{toggleSelect(ref);},600);}
@@ -855,7 +1015,6 @@ function handleTap(ref){if(selectMode)toggleSelect(ref);}
 // ── Render ────────────────────────────────────────────────
 function render(){
   const q=(document.querySelector('.search-bar').value||'').toLowerCase();
-  // display list: exclude 10/10
   const displayApps=getDisplayApps().filter(a=>{
     if(!matchesFilter(a))return false;
     if(q&&!a.name.toLowerCase().includes(q)&&!a.ref.toLowerCase().includes(q)&&!(policeTags[a.ref]||'').toLowerCase().includes(q))return false;
@@ -866,18 +1025,9 @@ function render(){
   const normal=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
   const done=displayApps.filter(a=>delivered[a.ref]);
   let html='';
-  if(star2.length){
-    html+=`<div class="section-row"><div class="section-title">🔴 জরুরি</div><div class="section-count">${star2.length}টি</div></div>`;
-    star2.forEach(a=>html+=cardHTML(a));
-  }
-  if(star1.length){
-    html+=`<div class="section-row"><div class="section-title">⭐ গুরুত্বপূর্ণ</div><div class="section-count">${star1.length}টি</div></div>`;
-    star1.forEach(a=>html+=cardHTML(a));
-  }
-  if(normal.length){
-    if(star1.length||star2.length)html+=`<div class="section-row"><div class="section-title">সাধারণ</div></div>`;
-    normal.forEach(a=>html+=cardHTML(a));
-  }
+  if(star2.length){html+=`<div class="section-row"><div class="section-title">🔴 জরুরি</div><div class="section-count">${star2.length}টি</div></div>`;star2.forEach(a=>html+=cardHTML(a));}
+  if(star1.length){html+=`<div class="section-row"><div class="section-title">⭐ গুরুত্বপূর্ণ</div><div class="section-count">${star1.length}টি</div></div>`;star1.forEach(a=>html+=cardHTML(a));}
+  if(normal.length){if(star1.length||star2.length)html+=`<div class="section-row"><div class="section-title">সাধারণ</div></div>`;normal.forEach(a=>html+=cardHTML(a));}
   if(done.length){html+=`<div class="section-row"><div class="section-title">✓ Delivered</div></div>`;done.forEach(a=>html+=cardHTML(a));}
   if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
@@ -898,6 +1048,7 @@ async function load(){
     render();
   }catch(e){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
 }
+updateTodayBtn();
 load();
 setInterval(load,30000);
 </script>

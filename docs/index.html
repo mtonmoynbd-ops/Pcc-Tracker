@@ -48,11 +48,13 @@
   .cal-dot.normal { background: #60a5fa; }
   .cal-dot.important { background: #f59e0b; }
   .cal-dot.urgent { background: #ef4444; }
+  .cal-dot.done { background: #34d399; }
   .cal-dot.today-dot { background: #fff; }
 
   /* Section */
-  .section-row { display: flex; align-items: center; margin: 12px 0 8px; }
+  .section-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 8px; }
   .section-title { font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 1px; }
+  .section-count { font-size: 11px; color: #334155; font-weight: 600; }
 
   /* Modals */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
@@ -73,17 +75,17 @@
   .modal-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 14px; padding: 0 2px; flex-shrink: 0; opacity: 0.6; }
 
   /* Date modal */
+  .date-modal-header { padding: 8px 0 10px; border-bottom: 1px solid #1e3a5f; margin-bottom: 4px; }
+  .date-modal-date-line { font-size: 14px; font-weight: 700; color: #60a5fa; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .date-modal-date-line:hover { color: #93c5fd; }
+  .date-modal-date-line .edit-hint { font-size: 10px; color: #334155; font-weight: 400; }
+  .date-picker-inline { margin-top: 8px; display: none; }
+  .date-picker-inline input[type=date] { background: #1e293b; border: 1px solid #2563eb; border-radius: 6px; padding: 7px 10px; color: #e2e8f0; font-size: 13px; outline: none; width: 100%; }
   .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
   .date-modal-item .dm-left { flex: 1; }
   .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
   .date-modal-item .dm-info { font-size: 11px; color: #64748b; margin-top: 2px; }
   .dm-star { font-size: 13px; flex-shrink: 0; margin-left: 8px; }
-
-  /* Print date picker */
-  .print-edit-box { background: #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid #2563eb; }
-  .print-edit-label { font-size: 11px; color: #60a5fa; margin-bottom: 8px; font-weight: 600; }
-  .print-date-picker { width: 100%; background: #0f1f3d; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; color: #e2e8f0; font-size: 14px; outline: none; }
-  .print-date-save { background: #1d4ed8; border: none; color: #fff; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; margin-top: 10px; width: 100%; }
 
   /* Timeline */
   .timeline-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
@@ -168,9 +170,18 @@
   .note-preview { font-size: 12px; color: #94a3b8; margin-top: 4px; cursor: pointer; }
   .phone-link { font-size: 12px; color: #38bdf8; text-decoration: none; margin-left: auto; flex-shrink: 0; }
 
-  /* Expand toggle — thin invisible line at bottom of normal cards */
-  .expand-toggle { width: 40%; margin: 8px auto 0; height: 2px; border-radius: 2px; background: #1e293b; cursor: pointer; transition: background 0.25s ease; display: block; border: none; }
-  .expand-toggle.open { background: rgba(96,165,250,0.35); }
+  /* Expand toggle — star-color, super thin, barely visible */
+  .expand-toggle {
+    width: 36%; margin: 7px auto 0;
+    height: 1px; border-radius: 2px;
+    background: rgba(255,255,255,0.07);
+    cursor: pointer; display: block; border: none;
+    transition: background 0.2s, height 0.15s;
+  }
+  .expand-toggle.open {
+    background: rgba(250,204,21,0.55);
+    height: 2px;
+  }
 
   .loading { text-align: center; padding: 40px; color: #475569; }
   #toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
@@ -258,11 +269,21 @@
   </div>
 </div>
 
-<!-- Date/Print Modal -->
+<!-- Date Modal — clean version -->
 <div class="modal" id="date-modal">
   <div class="modal-box">
-    <div class="modal-title"><span id="date-modal-title"></span><button class="modal-close" onclick="closeDateModal()">✕</button></div>
-    <div id="date-modal-edit"></div>
+    <div class="modal-title" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+        <div class="date-modal-date-line" id="date-modal-date-line" onclick="toggleInlinePicker()">
+          <span id="date-modal-date-text"></span>
+          <span class="edit-hint" id="date-picker-hint"></span>
+        </div>
+        <button class="modal-close" onclick="closeDateModal()">✕</button>
+      </div>
+      <div class="date-picker-inline" id="date-picker-inline">
+        <input type="date" id="inline-date-picker" onchange="confirmInlineDateChange(this.value)">
+      </div>
+    </div>
     <div id="date-modal-list"></div>
   </div>
 </div>
@@ -357,6 +378,8 @@ let modalType=null,activeFilter='all',activePoliceFilter=null;
 let selected=new Set(),selectMode=false;
 let calDate=new Date(),backupTimer=null,pickRef=null;
 let stageTimer={},noteModalRef=null;
+// date modal state
+let dateModalSourceField=null,dateModalDateStr=null,dateModalEditRef=null;
 
 // ── Date helpers ──────────────────────────────────────────
 function toInputDate(str){
@@ -368,7 +391,7 @@ function toInputDate(str){
     const mo=MONTHS_UP.indexOf(p[1].substring(0,3));
     if(mo<0)return '';
     let yr=parseInt(p[2]);
-    if(yr<100)yr=2000+yr; // fix: 26→2026
+    if(yr<100)yr=2000+yr;
     return `${yr}-${String(mo+1).padStart(2,'0')}-${dd}`;
   }catch{return '';}
 }
@@ -380,6 +403,9 @@ function fromInputDate(str){
   }catch{return '';}
 }
 function getEffectivePrintDate(ref){ return manualPrintDates[ref]||printDates[ref]||null; }
+
+// display apps = exclude 10/10 from main list
+function getDisplayApps(){ return allApps.filter(a=>a.status!=='10/10'); }
 
 // ── Save ──────────────────────────────────────────────────
 function saveLocal(){
@@ -434,8 +460,6 @@ async function syncFromCloud(){
     saveLocal();
   }catch(e){}
 }
-
-// ── Settings ──────────────────────────────────────────────
 function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-status').textContent='';document.getElementById('settings-modal').classList.add('open');}
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 async function savePAT(){
@@ -462,7 +486,7 @@ function stagePressStart(e,ref){
 }
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
 
-// ── Calendar ──────────────────────────────────────────────
+// ── Calendar — uses allApps (including 10/10) ─────────────
 function toggleCal(){const b=document.getElementById('cal-box');const h=b.style.display==='none'||b.style.display==='';b.style.display=h?'block':'none';if(h)renderCal();}
 function calNav(dir){calDate.setMonth(calDate.getMonth()+dir);renderCal();}
 function renderCal(){
@@ -473,11 +497,17 @@ function renderCal(){
   const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
   const today=new Date();today.setHours(0,0,0,0);
   const dayDots={};
+  // সব app — 10/10 সহ calendar-এ দেখাবে
   allApps.forEach(a=>{
     if(!a.apply_date)return;
     const p=a.apply_date.toUpperCase().split('-');if(p.length!==3)return;
     const dd=parseInt(p[0]),mo=MONTHS_UP.indexOf(p[1]),yr=2000+parseInt(p[2]);
-    if(mo>=0&&mo===m&&yr===y){if(!dayDots[dd])dayDots[dd]=[];const s=stars[a.ref]||0;dayDots[dd].push(s===2?'urgent':s===1?'important':'normal');}
+    if(mo>=0&&mo===m&&yr===y){
+      if(!dayDots[dd])dayDots[dd]=[];
+      const s=stars[a.ref]||0;
+      const isDone=a.status==='10/10';
+      dayDots[dd].push(isDone?'done':s===2?'urgent':s===1?'important':'normal');
+    }
   });
   let html='';
   for(let i=0;i<fd;i++)html+='<div class="cal-day"></div>';
@@ -497,33 +527,49 @@ function renderCal(){
   }
   document.getElementById('cal-days').innerHTML=html;
 }
-function calDayClick(ds){const same=allApps.filter(a=>a.apply_date===ds);if(!same.length)return;document.getElementById('cal-box').style.display='none';openDateModal(ds,'📅','apply_date',null);}
+function calDayClick(ds){
+  // calendar click uses allApps (including 10/10)
+  const same=allApps.filter(a=>a.apply_date===ds);
+  if(!same.length)return;
+  document.getElementById('cal-box').style.display='none';
+  openDateModal(ds,'📅','apply_date',null);
+}
 
-// ── Print Date Modal ──────────────────────────────────────
+// ── Date Modal — clean, clickable title ───────────────────
 function openDateModal(dateStr,prefix,sourceField,editRef){
+  dateModalSourceField=sourceField;
+  dateModalDateStr=dateStr;
+  dateModalEditRef=editRef;
+
+  // Use allApps for calendar source, displayApps for print_date
   const same=sourceField==='apply_date'
     ?allApps.filter(a=>a.apply_date===dateStr)
     :allApps.filter(a=>getEffectivePrintDate(a.ref)===dateStr);
-  document.getElementById('date-modal-title').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
 
-  const editEl=document.getElementById('date-modal-edit');
+  const dateTextEl=document.getElementById('date-modal-date-text');
+  const hintEl=document.getElementById('date-picker-hint');
+  const pickerWrap=document.getElementById('date-picker-inline');
+  const dateLine=document.getElementById('date-modal-date-line');
+
+  dateTextEl.textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
+
   if(sourceField==='print_date'){
-    const inputVal=toInputDate(dateStr);
-    editEl.innerHTML=`
-      <div class="print-edit-box">
-        <div class="print-edit-label">🖨️ তারিখ পরিবর্তন করুন</div>
-        <input class="print-date-picker" type="date" id="print-picker" value="${inputVal}">
-        <button class="print-date-save" onclick="savePrintDateFromPicker('${editRef||''}','${dateStr}')">✅ সংরক্ষণ করুন</button>
-      </div>`;
+    hintEl.textContent='✏️ ট্যাপ করে পরিবর্তন';
+    dateLine.style.cursor='pointer';
+    pickerWrap.style.display='none';
+    document.getElementById('inline-date-picker').value=toInputDate(dateStr);
   } else {
-    editEl.innerHTML='';
+    hintEl.textContent='';
+    dateLine.style.cursor='default';
+    pickerWrap.style.display='none';
   }
 
   const getStarIcon=s=>s===2?'🔴':s===1?'⭐':'';
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
     const n=parseInt((a.status||'').split('/')[0])||0;const sc='s'+Math.min(n,10);
-    const txt=sourceField==='print_date'?'(Printed)':a.status;
-    const st=sourceField==='print_date'?'color:#64748b':'';
+    const isDone=a.status==='10/10';
+    const txt=isDone?'✅ 10/10':sourceField==='print_date'?'(Printed)':a.status;
+    const st=isDone?'color:#34d399':sourceField==='print_date'?'color:#64748b':'';
     const s=stars[a.ref]||0;const si=getStarIcon(s);
     return `<div class="date-modal-item">
       <div class="dm-left">
@@ -535,16 +581,37 @@ function openDateModal(dateStr,prefix,sourceField,editRef){
   }).join('');
   document.getElementById('date-modal').classList.add('open');
 }
-function savePrintDateFromPicker(editRef,fallbackDate){
-  const picker=document.getElementById('print-picker');
-  if(!picker||!picker.value){showToast('তারিখ সিলেক্ট করুন');return;}
-  const newDate=fromInputDate(picker.value);
-  if(!newDate){showToast('তারিখ সঠিক নয়');return;}
-  if(editRef){manualPrintDates[editRef]=newDate;}
-  else{allApps.forEach(a=>{if(getEffectivePrintDate(a.ref)===fallbackDate)manualPrintDates[a.ref]=newDate;});}
+
+function toggleInlinePicker(){
+  if(dateModalSourceField!=='print_date')return;
+  const wrap=document.getElementById('date-picker-inline');
+  const isVisible=wrap.style.display==='block';
+  wrap.style.display=isVisible?'none':'block';
+  if(!isVisible){
+    const inp=document.getElementById('inline-date-picker');
+    inp.value=toInputDate(dateModalDateStr);
+    try{inp.showPicker();}catch(e){}
+  }
+}
+
+function confirmInlineDateChange(val){
+  if(!val)return;
+  const newDate=fromInputDate(val);
+  if(!newDate)return;
+  if(!confirm(`তারিখ পরিবর্তন করবেন?\n${dateModalDateStr} → ${newDate}`))return;
+  if(dateModalEditRef){
+    manualPrintDates[dateModalEditRef]=newDate;
+  } else {
+    allApps.forEach(a=>{if(getEffectivePrintDate(a.ref)===dateModalDateStr)manualPrintDates[a.ref]=newDate;});
+  }
   save();closeDateModal();render();showToast('✅ '+newDate);
 }
-function closeDateModal(){document.getElementById('date-modal').classList.remove('open');}
+
+function closeDateModal(){
+  document.getElementById('date-modal').classList.remove('open');
+  document.getElementById('date-picker-inline').style.display='none';
+  dateModalSourceField=null;dateModalDateStr=null;dateModalEditRef=null;
+}
 
 // ── Timeline ──────────────────────────────────────────────
 function openTimelineModal(ref){
@@ -552,7 +619,7 @@ function openTimelineModal(ref){
   const s=stars[ref]||0;const si=s===2?'🔴':s===1?'⭐':'';
   document.getElementById('timeline-modal-title').textContent=(si?si+' ':'')+app.name;
   const hist=statusHistory[ref]||[];
-  const clr={'s1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b','s6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399'};
+  const clr={'s1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b','s6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399','s10':'#34d399'};
   if(!hist.length){document.getElementById('timeline-list').innerHTML='<div style="color:#475569;font-size:12px;text-align:center;padding:12px">কোনো ইতিহাস নেই</div>';document.getElementById('timeline-modal').classList.add('open');return;}
   document.getElementById('timeline-list').innerHTML=hist.map(h=>{
     const n2=parseInt((h.status||'').split('/')[0])||0;const sc='s'+Math.min(n2,10);const color=clr[sc]||'#94a3b8';
@@ -723,8 +790,6 @@ function cardHTML(app){
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
   const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:'';
-
-  // Expand toggle — thin invisible line at bottom, only normal cards
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
 
   return `
@@ -790,25 +855,35 @@ function handleTap(ref){if(selectMode)toggleSelect(ref);}
 // ── Render ────────────────────────────────────────────────
 function render(){
   const q=(document.querySelector('.search-bar').value||'').toLowerCase();
-  let apps=allApps.filter(a=>{
+  // display list: exclude 10/10
+  const displayApps=getDisplayApps().filter(a=>{
     if(!matchesFilter(a))return false;
     if(q&&!a.name.toLowerCase().includes(q)&&!a.ref.toLowerCase().includes(q)&&!(policeTags[a.ref]||'').toLowerCase().includes(q))return false;
     return true;
   });
-  const star2=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2);
-  const star1=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1);
-  const normal=apps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
-  const done=apps.filter(a=>delivered[a.ref]);
+  const star2=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2);
+  const star1=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1);
+  const normal=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
+  const done=displayApps.filter(a=>delivered[a.ref]);
   let html='';
-  if(star2.length){html+=`<div class="section-row"><div class="section-title">🔴 জরুরি</div></div>`;star2.forEach(a=>html+=cardHTML(a));}
-  if(star1.length){html+=`<div class="section-row"><div class="section-title">⭐ গুরুত্বপূর্ণ</div></div>`;star1.forEach(a=>html+=cardHTML(a));}
-  if(normal.length){if(star1.length||star2.length)html+=`<div class="section-row"><div class="section-title">সাধারণ</div></div>`;normal.forEach(a=>html+=cardHTML(a));}
+  if(star2.length){
+    html+=`<div class="section-row"><div class="section-title">🔴 জরুরি</div><div class="section-count">${star2.length}টি</div></div>`;
+    star2.forEach(a=>html+=cardHTML(a));
+  }
+  if(star1.length){
+    html+=`<div class="section-row"><div class="section-title">⭐ গুরুত্বপূর্ণ</div><div class="section-count">${star1.length}টি</div></div>`;
+    star1.forEach(a=>html+=cardHTML(a));
+  }
+  if(normal.length){
+    if(star1.length||star2.length)html+=`<div class="section-row"><div class="section-title">সাধারণ</div></div>`;
+    normal.forEach(a=>html+=cardHTML(a));
+  }
   if(done.length){html+=`<div class="section-row"><div class="section-title">✓ Delivered</div></div>`;done.forEach(a=>html+=cardHTML(a));}
   if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
   document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
   document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
-  const hasDraft=allApps.some(a=>(a.status||'').toLowerCase().includes('draft'));
+  const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));
   const draftBtn=document.getElementById('draft-btn');
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
 }

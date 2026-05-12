@@ -12,7 +12,6 @@ DATA_FILE = "docs/data.json"
 RSS_FILE = "docs/rss.xml"
 USERDATA_FILE = "docs/userdata.json"
 
-# ✅ BD_TZ module level-এ — কোনো try block-এর বাইরে
 BD_TZ = timezone(timedelta(hours=6))
 
 
@@ -53,7 +52,7 @@ def save_data(applications):
     with open(DATA_FILE, "w") as f:
         json.dump({
             "updated": datetime.now(BD_TZ).strftime("%d-%b-%Y %I:%M %p"),
-            "applications": applications
+            "applications": applications  # সব app — 10/10 সহ, frontend ফিল্টার করবে
         }, f, ensure_ascii=False)
 
 
@@ -163,9 +162,8 @@ async def main():
                 await browser.close()
                 return
 
-            # 10/10 বাদ দিয়ে display
-            display_apps = [a for a in applications if a["status"] != "10/10"]
-            save_data(display_apps)
+            # সব app save করো (10/10 সহ) — calendar record রাখার জন্য
+            save_data(applications)
 
             old_state = load_state()
             old_statuses = old_state.get("statuses", {})
@@ -184,13 +182,11 @@ async def main():
                 status = app["status"]
                 new_statuses[ref] = status
 
-                # Print date — 5/10 হলে record
                 num = int(status.split('/')[0]) if '/' in status else 0
                 if num == 5 and ref not in new_print_dates:
                     new_print_dates[ref] = today_str
                     print(f"Print date recorded: {ref} → {today_str}")
 
-                # Status history
                 if ref not in new_history:
                     new_history[ref] = []
                 hist = new_history[ref]
@@ -198,7 +194,6 @@ async def main():
                     hist.append({"status": status, "date": today_str})
                 new_history[ref] = hist
 
-                # নতুন ফাইল বা status পরিবর্তন
                 if ref not in old_statuses:
                     new_files.append(app)
                 elif old_statuses[ref] != status:
@@ -210,7 +205,6 @@ async def main():
                         "date": app["apply_date"]
                     })
 
-            # নতুন ফাইল notification (প্রথম run-এ না)
             if new_files and old_statuses:
                 for app in new_files:
                     send_telegram(

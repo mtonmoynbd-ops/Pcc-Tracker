@@ -5,14 +5,26 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Sun, 10 May 2026 20:09:23 +0000</lastBuildDate>
+<lastBuildDate>Tue, 12 May 2026 11:11:35 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>ARJUN - 5/10</title>
+<title>RAZ LIZA - 2/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BGAK54 | Before: 4/10 - Now: 5/10</description>
-<pubDate>Sun, 10 May 2026 20:09:23 +0000</pubDate>
-<guid isPermaLink="false">1BGAK54-5/10-202605102009</guid>
+<description>Ref: 1BGB1VP | Before: 1/10 - Now: 2/10</description>
+<pubDate>Tue, 12 May 2026 11:11:35 +0600</pubDate>
+<guid isPermaLink="false">1BGB1VP-2/10-202605121111</guid>
+</item><item>
+<title>GOPAL CHAKROBROTI - 2/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BGB19Y | Before: 1/10 - Now: 2/10</description>
+<pubDate>Tue, 12 May 2026 11:11:35 +0600</pubDate>
+<guid isPermaLink="false">1BGB19Y-2/10-202605121111</guid>
+</item><item>
+<title>ARJUN - 6/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BGAK54 | Before: 5/10 - Now: 6/10</description>
+<pubDate>Tue, 12 May 2026 11:11:35 +0600</pubDate>
+<guid isPermaLink="false">1BGAK54-6/10-202605121111</guid>
 </item>
 </channel>
 </rss>

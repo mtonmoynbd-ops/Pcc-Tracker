@@ -11,7 +11,11 @@
   .header-left { display: flex; align-items: center; gap: 8px; }
   .shield-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; flex-shrink: 0; }
   .title-block { display: flex; flex-direction: column; }
-  h1 { font-size: 18px; color: #60a5fa; line-height: 1.2; }
+  h1 { font-size: 18px; color: #60a5fa; line-height: 1.2; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; display: inline-flex; align-items: center; gap: 5px; }
+  h1:active { opacity: 0.7; }
+  @keyframes spin-refresh { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .title-refresh-ico { display: inline-block; opacity: 0; transition: opacity 0.2s; }
+  .title-refresh-ico.spinning { animation: spin-refresh 0.7s linear infinite; opacity: 1; }
   .updated { font-size: 11px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .backup-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #475569; margin-left: 3px; vertical-align: middle; }
   .backup-dot.ok { background: #34d399; } .backup-dot.err { background: #ef4444; }
@@ -32,9 +36,7 @@
   .icon-filter-btn.police { border-color: #a78bfa; background: #1e1a3a; margin-left: auto; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
   .icon-filter-btn.archive-btn { border-color: #334155; background: #1e293b; }
-
-  /* Pull indicator */
-  #pull-indicator { text-align: center; padding: 8px; font-size: 12px; color: #60a5fa; display: none; }
+  .icon-filter-btn.refresh-ico-btn { border-color: #334155; background: #1e293b; }
 
   /* Live dot */
   @keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
@@ -42,9 +44,8 @@
 
   /* Section row */
   .section-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 8px; gap: 6px; }
-  .section-title { font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; font-weight: 600; }
+  .section-title { font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; flex-shrink: 0; font-weight: 600; }
   .section-count { font-size: 11px; color: #334155; font-weight: 600; flex-shrink: 0; }
-  /* Today date chip in section */
   .section-date-chip { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; flex: 1; justify-content: center; padding: 2px 0; }
   .section-date-chip .today-lbl { font-size: 9px; color: #475569; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
   .section-date-chip .today-date-txt { font-size: 11px; color: #7dd3fc; font-weight: 700; letter-spacing: 0.3px; }
@@ -62,15 +63,14 @@
   .cal-day:hover { background: #1e293b; }
   .cal-day.has-file { color: #e2e8f0; font-weight: 700; background: #1e3a5f; border-color: #2563eb; }
   .cal-day.today { background: #1d4ed8; color: #fff; font-weight: 700; }
-  @keyframes cal-note-blink { 0%,100%{border-color:rgba(251,191,36,0.2)} 50%{border-color:rgba(251,191,36,0.7)} }
-  .cal-day.has-note { animation: cal-note-blink 3s ease-in-out infinite; border-color: rgba(251,191,36,0.2); }
+  @keyframes cal-note-blink { 0%,100%{border-color:rgba(251,191,36,0.15)} 50%{border-color:rgba(251,191,36,0.65)} }
+  .cal-day.has-note { animation: cal-note-blink 3s ease-in-out infinite; border-color: rgba(251,191,36,0.15); }
   .cal-day.has-note.today { animation: none; }
   .cal-dots { display: flex; gap: 1px; justify-content: center; margin-top: 2px; flex-wrap: wrap; max-width: 32px; }
   .cal-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
   .cal-dot.normal { background: #60a5fa; } .cal-dot.important { background: #f59e0b; }
   .cal-dot.urgent { background: #ef4444; } .cal-dot.done { background: #34d399; }
   .cal-dot.today-dot { background: #fff; }
-  /* Note tag in calendar */
   .cal-note-indicator { font-size: 7px; line-height: 1; margin-top: 1px; color: #f59e0b; }
 
   /* Cal day modal */
@@ -104,8 +104,7 @@
   .date-picker-inline { display: none; margin-top: 8px; }
   .date-picker-inline input[type=date] { background: #1e293b; border: 1px solid #2563eb; border-radius: 6px; padding: 7px 10px; color: #e2e8f0; font-size: 13px; outline: none; width: 100%; }
   .date-modal-item { padding: 8px 0; border-bottom: 1px solid #1e3a5f; display: flex; justify-content: space-between; align-items: center; }
-  .date-modal-item .dm-left { flex: 1; }
-  .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
+  .date-modal-item .dm-left { flex: 1; } .date-modal-item .dm-name { font-weight: 600; color: #f1f5f9; font-size: 13px; }
   .date-modal-item .dm-info { font-size: 11px; color: #64748b; margin-top: 2px; }
   .dm-star { font-size: 13px; flex-shrink: 0; margin-left: 8px; }
   /* Timeline */
@@ -115,7 +114,8 @@
   .note-modal-textarea { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: #e2e8f0; font-size: 13px; outline: none; resize: none; margin-bottom: 10px; min-height: 80px; }
   .note-modal-save { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .note-modal-clear { background: none; border: 1px solid #334155; color: #64748b; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-left: 8px; }
-  /* Custom confirm */
+  /* Confirm — always on top */
+  #confirm-modal { z-index: 200; }
   .confirm-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 14px; padding: 20px; width: 100%; max-width: 280px; }
   .confirm-msg { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin-bottom: 16px; }
   .confirm-sub { font-size: 11px; color: #60a5fa; margin-top: 5px; line-height: 1.5; }
@@ -152,7 +152,6 @@
   .arch-item-name:hover { color: #60a5fa; }
   .arch-item-ref { color: #475569; flex-shrink: 0; font-size: 10px; }
   .arch-item-date { color: #3f4f6a; flex-shrink: 0; font-size: 10px; }
-  /* Search archive result */
   .arch-search-result { background: #0f1a2e; border: 1px solid #1e3a5f; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
   .arch-search-tag { font-size: 10px; color: #475569; background: #1e293b; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-bottom: 6px; }
   /* Police */
@@ -237,16 +236,23 @@
   <symbol id="ico-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
   </symbol>
+  <symbol id="ico-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+  </symbol>
 </svg>
-
-<!-- Pull indicator -->
-<div id="pull-indicator">⟳놓으면 Refresh...</div>
 
 <div class="header">
   <div class="header-left">
     <button class="shield-btn" onclick="openSettings()">🛡️</button>
     <div class="title-block">
-      <h1>PCC Tracker</h1>
+      <h1 onclick="manualRefresh()" title="ট্যাপ করে Refresh করুন">
+        PCC Tracker
+        <svg id="refresh-spin" class="title-refresh-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </h1>
       <div class="updated" id="updated">লোড হচ্ছে...<span class="backup-dot" id="backup-dot"></span></div>
     </div>
     <a class="web-btn" href="https://pcc.police.gov.bd/ords/r/pcc/pcc/login_desktop" target="_blank" rel="external noopener">🌐</a>
@@ -263,7 +269,7 @@
 <input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম বা Ref খুঁজুন..." oninput="render()">
 
 <div class="filter-row">
-  <button class="filter-btn active" onclick="setFilter('all',this)">সব</button>
+  <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
   <button class="filter-btn" onclick="setFilter('1-3',this)">1-3</button>
   <button class="filter-btn" onclick="setFilter('4-6',this)">4-6</button>
   <button class="filter-btn" onclick="setFilter('7-9',this)">7-9</button>
@@ -271,7 +277,7 @@
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <span style="font-size:13px">🏷️</span>
   </button>
-  <button class="icon-filter-btn archive-btn" onclick="openArchive()" title="আর্কাইভ">
+  <button class="icon-filter-btn archive-btn" onclick="openArchive()">
     <svg width="16" height="16"><use href="#ico-archive" stroke="#60a5fa"/></svg>
   </button>
 </div>
@@ -299,7 +305,7 @@
   </div>
 </div>
 
-<!-- Custom Confirm -->
+<!-- Custom Confirm — z-index 200, always on top -->
 <div class="modal" id="confirm-modal">
   <div class="confirm-box">
     <div class="confirm-msg" id="confirm-msg"></div>
@@ -473,6 +479,7 @@ let stageTimer={},noteModalRef=null;
 let dateModalSourceField=null,dateModalDateStr=null,dateModalEditRef=null;
 let archTab='month',archYearFilter=null,archMonthFilter=null;
 let currentCalDay=null;
+let refreshLock=false;
 
 // ── Custom Confirm ────────────────────────────────────────
 let confirmResolve=null;
@@ -512,6 +519,25 @@ function todayDateChipHTML(){
   </span>`;
 }
 
+// ── Manual Refresh (title tap) ────────────────────────────
+async function manualRefresh(){
+  if(refreshLock)return;refreshLock=true;
+  const ico=document.getElementById('refresh-spin');
+  if(ico)ico.classList.add('spinning');
+  const pat=localStorage.getItem('pcc_pat');
+  if(pat){
+    showToast('🔄 Workflow চালু হচ্ছে...');
+    try{
+      const r=await fetch(WORKFLOW_API,{method:'POST',headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({ref:'main'})});
+      if(r.status===204)showToast('✅ Workflow শুরু — ৩-৫ মিনিট পর ডেটা আসবে');
+      else showToast('⚠️ Workflow trigger হয়নি');
+    }catch{showToast('⚠️ Network error');}
+  }
+  await load();
+  if(ico)ico.classList.remove('spinning');
+  setTimeout(()=>{refreshLock=false;},3000);
+}
+
 // ── Save ──────────────────────────────────────────────────
 function saveLocal(){
   localStorage.setItem('pcc_stars',JSON.stringify(stars));
@@ -536,40 +562,10 @@ function saveLocal(){
 }
 function save(){saveLocal();scheduleBackup();}
 
-// ── Workflow trigger ──────────────────────────────────────
-async function triggerWorkflow(){
-  const pat=localStorage.getItem('pcc_pat');if(!pat)return false;
-  try{
-    const r=await fetch(WORKFLOW_API,{method:'POST',headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify({ref:'main'})});
-    return r.status===204;
-  }catch{return false;}
-}
-
-// ── Pull to Refresh ───────────────────────────────────────
-let pullStartY=0,pullActive=false;
-document.addEventListener('touchstart',e=>{if(window.scrollY<=0){pullStartY=e.touches[0].clientY;pullActive=true;}},{passive:true});
-document.addEventListener('touchmove',e=>{
-  if(!pullActive)return;
-  const dy=e.touches[0].clientY-pullStartY;
-  const ind=document.getElementById('pull-indicator');
-  if(dy>40&&window.scrollY<=0){ind.style.display='block';ind.textContent=dy>80?'⟳ 놓으면 Refresh':'↓ 당겨서 새로고침';}
-},{passive:true});
-document.addEventListener('touchend',async e=>{
-  if(!pullActive)return;pullActive=false;
-  const dy=e.changedTouches[0].clientY-pullStartY;
-  document.getElementById('pull-indicator').style.display='none';
-  if(dy>80&&window.scrollY<=0){
-    showToast('🔄 Workflow চালু হচ্ছে...');
-    const ok=await triggerWorkflow();
-    if(ok)showToast('✅ Workflow শুরু হয়েছে — ৩-৫ মিনিট পর ডেটা আসবে');
-    await load();
-  }},{passive:true});
-
 // ── Backup ────────────────────────────────────────────────
 function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=setTimeout(doBackup,5000);}
 async function doBackup(){
-  const pat=localStorage.getItem('pcc_pat');if(!pat)return;
-  setBkDot('...');
+  const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
   try{
     const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,manualPrintDates,resetArchive,calNotes};
     const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
@@ -595,8 +591,7 @@ async function syncFromCloud(){
     if(d.counts)counts=d.counts;if(d.history)history=d.history;
     if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;
     if(d.manualPrintDates)manualPrintDates=d.manualPrintDates;
-    if(d.resetArchive)resetArchive=d.resetArchive;
-    if(d.calNotes)calNotes=d.calNotes;
+    if(d.resetArchive)resetArchive=d.resetArchive;if(d.calNotes)calNotes=d.calNotes;
     saveLocal();
   }catch(e){}
 }
@@ -630,8 +625,7 @@ function calNav(dir){calDate.setMonth(calDate.getMonth()+dir);renderCal();}
 function renderCal(){
   const sm=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   const y=calDate.getFullYear(),m=calDate.getMonth();
-  const now=new Date();
-  const isCurrentMonth=y===now.getFullYear()&&m===now.getMonth();
+  const now=new Date();const isCurrentMonth=y===now.getFullYear()&&m===now.getMonth();
   const titleWrap=document.getElementById('cal-title-wrap');
   if(isCurrentMonth){
     titleWrap.innerHTML=`<span class="live-dot" style="width:5px;height:5px"></span><span class="cal-title-lbl" style="margin-right:2px">Today</span><span class="cal-title-text" style="color:#7dd3fc">${getTodayDisplay()}</span>`;
@@ -670,8 +664,6 @@ function renderCal(){
   }
   document.getElementById('cal-days').innerHTML=html;
 }
-
-// ── Cal Day Modal ─────────────────────────────────────────
 function openCalDayModal(ds){
   currentCalDay=ds;
   const isToday=ds===todayStr();
@@ -688,8 +680,7 @@ function openCalDayModal(ds){
     filesEl.innerHTML=files.map(a=>{
       const s=stars[a.ref]||0;const si=s===2?'🔴':s===1?'⭐':'📄';
       const isDone=a.status==='10/10';
-      return `<div class="cal-day-file-item">
-        <span style="font-size:12px">${si}</span>
+      return `<div class="cal-day-file-item"><span style="font-size:12px">${si}</span>
         <span class="cal-day-file-name" style="${isDone?'color:#34d399':''}">${a.name}</span>
         <span class="cal-day-file-ref">${a.ref}</span>
         <span style="font-size:10px;color:#475569">${a.status}</span>
@@ -708,13 +699,11 @@ function renderCalDayTags(){
   ).join('');
 }
 function toggleCalTag(idx){
-  if(!currentCalDay)return;
-  let tags=calNotes[currentCalDay]||[];
+  if(!currentCalDay)return;let tags=calNotes[currentCalDay]||[];
   if(tags.includes(idx))tags=tags.filter(i=>i!==idx);else tags=[...tags,idx];
   if(tags.length)calNotes[currentCalDay]=tags;else delete calNotes[currentCalDay];
   localStorage.setItem('pcc_cal_notes',JSON.stringify(calNotes));
-  renderCalDayTags();
-  renderCal();
+  renderCalDayTags();renderCal();
 }
 function closeCalDayModal(){document.getElementById('cal-day-modal').classList.remove('open');currentCalDay=null;}
 
@@ -722,8 +711,7 @@ function closeCalDayModal(){document.getElementById('cal-day-modal').classList.r
 function openDateModal(dateStr,prefix,sourceField,editRef){
   dateModalSourceField=sourceField;dateModalDateStr=dateStr;dateModalEditRef=editRef;
   const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>getEffectivePrintDate(a.ref)===dateStr);
-  const dateLine=document.getElementById('date-modal-date-line');
-  const pickerWrap=document.getElementById('date-picker-inline');
+  const dateLine=document.getElementById('date-modal-date-line');const pickerWrap=document.getElementById('date-picker-inline');
   document.getElementById('date-modal-date-text').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
   if(sourceField==='print_date'){dateLine.style.cursor='pointer';pickerWrap.style.display='none';document.getElementById('inline-date-picker').value=toInputDate(dateStr);}
   else{dateLine.style.cursor='default';pickerWrap.style.display='none';}
@@ -733,19 +721,16 @@ function openDateModal(dateStr,prefix,sourceField,editRef){
     const isDone=a.status==='10/10';const txt=isDone?'✅ 10/10':sourceField==='print_date'?'(Printed)':a.status;
     const st=isDone?'color:#34d399':sourceField==='print_date'?'color:#64748b':'';
     const s=stars[a.ref]||0;const si=getStarIcon(s);
-    return `<div class="date-modal-item">
-      <div class="dm-left"><div class="dm-name">${a.name}</div>
+    return `<div class="date-modal-item"><div class="dm-left"><div class="dm-name">${a.name}</div>
       <div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${st}">${txt}</span></div>
-      </div>${si?`<span class="dm-star">${si}</span>`:''}
-    </div>`;
+      </div>${si?`<span class="dm-star">${si}</span>`:''}</div>`;
   }).join('');
   document.getElementById('date-modal').classList.add('open');
 }
 function toggleInlinePicker(){
   if(dateModalSourceField!=='print_date')return;
-  const wrap=document.getElementById('date-picker-inline');
-  const isV=wrap.style.display==='block';wrap.style.display=isV?'none':'block';
-  if(!isV){try{document.getElementById('inline-date-picker').showPicker();}catch(e){}}
+  const wrap=document.getElementById('date-picker-inline');const isV=wrap.style.display==='block';
+  wrap.style.display=isV?'none':'block';if(!isV){try{document.getElementById('inline-date-picker').showPicker();}catch(e){}}
 }
 async function confirmInlineDateChange(val){
   if(!val)return;const newDate=fromInputDate(val);if(!newDate)return;
@@ -792,20 +777,12 @@ function setArchTab(tab){
   renderArchiveFilters();renderArchiveContent();
 }
 function getArchiveYears(){
-  if(archTab==='month'){
-    const yrs=new Set();allApps.forEach(a=>{const p=(a.apply_date||'').toUpperCase().split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}});
-    return [...yrs].sort((a,b)=>b-a);
-  } else if(archTab==='reset'){
-    const yrs=new Set();resetArchive.forEach(r=>{if(r.resetDate){const p=r.resetDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});
-    return [...yrs].sort((a,b)=>b-a);
-  } else {
-    const yrs=new Set();deletedAppsStore.forEach(a=>{if(a.deletedDate){const p=a.deletedDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});
-    return [...yrs].sort((a,b)=>b-a);
-  }
+  if(archTab==='month'){const yrs=new Set();allApps.forEach(a=>{const p=(a.apply_date||'').toUpperCase().split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}});return [...yrs].sort((a,b)=>b-a);}
+  else if(archTab==='reset'){const yrs=new Set();resetArchive.forEach(r=>{if(r.resetDate){const p=r.resetDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
+  else{const yrs=new Set();deletedAppsStore.forEach(a=>{if(a.deletedDate){const p=a.deletedDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
 }
 function renderArchiveFilters(){
-  const wrap=document.getElementById('arch-filter-wrap');
-  const years=getArchiveYears();
+  const wrap=document.getElementById('arch-filter-wrap');const years=getArchiveYears();
   if(years.length<=1){wrap.innerHTML='';return;}
   let html=`<div class="arch-year-row">`;
   years.forEach(y=>{html+=`<span class="arch-year-chip ${archYearFilter===y?'active':''}" onclick="setArchYear(${y})">${y}</span>`;});
@@ -822,15 +799,17 @@ function setArchMonth(m){archMonthFilter=archMonthFilter===m?null:m;renderArchiv
 function copyArchText(itemsStr){
   try{const items=JSON.parse(itemsStr);navigator.clipboard.writeText(items.map(a=>`${a.name||''}  ${a.ref||''}  ${a.apply_date||a.applyDate||''}`).join('\n')).then(()=>showToast('✓ কপি'));}catch(e){}
 }
-function archPhoneClick(name,phone){
+function archPhoneClick(nameEsc,phone){
+  const name=nameEsc.replace(/\\'/g,"'");
   if(!phone||phone.trim()==='-'||phone.trim()===''){showToast('ফোন নম্বর নেই');return;}
   showConfirm(`📞 ${name}`,`${phone} নম্বরে কল করবেন?`).then(ok=>{if(ok)window.location.href=`tel:${phone}`;});
 }
 function archItemHTML(a,si){
   const phone=a.phone||a.phoneNum||'';
+  const nameEsc=(a.name||'').replace(/'/g,"\\'");
   return `<div class="arch-item">
     <span class="arch-item-star">${si}</span>
-    <span class="arch-item-name" onclick="archPhoneClick('${(a.name||'').replace(/'/g,"\\'")}','${phone}')">${a.name||''}</span>
+    <span class="arch-item-name" onclick="archPhoneClick('${nameEsc}','${phone}')">${a.name||''}</span>
     <span class="arch-item-ref">${a.ref||''}</span>
     <span class="arch-item-date">${a.apply_date||a.applyDate||''}</span>
   </div>`;
@@ -853,10 +832,10 @@ function renderArchiveContent(){
     el.innerHTML=sorted.map(m=>{
       const total=m.urgent.length+m.important.length+m.normal.length;
       const allItems=[...m.urgent,...m.important,...m.normal];
-      const copyData=JSON.stringify(allItems).replace(/"/g,'&quot;');
+      const copyStr=JSON.stringify(allItems).replace(/"/g,'&quot;');
       return `<div class="arch-section">
         <div class="arch-header"><span class="arch-month-label">${m.label}</span>
-          <button class="arch-copy-btn" onclick="copyArchText('${copyData}')">${copySVG} কপি</button></div>
+          <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
         <div class="arch-badges">
           ${m.urgent.length?`<span class="arch-badge urgent">🔴 ${m.urgent.length}</span>`:''}
           ${m.important.length?`<span class="arch-badge important">⭐ ${m.important.length}</span>`:''}
@@ -875,36 +854,33 @@ function renderArchiveContent(){
     if(archYearFilter){filtered=resetArchive.filter(r=>{const p=(r.resetDate||'').split('-');return p.length===3&&(2000+parseInt(p[2]))===archYearFilter;});}
     if(!filtered.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো রিসেট রেকর্ড নেই</div>';return;}
     el.innerHTML=filtered.map(r=>{
-      const allItems=[...r.urgentItems,...r.importantItems];
-      const copyData=JSON.stringify(allItems.map(a=>({...a,apply_date:a.applyDate}))).replace(/"/g,'&quot;');
+      const allItems=[...(r.urgentItems||[]),...(r.importantItems||[])];
+      const copyStr=JSON.stringify(allItems.map(a=>({...a,apply_date:a.applyDate}))).replace(/"/g,'&quot;');
       return `<div class="arch-section">
         <div class="arch-header"><div><div class="arch-month-label">${r.resetDate}</div>
           ${r.fromDate?`<div class="arch-date-range">${r.fromDate} → ${r.resetDate}</div>`:''}</div>
-          <button class="arch-copy-btn" onclick="copyArchText('${copyData}')">${copySVG} কপি</button></div>
+          <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
         <div class="arch-badges">
           ${r.urgentCount?`<span class="arch-badge urgent">🔴 ${r.urgentCount}</span>`:''}
           ${r.importantCount?`<span class="arch-badge important">⭐ ${r.importantCount}</span>`:''}
           <span class="arch-badge total">Total ${allItems.length}</span>
         </div>
         <div class="arch-list">
-          ${r.urgentItems.map(a=>archItemHTML(a,'🔴')).join('')}
-          ${r.importantItems.map(a=>archItemHTML(a,'⭐')).join('')}
+          ${(r.urgentItems||[]).map(a=>archItemHTML(a,'🔴')).join('')}
+          ${(r.importantItems||[]).map(a=>archItemHTML(a,'⭐')).join('')}
         </div>
       </div>`;
     }).join('');
   } else {
-    // Deleted
     let filtered=deletedAppsStore;
     if(archYearFilter){filtered=deletedAppsStore.filter(a=>{const p=(a.deletedDate||'').split('-');return p.length===3&&(2000+parseInt(p[2]))===archYearFilter;});}
     if(!filtered.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো মুছে ফেলা ফাইল নেই</div>';return;}
-    // Group by deleted date
-    const byDate={};
-    filtered.forEach(a=>{const k=a.deletedDate||'অজানা';if(!byDate[k])byDate[k]=[];byDate[k].push(a);});
+    const byDate={};filtered.forEach(a=>{const k=a.deletedDate||'অজানা';if(!byDate[k])byDate[k]=[];byDate[k].push(a);});
     el.innerHTML=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,items])=>{
-      const copyData=JSON.stringify(items).replace(/"/g,'&quot;');
+      const copyStr=JSON.stringify(items).replace(/"/g,'&quot;');
       return `<div class="arch-section">
         <div class="arch-header"><span class="arch-month-label">🗑 ${date}</span>
-          <button class="arch-copy-btn" onclick="copyArchText('${copyData}')">${copySVG} কপি</button></div>
+          <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
         <div class="arch-badges"><span class="arch-badge deleted">মুছে ফেলা ${items.length}</span></div>
         <div class="arch-list">${items.map(a=>archItemHTML(a,'🗑')).join('')}</div>
       </div>`;
@@ -917,12 +893,8 @@ async function deleteSelected(){
   if(!selected.size)return;
   const ok=await showConfirm(`${selected.size}টি ফাইল মুছবেন?`,'আর্কাইভের "মুছে ফেলা" ট্যাবে চলে যাবে');
   if(!ok)return;
-  const toDelete=allApps.filter(a=>selected.has(a.ref));
-  const delDate=todayStr();
-  toDelete.forEach(a=>{
-    deletedRefs.add(a.ref);
-    deletedAppsStore.push({...a,deletedDate:delDate});
-  });
+  const toDelete=allApps.filter(a=>selected.has(a.ref));const delDate=todayStr();
+  toDelete.forEach(a=>{deletedRefs.add(a.ref);deletedAppsStore.push({...a,deletedDate:delDate});});
   clearSelection();saveLocal();render();showToast(`🗑 ${toDelete.length}টি মুছে ফেলা হয়েছে`);
 }
 
@@ -930,8 +902,7 @@ async function deleteSelected(){
 function searchInArchive(q){
   if(!q)return[];const results=[];
   resetArchive.forEach(r=>{
-    const matched=[...(r.urgentItems||[]),...(r.importantItems||[])].filter(a=>
-      (a.name||'').toLowerCase().includes(q)||(a.ref||'').toLowerCase().includes(q));
+    const matched=[...(r.urgentItems||[]),...(r.importantItems||[])].filter(a=>(a.name||'').toLowerCase().includes(q)||(a.ref||'').toLowerCase().includes(q));
     if(matched.length)results.push({source:`রিসেট: ${r.resetDate}`,items:matched});
   });
   const done10=allApps.filter(a=>a.status==='10/10'&&((a.name||'').toLowerCase().includes(q)||(a.ref||'').toLowerCase().includes(q)));
@@ -1007,15 +978,10 @@ async function resetCounts(){
     const urgentItems=allApps.filter(a=>(stars[a.ref]||0)===2).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,phone:a.phone||'',type:'urgent'}));
     const importantItems=allApps.filter(a=>(stars[a.ref]||0)===1).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,phone:a.phone||'',type:'important'}));
     const total=urgentItems.length+importantItems.length;
-    const ok=await showConfirm(
-      'কাউন্ট রিসেট করবেন?',
-      `Urgent ${urgentItems.length} + Important ${importantItems.length} = ${total} file আর্কাইভে (রিসেট ট্যাব) চলে যাবে।`
-    );
+    const ok=await showConfirm('কাউন্ট রিসেট করবেন?',`Urgent ${urgentItems.length} + Important ${importantItems.length} = ${total} file আর্কাইভে (রিসেট ট্যাব) চলে যাবে।`);
     if(!ok)return;
     if(urgentItems.length||importantItems.length){
-      const allItems=[...urgentItems,...importantItems];
-      const dates=allItems.map(a=>a.applyDate).filter(Boolean);
-      let fromDate='';
+      const allItems=[...urgentItems,...importantItems];const dates=allItems.map(a=>a.applyDate).filter(Boolean);let fromDate='';
       if(dates.length){const parsed=dates.map(d=>toInputDate(d)).filter(Boolean).sort();if(parsed.length)fromDate=fromInputDate(parsed[0]);}
       resetArchive.unshift({id:Date.now(),resetDate:todayStr(),fromDate,urgentItems,importantItems,urgentCount:urgentItems.length,importantCount:importantItems.length});
       localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
@@ -1143,8 +1109,7 @@ async function swipeEnd(e,ref){
   const dx=e.changedTouches[0].clientX-touchStartX[ref];
   const card=document.getElementById('card-'+ref);const hl=document.getElementById('hint-left-'+ref),hr=document.getElementById('hint-right-'+ref);
   if(card){card.style.transition='transform 0.2s ease';card.style.transform='';}
-  if(hl)hl.style.opacity=0;if(hr)hr.style.opacity=0;
-  if(selectMode)return;
+  if(hl)hl.style.opacity=0;if(hr)hr.style.opacity=0;if(selectMode)return;
   if(dx<-80){
     const s=stars[ref]||0;
     if(s>0&&!delivered[ref]){const ok=await showConfirm('Delivered করবেন?');if(!ok)return;}
@@ -1171,33 +1136,29 @@ function render(){
   const normal=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
   const done=displayApps.filter(a=>delivered[a.ref]);
   const dateChip=todayDateChipHTML();
-  let firstSection=true;let html='';
-  function sectionRow(title,count,withDate){
-    const dc=withDate&&firstSection?dateChip:'';firstSection=firstSection&&withDate?false:firstSection;
+  let html='';let dateShown=false;
+  function secRow(title,count){
+    const dc=!dateShown?dateChip:'';if(!dateShown)dateShown=true;
     return `<div class="section-row"><div class="section-title">${title}</div>${dc}${count!==null?`<div class="section-count">${count} file</div>`:''}</div>`;
   }
-  if(star2.length){html+=sectionRow('🔴 Urgent',star2.length,true);firstSection=false;star2.forEach(a=>html+=cardHTML(a));}
-  if(star1.length){html+=sectionRow('⭐ Important',star1.length,!star2.length);firstSection=false;star1.forEach(a=>html+=cardHTML(a));}
-  if(normal.length){
-    html+=sectionRow('Normal',null,!star2.length&&!star1.length);firstSection=false;
-    normal.forEach(a=>html+=cardHTML(a));
-  }
+  if(star2.length){html+=secRow('🔴 Urgent',star2.length);star2.forEach(a=>html+=cardHTML(a));}
+  if(star1.length){html+=secRow('⭐ Important',star1.length);star1.forEach(a=>html+=cardHTML(a));}
+  if(normal.length){html+=secRow('Normal',null);normal.forEach(a=>html+=cardHTML(a));}
   if(done.length){html+=`<div class="section-row"><div class="section-title">✓ Delivered</div></div>`;done.forEach(a=>html+=cardHTML(a));}
-
-  // Archive search
   if(q){
     const archResults=searchInArchive(q);
     if(archResults.length){
       html+=`<div class="section-row" style="margin-top:16px"><div class="section-title" style="color:#7c3aed">📦 আর্কাইভে পাওয়া</div></div>`;
       archResults.forEach(r=>{
-        html+=`<div class="arch-search-result">
-          <span class="arch-search-tag">${r.source}</span>
-          <div class="arch-list">${r.items.map(a=>`<div class="arch-item">
-            <span class="arch-item-name" onclick="archPhoneClick('${(a.name||'').replace(/'/g,"\\'")}','${a.phone||''}')">${a.name||''}</span>
-            <span class="arch-item-ref">${a.ref||''}</span>
-            <span class="arch-item-date">${a.applyDate||''}</span>
-          </div>`).join('')}</div>
-        </div>`;
+        html+=`<div class="arch-search-result"><span class="arch-search-tag">${r.source}</span>
+          <div class="arch-list">${r.items.map(a=>{
+            const nameEsc=(a.name||'').replace(/'/g,"\\'");const phone=a.phone||'';
+            return `<div class="arch-item">
+              <span class="arch-item-name" onclick="archPhoneClick('${nameEsc}','${phone}')">${a.name||''}</span>
+              <span class="arch-item-ref">${a.ref||''}</span>
+              <span class="arch-item-date">${a.applyDate||''}</span>
+            </div>`;
+          }).join('')}</div></div>`;
       });
     }
   }

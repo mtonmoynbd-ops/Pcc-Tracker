@@ -52,7 +52,7 @@ def save_data(applications):
     with open(DATA_FILE, "w") as f:
         json.dump({
             "updated": datetime.now(BD_TZ).strftime("%d-%b-%Y %I:%M %p"),
-            "applications": applications  # সব app — 10/10 সহ, frontend ফিল্টার করবে
+            "applications": applications
         }, f, ensure_ascii=False)
 
 
@@ -64,7 +64,7 @@ def save_rss(changes):
         items += f"""<item>
 <title>{c['name']} - {c['new']}</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: {c['ref']} | Before: {c['old']} - Now: {c['new']}</description>
+<description>Ref: {c['ref']} | {c['old']} → {c['new']}</description>
 <pubDate>{now}</pubDate>
 <guid isPermaLink="false">{c['ref']}-{c['new']}-{datetime.now(BD_TZ).strftime('%Y%m%d%H%M')}</guid>
 </item>"""
@@ -92,6 +92,99 @@ def save_userdata(print_dates, status_history):
     existing["script_updated"] = datetime.now(BD_TZ).strftime("%d-%b-%Y %I:%M %p")
     with open(USERDATA_FILE, "w") as f:
         json.dump(existing, f, ensure_ascii=False)
+
+
+def parse_rows(rows):
+    """Parse table rows into application dicts"""
+    apps = []
+    for row in rows:
+        cols = row.select("td")
+        if len(cols) >= 9:
+            ref = cols[0].text.strip()
+            apply_date = cols[3].text.strip()
+            phone = cols[4].text.strip()
+            name = cols[5].text.strip()
+            full_status = cols[8].text.strip()
+            m = re.match(r'(\d+/\d+)', full_status)
+            status = m.group(1) if m else full_status
+            if ref and len(ref) > 2:
+                apps.append({
+                    "ref": ref,
+                    "name": name,
+                    "apply_date": apply_date,
+                    "phone": phone,
+                    "status": status
+                })
+    return apps
+
+
+async def scrape_all_pages(page):
+    """Scrape all pagination pages — handles multi-page PCC lists"""
+    all_apps = []
+    page_num = 0
+
+    while page_num < 20:  # safety limit: max 20 pages
+        page_num += 1
+        await page.wait_for_timeout(1500)
+
+        content = await page.content()
+        soup = BeautifulSoup(content, "html.parser")
+        rows = soup.select("table tr")[1:]  # skip header row
+
+        if not rows:
+            print(f"Page {page_num}: no rows found, stopping")
+            break
+
+        page_apps = parse_rows(rows)
+        all_apps.extend(page_apps)
+        print(f"Page {page_num}: {len(page_apps)} applications")
+
+        # Try to find and click "Next" pagination button using JS
+        has_next = await page.evaluate("""() => {
+            const candidates = [
+                ...document.querySelectorAll(
+                    'button[title="Next"], a[title="Next"], ' +
+                    'button[aria-label="Next"], a[aria-label="Next"], ' +
+                    '.t-Report-paginationLink--next, ' +
+                    'a.t-Button--pagination, button.t-Button--pagination'
+                )
+            ];
+            for (const el of candidates) {
+                const txt = el.textContent.trim();
+                const title = (el.getAttribute('title') || '').toLowerCase();
+                const aria = (el.getAttribute('aria-label') || '').toLowerCase();
+                if (
+                    title.includes('next') || aria.includes('next') ||
+                    txt === '>' || txt === 'Next' || txt === '›'
+                ) {
+                    if (!el.disabled && !el.classList.contains('disabled') && el.offsetParent !== null) {
+                        el.click();
+                        return true;
+                    }
+                }
+            }
+            // Fallback: find any button/link containing ">" or "Next"
+            const all = [...document.querySelectorAll('button, a, span[role="button"]')];
+            for (const el of all) {
+                if (
+                    el.textContent.trim() === '>' &&
+                    !el.disabled && el.offsetParent !== null
+                ) {
+                    el.click();
+                    return true;
+                }
+            }
+            return false;
+        }""")
+
+        if not has_next:
+            print(f"No next page found after page {page_num}")
+            break
+
+        await page.wait_for_load_state("networkidle")
+        print(f"Navigated to page {page_num + 1}")
+
+    return all_apps
 
 
 async def main():
@@ -133,37 +226,16 @@ async def main():
                 await browser.close()
                 return
 
-            content = await page.content()
-            soup = BeautifulSoup(content, "html.parser")
-            applications = []
-            rows = soup.select("table tr")
-
-            for row in rows[1:]:
-                cols = row.select("td")
-                if len(cols) >= 9:
-                    ref = cols[0].text.strip()
-                    apply_date = cols[3].text.strip()
-                    phone = cols[4].text.strip()
-                    name = cols[5].text.strip()
-                    full_status = cols[8].text.strip()
-                    m = re.match(r'(\d+/\d+)', full_status)
-                    status = m.group(1) if m else full_status
-                    if ref and len(ref) > 2:
-                        applications.append({
-                            "ref": ref,
-                            "name": name,
-                            "apply_date": apply_date,
-                            "phone": phone,
-                            "status": status
-                        })
+            # ✅ সব পেজ scrape করো
+            applications = await scrape_all_pages(page)
 
             if not applications:
                 send_telegram("⚠️ আবেদন পাওয়া যায়নি।")
                 await browser.close()
                 return
 
-            # সব app save করো (10/10 সহ) — calendar record রাখার জন্য
-            save_data(applications)
+            print(f"Total applications found: {len(applications)}")
+            save_data(applications)  # সব app (10/10 সহ)
 
             old_state = load_state()
             old_statuses = old_state.get("statuses", {})
@@ -198,43 +270,31 @@ async def main():
                     new_files.append(app)
                 elif old_statuses[ref] != status:
                     changes.append({
-                        "ref": ref,
-                        "name": app["name"],
-                        "old": old_statuses[ref],
-                        "new": status,
+                        "ref": ref, "name": app["name"],
+                        "old": old_statuses[ref], "new": status,
                         "date": app["apply_date"]
                     })
 
             if new_files and old_statuses:
                 for app in new_files:
                     send_telegram(
-                        f"🆕 <b>নতুন আবেদন!</b>\n\n"
-                        f"<b>{app['name']}</b>\n"
-                        f"📄 Ref: {app['ref']}\n"
-                        f"📅 তারিখ: {app['apply_date']}\n"
-                        f"✅ স্ট্যাটাস: {app['status']}"
+                        f"🆕 <b>নতুন আবেদন!</b>\n\n<b>{app['name']}</b>\n"
+                        f"📄 Ref: {app['ref']}\n📅 তারিখ: {app['apply_date']}\n✅ স্ট্যাটাস: {app['status']}"
                     )
 
             if changes:
                 save_rss(changes)
                 for c in changes:
                     send_telegram(
-                        f"<b>স্ট্যাটাস:</b>\n\n"
-                        f"<b>{c['name']}</b>\n"
-                        f"📄 Ref: {c['ref']}\n"
-                        f"📅 তারিখ: {c['date']}\n"
-                        f"⬅️ আগে: {c['old']}\n"
-                        f"✅ এখন: {c['new']}"
+                        f"<b>স্ট্যাটাস:</b>\n\n<b>{c['name']}</b>\n"
+                        f"📄 Ref: {c['ref']}\n📅 তারিখ: {c['date']}\n"
+                        f"⬅️ আগে: {c['old']}\n✅ এখন: {c['new']}"
                     )
             elif not old_statuses:
                 save_rss([])
                 send_telegram(f"✅ প্রথম চেক সম্পন্ন!\n📊 মোট আবেদন: {len(applications)}টি")
 
-            save_state({
-                "statuses": new_statuses,
-                "print_dates": new_print_dates,
-                "status_history": new_history
-            })
+            save_state({"statuses": new_statuses, "print_dates": new_print_dates, "status_history": new_history})
             save_userdata(new_print_dates, new_history)
             print(f"Done. {len(applications)} apps, {len(changes)} changes, {len(new_files)} new.")
 

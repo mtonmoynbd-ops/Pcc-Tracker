@@ -5,14 +5,26 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Wed, 13 May 2026 21:06:41 +0600</lastBuildDate>
+<lastBuildDate>Wed, 13 May 2026 22:58:43 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>ARJUN - 8/10</title>
+<title>GOPAL SARKER - 4/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BGAK54 | 7/10 → 8/10</description>
-<pubDate>Wed, 13 May 2026 21:06:41 +0600</pubDate>
-<guid isPermaLink="false">1BGAK54-8/10-202605132106</guid>
+<description>Ref: 1BGAL2D | 3/10 → 4/10</description>
+<pubDate>Wed, 13 May 2026 22:58:43 +0600</pubDate>
+<guid isPermaLink="false">1BGAL2D-4/10-202605132258</guid>
+</item><item>
+<title>ANONTO CHANDRA SARKER - 4/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BGAKM9 | 3/10 → 4/10</description>
+<pubDate>Wed, 13 May 2026 22:58:43 +0600</pubDate>
+<guid isPermaLink="false">1BGAKM9-4/10-202605132258</guid>
+</item><item>
+<title>SHOVO MANDAL - 4/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BGAKC6 | 3/10 → 4/10</description>
+<pubDate>Wed, 13 May 2026 22:58:43 +0600</pubDate>
+<guid isPermaLink="false">1BGAKC6-4/10-202605132258</guid>
 </item>
 </channel>
 </rss>

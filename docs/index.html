@@ -7,6 +7,30 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0a1628; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 16px; overflow-x: hidden; }
+  body.light { background: #f1f5f9; color: #1e293b; }
+  body.light .card { background: #ffffff; border-color: #cbd5e1; }
+  body.light .card.star1 { border-color: #f59e0b; }
+  body.light .card.star2 { border-color: #ef4444; }
+  body.light .card.delivered { background: #f8fafc; border-color: #e2e8f0; }
+  body.light .name { color: #0f172a; }
+  body.light .search-bar { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
+  body.light .filter-btn { background: #ffffff; border-color: #cbd5e1; color: #64748b; }
+  body.light .filter-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+  body.light .modal-box, body.light .confirm-box { background: #ffffff; border-color: #cbd5e1; }
+  body.light .cal-box { background: #ffffff; border-color: #cbd5e1; }
+  body.light .cal-day { color: #94a3b8; }
+  body.light .cal-day.has-file { background: #dbeafe; border-color: #93c5fd; color: #1e3a5f; }
+  body.light .cal-day.today { background: #1d4ed8; color: #fff; }
+  body.light h1 { color: #1d4ed8; }
+  body.light .updated { color: #64748b; }
+  body.light .shield-btn, body.light .web-btn { background: #dbeafe; border-color: #93c5fd; }
+  body.light .status { background: #dbeafe !important; }
+  body.light .info { color: #475569; }
+  body.light .section-title { color: #64748b; }
+  body.light .arch-section { background: #f8fafc; border-color: #e2e8f0; }
+  body.light .modal-list-item { color: #475569; border-color: #e2e8f0; }
+  body.light .pick-item { background: #f8fafc; border-color: #e2e8f0; color: #7c3aed; }
+  body.light .note-tpl-btn { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .header-left { display: flex; align-items: center; gap: 8px; }
   .shield-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; flex-shrink: 0; }
@@ -185,6 +209,9 @@
   .pick-item { background: #1e293b; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #c4b5fd; cursor: pointer; border: 1px solid #334155; margin-bottom: 6px; }
   .pick-item.active-pick { background: #2d1f5e; border-color: #7c3aed; }
   .settings-info { font-size: 11px; color: #475569; margin-bottom: 12px; line-height: 1.6; }
+  .theme-row { display: flex; gap: 6px; margin-bottom: 16px; }
+  .theme-opt { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #64748b; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .theme-opt.active { border-color: #2563eb; background: #1e3a5f; color: #60a5fa; }
   .settings-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; margin-bottom: 10px; }
   .settings-save-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .select-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1f3d; border-top: 1px solid #1e3a5f; padding: 12px 16px; z-index: 50; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; }
@@ -229,6 +256,7 @@
   .day-normal { color: #60a5fa; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
   .day-warn-urgent { color: #ef4444; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
   .day-warn-important { color: #f97316; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+  .day-collected { color: #34d399; font-size: 12px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
   .bottom-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
   .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; cursor: pointer; }
   .s1,.s2{background:#1e3a5f;color:#60a5fa} .s3,.s4,.s5{background:#1e3a5f;color:#f59e0b}
@@ -447,10 +475,18 @@
 <div class="modal" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title">🛡️ Settings<button class="modal-close" onclick="closeSettings()">✕</button></div>
-    <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
-    <input class="settings-input" type="password" id="pat-input" placeholder="GitHub PAT (ghp_xxx...)">
-    <button class="settings-save-btn" onclick="savePAT()">Save & Backup</button>
-    <div id="settings-status" style="font-size:11px;color:#475569;margin-top:10px"></div>
+    <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">থিম</div>
+    <div class="theme-row">
+      <button class="theme-opt" id="theme-system" onclick="setTheme('system')">⚙️ System</button>
+      <button class="theme-opt" id="theme-light" onclick="setTheme('light')">☀️ Light</button>
+      <button class="theme-opt" id="theme-dark" onclick="setTheme('dark')">🌙 Dark</button>
+    </div>
+    <div style="border-top:1px solid #1e3a5f;margin-bottom:14px;padding-top:14px">
+      <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
+      <input class="settings-input" type="password" id="pat-input" placeholder="GitHub PAT (ghp_xxx...)">
+      <button class="settings-save-btn" onclick="savePAT()">Save & Backup</button>
+      <div id="settings-status" style="font-size:11px;color:#475569;margin-top:10px"></div>
+    </div>
   </div>
 </div>
 
@@ -538,6 +574,7 @@ let history=JSON.parse(localStorage.getItem('pcc_history')||'{"urgent":[],"impor
 let forwarded=JSON.parse(localStorage.getItem('pcc_forwarded')||'{}');
 let collected=JSON.parse(localStorage.getItem('pcc_collected')||'{}');
 let collectedDay=JSON.parse(localStorage.getItem('pcc_collected_day')||'{}');
+let collectedDate=JSON.parse(localStorage.getItem('pcc_collected_date')||'{}');
 let manualPrintDates=JSON.parse(localStorage.getItem('pcc_manual_print_dates')||'{}');
 let expandedNormal=new Set(JSON.parse(localStorage.getItem('pcc_expanded_normal')||'[]'));
 let resetArchive=JSON.parse(localStorage.getItem('pcc_reset_archive')||'[]');
@@ -627,6 +664,7 @@ function saveLocal(){
   localStorage.setItem('pcc_forwarded',JSON.stringify(forwarded));
   localStorage.setItem('pcc_collected',JSON.stringify(collected));
   localStorage.setItem('pcc_collected_day',JSON.stringify(collectedDay));
+  localStorage.setItem('pcc_collected_date',JSON.stringify(collectedDate));
   localStorage.setItem('pcc_manual_print_dates',JSON.stringify(manualPrintDates));
   localStorage.setItem('pcc_expanded_normal',JSON.stringify([...expandedNormal]));
   localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
@@ -641,7 +679,7 @@ function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=s
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
   try{
-    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,manualPrintDates,resetArchive,calNotes};
+    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes};
     const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
     let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
@@ -663,13 +701,31 @@ async function syncFromCloud(){
     if(d.showDeu)showDeu=d.showDeu;if(d.notes)notes=d.notes;if(d.blinkStopped)blinkStopped=d.blinkStopped;
     if(d.policeTags)policeTags=d.policeTags;if(d.clientNames)clientNames=d.clientNames;
     if(d.counts)counts=d.counts;if(d.history)history=d.history;
-    if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;
+    if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;if(d.collectedDate)collectedDate=d.collectedDate;
     if(d.manualPrintDates)manualPrintDates=d.manualPrintDates;
     if(d.resetArchive)resetArchive=d.resetArchive;if(d.calNotes)calNotes=d.calNotes;
     saveLocal();
   }catch(e){}
 }
-function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-status').textContent='';document.getElementById('settings-modal').classList.add('open');}
+// ── Theme ──────────────────────────────────────────────────
+let themeMode=localStorage.getItem('pcc_theme')||'system';
+const sysDark=window.matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(mode){
+  themeMode=mode;localStorage.setItem('pcc_theme',mode);
+  const isDark=mode==='dark'||(mode==='system'&&sysDark.matches);
+  document.body.classList.toggle('light',!isDark);
+  ['system','light','dark'].forEach(m=>document.getElementById('theme-'+m)?.classList.toggle('active',m===mode));
+}
+function setTheme(mode){applyTheme(mode);}
+sysDark.addEventListener('change',()=>{if(themeMode==='system')applyTheme('system');});
+applyTheme(themeMode);
+
+function openSettings(){
+  document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';
+  document.getElementById('settings-status').textContent='';
+  ['system','light','dark'].forEach(m=>document.getElementById('theme-'+m)?.classList.toggle('active',m===themeMode));
+  document.getElementById('settings-modal').classList.add('open');
+}
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 async function savePAT(){
   const pat=document.getElementById('pat-input').value.trim();
@@ -687,8 +743,8 @@ function stagePressStart(e,ref){
   stageTimer[ref]=setTimeout(()=>{
     if(btn)btn.classList.remove('pressing');
     if(stage===0){forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↑ Forwarded');}
-    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);save();render();showToast('↓ Collected');}
-    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↺ Reset');}
+    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);collectedDate[ref]=todayStr();save();render();showToast('↓ Collected');}
+    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];delete collectedDate[ref];save();render();showToast('↺ Reset');}
   },stage===2?2000:600);
 }
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
@@ -1132,6 +1188,19 @@ function matchesFilter(app){
   if(activeFilter==='1-3')return !isDraft&&num>=1&&num<=3;if(activeFilter==='4-6')return !isDraft&&num>=4&&num<=6;
   if(activeFilter==='7-9')return !isDraft&&num>=7&&num<=9;return true;
 }
+function daysSinceCollected(ref){
+  // Days since the file was collected (from today)
+  if(!collected[ref]||collectedDay[ref]===undefined)return null;
+  // collectedDay stores apply_date days at collection time
+  // We need to track the actual collection date separately
+  const cd=collectedDate[ref];if(!cd)return null;
+  const p=cd.split('-');if(p.length!==3)return null;
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dd=parseInt(p[0]),m=mo.indexOf(p[1]),y=2000+parseInt(p[2]);
+  if(isNaN(dd)||m<0||isNaN(y))return null;
+  const cDate=new Date(y,m,dd),today=new Date();today.setHours(0,0,0,0);
+  const diff=Math.floor((today-cDate)/86400000);return diff>=0?diff:null;
+}
 function daysSince(ds,ref){
   if(collected[ref]&&collectedDay[ref]!==undefined)return collectedDay[ref];
   try{
@@ -1164,6 +1233,7 @@ function cardHTML(app){
   const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded;
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const days=(!isDelivered&&showDetails)?daysSince(app.apply_date,app.ref):null;
+  const daysCol=isCol?daysSinceCollected(app.ref):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
@@ -1182,6 +1252,7 @@ function cardHTML(app){
   const nameClick=`${s>0?`openNoteModal('${app.ref}');`:''}event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
   const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
+  const colDaySpan=daysCol!==null?`<span class="day-collected" title="Collected থেকে">📥${String(daysCol).padStart(2,'0')}d</span>`:'';
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count
@@ -1207,7 +1278,7 @@ function cardHTML(app){
           ${refHTML} &nbsp;|&nbsp;
           ${calSVG} ${app.apply_date}
           ${policeTagHTML?`&nbsp;${policeTagHTML}`:''}
-          &nbsp;${daySpan}
+          &nbsp;${daySpan}${colDaySpan?'&nbsp;'+colDaySpan:''}
         </div>
         <div class="bottom-row">
           <span class="status ${scls}${shouldBlink?' status-blink':''}" onclick="${statusClick}">${app.status}</span>
@@ -1283,47 +1354,4 @@ function render(){
   if(q){
     const archResults=searchInArchive(q);
     if(archResults.length){
-      html+=`<div class="section-row" style="margin-top:16px"><div class="section-title" style="color:#7c3aed">📦 আর্কাইভে পাওয়া</div></div>`;
-      archResults.forEach(r=>{
-        html+=`<div class="arch-search-result"><span class="arch-search-tag">${r.source}</span>
-          <div class="arch-list">${r.items.map(a=>{
-            const nameEsc=(a.name||'').replace(/'/g,"\\'");const phone=a.phone||'';
-            return `<div class="arch-item">
-              <span class="arch-item-name" onclick="archPhoneClick('${nameEsc}','${phone}')">${a.name||''}</span>
-              <span class="arch-item-ref">${a.ref||''}</span>
-              <span class="arch-item-date">${a.applyDate||''}</span>
-            </div>`;
-          }).join('')}</div></div>`;
-      });
-    }
-  }
-  if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
-  document.getElementById('list').innerHTML=html;
-  document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
-  document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
-  const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));
-  const draftBtn=document.getElementById('draft-btn');
-  if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
-}
-
-let loadLock=false;
-async function load(){
-  if(loadLock)return;loadLock=true;
-  try{
-    const r=await fetch('data.json?t='+Date.now());const d=await r.json();
-    document.getElementById('updated').textContent='আপডেট: '+d.updated;
-    // Deduplicate by ref
-    const seen=new Set();
-    allApps=(d.applications||[]).filter(a=>{if(seen.has(a.ref))return false;seen.add(a.ref);return true;});
-    try{const ur=await fetch('userdata.json?t='+Date.now());if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};
-      if(ud.stars)stars={...ud.stars,...stars};
-    }}catch(e){}
-    render();
-  }catch(e){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
-  finally{loadLock=false;}
-}
-load();
-setInterval(load,30000);
-</script>
-</body>
-</html>
+      html+=`<div class="section-row" style="margin-top:16p

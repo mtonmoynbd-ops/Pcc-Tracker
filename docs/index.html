@@ -70,11 +70,18 @@
   @keyframes cal-note-blink { 0%,100%{border-color:rgba(251,191,36,0.15)} 50%{border-color:rgba(251,191,36,0.65)} }
   .cal-day.has-note { animation: cal-note-blink 3s ease-in-out infinite; border-color: rgba(251,191,36,0.15); }
   .cal-day.has-note.today { animation: none; }
-  .cal-day.holiday { background: rgba(239,68,68,0.13); border-color: rgba(239,68,68,0.35); color: #f1f5f9; justify-content: center; padding-top: 0; }
-  .cal-day.holiday.has-file { background: rgba(239,68,68,0.22); border-color: #ef4444; color: #f1f5f9; }
-  .cal-day.holiday.today { background: #7f1d1d; border-color: #ef4444; color: #fff; }
-  .cal-holiday-badge { font-size: 9px; line-height: 1; margin-top: 1px; color: #fb923c; text-align: center; flex-shrink: 0; }
-  .holiday-name-tag { display: flex; align-items: center; gap: 7px; background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.3); border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px; color: #f1f5f9; }
+  .cal-day.holiday { background: rgba(251,146,60,0.13); border-color: rgba(251,146,60,0.45); color: #f1f5f9; justify-content: center; padding-top: 0; }
+  .cal-day.holiday.has-file { background: rgba(251,146,60,0.22); border-color: #fb923c; color: #f1f5f9; }
+  .cal-day.holiday.today { background: #7c2d12; border-color: #fb923c; color: #fff; }
+  .cal-day.national { background: rgba(167,139,250,0.13); border-color: rgba(167,139,250,0.4); color: #f1f5f9; justify-content: center; padding-top: 0; }
+  .cal-day.national.has-file { background: rgba(167,139,250,0.2); border-color: #a78bfa; color: #f1f5f9; }
+  .cal-day.national.today { background: #3b1f6e; border-color: #a78bfa; color: #fff; }
+  .cal-holiday-badge { font-size: 9px; line-height: 1; margin-top: 1px; text-align: center; flex-shrink: 0; }
+  .cal-holiday-badge.public { color: #fb923c; }
+  .cal-holiday-badge.national { color: #a78bfa; }
+  .holiday-name-tag { display: flex; align-items: center; gap: 7px; border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px; color: #f1f5f9; }
+  .holiday-name-tag.public { background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.35); }
+  .holiday-name-tag.national { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.35); }
   .cal-dots { display: flex; gap: 1px; justify-content: center; margin-top: 2px; flex-wrap: wrap; max-width: 32px; }
   .cal-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
   .cal-dot.normal { background: #60a5fa; } .cal-dot.important { background: #f59e0b; }
@@ -442,49 +449,61 @@ const MONTHS_UP=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NO
 const MONTHS_BN=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
 const PRESET_TAGS=['ওসি নেই','এসপি নেই','Mofa প্রবলেম','মেইন সার্ভার ডাউন','প্রিন্টিং প্রবলেম','চালান সার্ভার ডাউন','সাধারন ছুটি','ভিআইপি ডিউটি'];
 
-// Bangladesh Public Holidays 2025-2026 (dd-Mon-yy format)
-const BD_HOLIDAYS={
+// Bangladesh Holidays 2025-2026
+// Type 'public' = PCC office closed | Type 'national' = national day, office may open
+
+// 🟠 PCC অফিস বন্ধ — সরকারি সাধারণ ছুটি
+const BD_PUBLIC_HOLIDAYS={
   '21-Feb-25':'শহীদ দিবস ও আন্তর্জাতিক মাতৃভাষা দিবস',
-  '17-Mar-25':'জাতির পিতা বঙ্গবন্ধুর জন্মদিন ও জাতীয় শিশু দিবস',
   '26-Mar-25':'স্বাধীনতা ও জাতীয় দিবস',
   '31-Mar-25':'ঈদুল ফিতর',
   '01-Apr-25':'ঈদুল ফিতর',
   '02-Apr-25':'ঈদুল ফিতর',
   '14-Apr-25':'বাংলা নববর্ষ (পহেলা বৈশাখ)',
-  '01-May-25':'মে দিবস (আন্তর্জাতিক শ্রমিক দিবস)',
+  '01-May-25':'মে দিবস',
   '12-May-25':'বুদ্ধ পূর্ণিমা',
   '07-Jun-25':'ঈদুল আযহা',
   '08-Jun-25':'ঈদুল আযহা',
   '09-Jun-25':'ঈদুল আযহা',
   '05-Jul-25':'আশুরা',
-  '05-Aug-25':'জাতীয় বিপ্লব ও সংহতি দিবস',
   '15-Aug-25':'জাতীয় শোক দিবস',
   '05-Sep-25':'ঈদে মিলাদুন্নবী (সা:)',
   '02-Oct-25':'দুর্গাপূজা (বিজয়া দশমী)',
   '16-Dec-25':'মহান বিজয় দিবস',
   '25-Dec-25':'বড়দিন',
   '21-Feb-26':'শহীদ দিবস ও আন্তর্জাতিক মাতৃভাষা দিবস',
-  '17-Mar-26':'জাতির পিতা বঙ্গবন্ধুর জন্মদিন ও জাতীয় শিশু দিবস',
+  '26-Mar-26':'স্বাধীনতা ও জাতীয় দিবস',
   '20-Mar-26':'ঈদুল ফিতর',
   '21-Mar-26':'ঈদুল ফিতর',
   '22-Mar-26':'ঈদুল ফিতর',
-  '26-Mar-26':'স্বাধীনতা ও জাতীয় দিবস',
   '14-Apr-26':'বাংলা নববর্ষ (পহেলা বৈশাখ)',
-  '01-May-26':'মে দিবস (আন্তর্জাতিক শ্রমিক দিবস)',
+  '01-May-26':'মে দিবস',
   '27-May-26':'ঈদুল আযহা',
   '28-May-26':'ঈদুল আযহা',
   '29-May-26':'ঈদুল আযহা',
-  '05-Aug-26':'জাতীয় বিপ্লব ও সংহতি দিবস',
   '15-Aug-26':'জাতীয় শোক দিবস',
   '16-Dec-26':'মহান বিজয় দিবস',
   '25-Dec-26':'বড়দিন',
 };
+
+// 🟣 জাতীয় দিবস — অফিস খোলা থাকতে পারে
+const BD_NATIONAL_DAYS={
+  '17-Mar-25':'জাতির পিতার জন্মদিন ও জাতীয় শিশু দিবস',
+  '05-Aug-25':'জাতীয় বিপ্লব ও সংহতি দিবস',
+  '17-Mar-26':'জাতির পিতার জন্মদিন ও জাতীয় শিশু দিবস',
+  '05-Aug-26':'জাতীয় বিপ্লব ও সংহতি দিবস',
+};
+
+// returns {name, type} or null
 function getHoliday(ds){
   const p=ds.split('-');if(p.length!==3)return null;
   const dd=p[0].padStart(2,'0');
   const mon=p[1].charAt(0).toUpperCase()+p[1].slice(1,3).toLowerCase();
   const yy=p[2].length===4?p[2].slice(2):p[2];
-  return BD_HOLIDAYS[`${dd}-${mon}-${yy}`]||null;
+  const key=`${dd}-${mon}-${yy}`;
+  if(BD_PUBLIC_HOLIDAYS[key])return{name:BD_PUBLIC_HOLIDAYS[key],type:'public'};
+  if(BD_NATIONAL_DAYS[key])return{name:BD_NATIONAL_DAYS[key],type:'national'};
+  return null;
 }
 
 let allApps=[],printDates={},statusHistory={};
@@ -695,7 +714,8 @@ function renderCal(){
     const ds=String(d).padStart(2,'0')+'-'+sm[m]+'-'+String(y).slice(2);
     const hasNote=calNotes[ds]&&calNotes[ds].length>0;
     const holiday=getHoliday(ds);
-    let cls='cal-day'+(isT?' today':hasF?' has-file':'')+(hasNote&&!isT?' has-note':'')+(holiday?' holiday':'');
+    const holidayCls=holiday?(holiday.type==='public'?' holiday':' national'):'';
+    let cls='cal-day'+(isT?' today':hasF?' has-file':'')+(hasNote&&!isT?' has-note':'')+holidayCls;
     let dotsHTML='';
     if(hasF){
       const shown=dots.slice(0,5);
@@ -704,7 +724,7 @@ function renderCal(){
       dotsHTML=`<div class="cal-dots">${dotSpans}${plus}</div>`;
     }
     if(hasNote)dotsHTML+=`<div class="cal-note-indicator">✦</div>`;
-    if(holiday)dotsHTML+=`<div class="cal-holiday-badge">✿</div>`;
+    if(holiday)dotsHTML+=`<div class="cal-holiday-badge ${holiday.type}">✿</div>`;
     html+=`<div class="${cls}" onclick="openCalDayModal('${ds}')">${d}${dotsHTML}</div>`;
   }
   document.getElementById('cal-days').innerHTML=html;
@@ -716,10 +736,16 @@ function openCalDayModal(ds){
   const titleEl=document.getElementById('cal-day-modal-title');
   titleEl.innerHTML=isToday?`<span class="today-lbl" style="font-size:9px;color:#475569;font-weight:500;letter-spacing:0.5px;text-transform:uppercase">Today</span><span class="today-date-txt" style="font-size:13px;color:#7dd3fc;font-weight:700">${ds}</span><span class="live-dot" style="width:5px;height:5px;margin-left:2px"></span>`:ds;
   // Show holiday name banner if applicable
-  const holidayName=getHoliday(ds);
+  const holidayObj=getHoliday(ds);
+  const holidayName=holidayObj?holidayObj.name:null;
   const holidayBanner=document.getElementById('cal-holiday-banner');
   if(holidayBanner){
-    if(holidayName){holidayBanner.innerHTML=`<span style="color:#fb923c;font-size:12px">✿</span><span>${holidayName}</span>`;holidayBanner.style.display='flex';}
+    if(holidayName){
+      const iconColor=holidayObj.type==='public'?'#fb923c':'#a78bfa';
+      holidayBanner.className='holiday-name-tag '+holidayObj.type;
+      holidayBanner.innerHTML=`<span style="color:${iconColor};font-size:12px">✿</span><span>${holidayName}</span>`;
+      holidayBanner.style.display='flex';
+    }
     else holidayBanner.style.display='none';
   }
   renderCalDayTags();

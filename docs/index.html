@@ -41,7 +41,7 @@
   @keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
   .live-dot { width: 5px; height: 5px; border-radius: 50%; background: #34d399; display: inline-block; flex-shrink: 0; animation: live-pulse 3.5s ease-in-out infinite; }
 
-  /* Section row */
+  /* Section row — colors match header counts */
   .section-row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0 8px; gap: 6px; }
   .section-title { font-size: 11px; flex-shrink: 0; font-weight: 700; color: #475569; }
   .section-title.urgent-title { color: #ef4444; }
@@ -49,6 +49,7 @@
   .section-count { font-size: 11px; font-weight: 700; flex-shrink: 0; }
   .section-count.urgent-count { color: #ef4444; }
   .section-count.important-count { color: #f59e0b; }
+  /* Date chip — same size as cal heading, live dot RIGHT */
   .section-date-chip { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; flex: 1; justify-content: center; padding: 2px 0; }
   .section-date-chip .today-lbl { font-size: 9px; color: #475569; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
   .section-date-chip .today-date-txt { font-size: 13px; color: #7dd3fc; font-weight: 700; }
@@ -69,6 +70,11 @@
   @keyframes cal-note-blink { 0%,100%{border-color:rgba(251,191,36,0.15)} 50%{border-color:rgba(251,191,36,0.65)} }
   .cal-day.has-note { animation: cal-note-blink 3s ease-in-out infinite; border-color: rgba(251,191,36,0.15); }
   .cal-day.has-note.today { animation: none; }
+  .cal-day.holiday { background: rgba(239,68,68,0.13); border-color: rgba(239,68,68,0.35); color: #fca5a5; }
+  .cal-day.holiday.has-file { background: rgba(239,68,68,0.22); border-color: #ef4444; color: #fca5a5; }
+  .cal-day.holiday.today { background: #7f1d1d; border-color: #ef4444; color: #fff; }
+  .cal-holiday-badge { font-size: 6px; line-height: 1; margin-top: 1px; color: #f87171; text-align: center; max-width: 32px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .holiday-name-tag { display: inline-block; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; margin-bottom: 8px; width: 100%; text-align: center; }
   .cal-dots { display: flex; gap: 1px; justify-content: center; margin-top: 2px; flex-wrap: wrap; max-width: 32px; }
   .cal-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
   .cal-dot.normal { background: #60a5fa; } .cal-dot.important { background: #f59e0b; }
@@ -193,16 +199,19 @@
   .card.deu-collected-blink { animation: deu-collected-blink 1.4s ease-in-out infinite; }
   .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
   .card-top-right { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  /* Stage btn — icon only, no circle, same size as star btn */
   .stage-btn { width: 16px; height: 16px; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: #1e3a5f; font-size: 11px; line-height: 1; padding: 0; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
   .stage-btn.fwd { color: #eab308; }
   .stage-btn.col { color: #22c55e; }
   .stage-btn.pressing { transform: scale(0.85); opacity: 0.6; }
+  /* Star btn — 11px (one size smaller) */
   .star-btn { background: none; border: none; cursor: pointer; font-size: 11px; opacity: 0.4; line-height: 1; padding: 0; flex-shrink: 0; }
   .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
   .name { font-weight: 700; font-size: 15px; color: #f1f5f9; flex: 1; cursor: pointer; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 6px; }
   .info { font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; }
   .ref-icon { display: inline-block; vertical-align: middle; margin-right: 1px; flex-shrink: 0; }
   .cal-icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+  /* Ref clickable — no underline on date */
   .ref-link { cursor: pointer; color: #94a3b8; font-size: 12px; }
   .ref-link:hover { color: #c4b5fd; }
   .police-inline-tag { color: #c4b5fd; font-size: 10px; padding: 1px 6px; border: 1px solid #4c1d95; border-radius: 3px; background: #1e1a3a; cursor: pointer; flex-shrink: 0; }
@@ -346,6 +355,7 @@
       <div class="cal-day-modal-date" id="cal-day-modal-title"></div>
       <button class="modal-close" onclick="closeCalDayModal()">✕</button>
     </div>
+    <div id="cal-holiday-banner" class="holiday-name-tag" style="display:none"></div>
     <div style="font-size:10px;color:#475569;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">ফাইল বিলম্ব হওয়ার কারন সমুহ:</div>
     <div class="cal-tag-grid" id="cal-day-tags"></div>
     <div style="font-size:10px;color:#475569;margin-bottom:6px;margin-top:6px;text-transform:uppercase;letter-spacing:0.5px;border-top:1px solid #1e3a5f;padding-top:8px">এই দিনের ফাইল</div>
@@ -432,6 +442,51 @@ const MONTHS_UP=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NO
 const MONTHS_BN=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
 const PRESET_TAGS=['ওসি নেই','এসপি নেই','Mofa প্রবলেম','মেইন সার্ভার ডাউন','প্রিন্টিং প্রবলেম','চালান সার্ভার ডাউন','সাধারন ছুটি','ভিআইপি ডিউটি'];
 
+// Bangladesh Public Holidays 2025-2026 (dd-Mon-yy format)
+const BD_HOLIDAYS={
+  '21-Feb-25':'শহীদ দিবস ও আন্তর্জাতিক মাতৃভাষা দিবস',
+  '17-Mar-25':'জাতির পিতা বঙ্গবন্ধুর জন্মদিন ও জাতীয় শিশু দিবস',
+  '26-Mar-25':'স্বাধীনতা ও জাতীয় দিবস',
+  '31-Mar-25':'ঈদুল ফিতর',
+  '01-Apr-25':'ঈদুল ফিতর',
+  '02-Apr-25':'ঈদুল ফিতর',
+  '14-Apr-25':'বাংলা নববর্ষ (পহেলা বৈশাখ)',
+  '01-May-25':'মে দিবস (আন্তর্জাতিক শ্রমিক দিবস)',
+  '12-May-25':'বুদ্ধ পূর্ণিমা',
+  '07-Jun-25':'ঈদুল আযহা',
+  '08-Jun-25':'ঈদুল আযহা',
+  '09-Jun-25':'ঈদুল আযহা',
+  '05-Jul-25':'আশুরা',
+  '05-Aug-25':'জাতীয় বিপ্লব ও সংহতি দিবস',
+  '15-Aug-25':'জাতীয় শোক দিবস',
+  '05-Sep-25':'ঈদে মিলাদুন্নবী (সা:)',
+  '02-Oct-25':'দুর্গাপূজা (বিজয়া দশমী)',
+  '16-Dec-25':'মহান বিজয় দিবস',
+  '25-Dec-25':'বড়দিন',
+  '21-Feb-26':'শহীদ দিবস ও আন্তর্জাতিক মাতৃভাষা দিবস',
+  '17-Mar-26':'জাতির পিতা বঙ্গবন্ধুর জন্মদিন ও জাতীয় শিশু দিবস',
+  '20-Mar-26':'ঈদুল ফিতর',
+  '21-Mar-26':'ঈদুল ফিতর',
+  '22-Mar-26':'ঈদুল ফিতর',
+  '26-Mar-26':'স্বাধীনতা ও জাতীয় দিবস',
+  '14-Apr-26':'বাংলা নববর্ষ (পহেলা বৈশাখ)',
+  '01-May-26':'মে দিবস (আন্তর্জাতিক শ্রমিক দিবস)',
+  '27-May-26':'ঈদুল আযহা',
+  '28-May-26':'ঈদুল আযহা',
+  '29-May-26':'ঈদুল আযহা',
+  '05-Aug-26':'জাতীয় বিপ্লব ও সংহতি দিবস',
+  '15-Aug-26':'জাতীয় শোক দিবস',
+  '16-Dec-26':'মহান বিজয় দিবস',
+  '25-Dec-26':'বড়দিন',
+};
+function getHoliday(ds){
+  const p=ds.split('-');if(p.length!==3)return null;
+  const dd=p[0].padStart(2,'0');
+  const mon=p[1].charAt(0).toUpperCase()+p[1].slice(1,3).toLowerCase();
+  const yy=p[2].length===4?p[2].slice(2):p[2];
+  return BD_HOLIDAYS[`${dd}-${mon}-${yy}`]||null;
+}
+
 let allApps=[],printDates={},statusHistory={};
 let stars=JSON.parse(localStorage.getItem('pcc_stars')||'{}');
 let delivered=JSON.parse(localStorage.getItem('pcc_delivered')||'{}');
@@ -462,8 +517,9 @@ let dateModalSourceField=null,dateModalDateStr=null,dateModalEditRef=null;
 let archTab='month',archYearFilter=null,archMonthFilter=null;
 let currentCalDay=null;
 let refreshLock=false;
-let calOpen=false;
+let calOpen=false; // tracks calendar visibility
 
+// ── Custom Confirm ────────────────────────────────────────
 let confirmResolve=null;
 function showConfirm(mainText,subText=''){
   return new Promise(resolve=>{
@@ -475,6 +531,7 @@ function showConfirm(mainText,subText=''){
 function confirmOk(){document.getElementById('confirm-modal').classList.remove('open');if(confirmResolve)confirmResolve(true);confirmResolve=null;}
 function confirmCancel(){document.getElementById('confirm-modal').classList.remove('open');if(confirmResolve)confirmResolve(false);confirmResolve=null;}
 
+// ── Helpers ───────────────────────────────────────────────
 function toInputDate(str){
   try{if(!str)return '';const p=str.toUpperCase().split('-');if(p.length!==3)return '';
     const dd=String(parseInt(p[0])).padStart(2,'0');const mo=MONTHS_UP.indexOf(p[1].substring(0,3));if(mo<0)return '';
@@ -492,6 +549,7 @@ function trimStatus(s){
   if(low.includes('pending for payment'))return 'Pending For Payment';if(low.includes('draft'))return 'Draft';
   return s.length>25?s.substring(0,25)+'…':s;
 }
+// Date chip: live dot on RIGHT, same font size as cal heading (13px)
 function todayDateChipHTML(){
   return `<span class="section-date-chip" onclick="toggleCal()">
     <span class="today-lbl">Today</span>
@@ -500,6 +558,7 @@ function todayDateChipHTML(){
   </span>`;
 }
 
+// ── Refresh ───────────────────────────────────────────────
 async function manualRefresh(){
   if(refreshLock)return;refreshLock=true;
   const ico=document.getElementById('refresh-spin');if(ico)ico.classList.add('spinning');
@@ -516,6 +575,7 @@ async function manualRefresh(){
   setTimeout(()=>{refreshLock=false;},3000);
 }
 
+// ── Save ──────────────────────────────────────────────────
 function saveLocal(){
   localStorage.setItem('pcc_stars',JSON.stringify(stars));
   localStorage.setItem('pcc_delivered',JSON.stringify(delivered));
@@ -539,6 +599,7 @@ function saveLocal(){
 }
 function save(){saveLocal();scheduleBackup();}
 
+// ── Backup ────────────────────────────────────────────────
 function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=setTimeout(doBackup,5000);}
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
@@ -581,6 +642,7 @@ async function savePAT(){
   document.getElementById('settings-status').textContent=pat?'✅ Backup সম্পন্ন':'PAT মুছে ফেলা হয়েছে';
 }
 
+// ── Stage ─────────────────────────────────────────────────
 function stagePressStart(e,ref){
   e.stopPropagation();
   const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.add('pressing');
@@ -594,12 +656,13 @@ function stagePressStart(e,ref){
 }
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
 
+// ── Calendar — toggleCal hides/shows section date chip ────
 function toggleCal(){
   const b=document.getElementById('cal-box');
   calOpen=!(calOpen);
   b.style.display=calOpen?'block':'none';
   if(calOpen)renderCal();
-  render();
+  render(); // re-render section rows to show/hide date chip
 }
 function calNav(dir){calDate.setMonth(calDate.getMonth()+dir);renderCal();}
 function renderCal(){
@@ -631,7 +694,8 @@ function renderCal(){
     const dots=dayDots[d]||[];const hasF=dots.length>0;
     const ds=String(d).padStart(2,'0')+'-'+sm[m]+'-'+String(y).slice(2);
     const hasNote=calNotes[ds]&&calNotes[ds].length>0;
-    let cls='cal-day'+(isT?' today':hasF?' has-file':'')+(hasNote&&!isT?' has-note':'');
+    const holiday=getHoliday(ds);
+    let cls='cal-day'+(isT?' today':hasF?' has-file':'')+(hasNote&&!isT?' has-note':'')+(holiday?' holiday':'');
     let dotsHTML='';
     if(hasF){
       const shown=dots.slice(0,5);
@@ -640,15 +704,24 @@ function renderCal(){
       dotsHTML=`<div class="cal-dots">${dotSpans}${plus}</div>`;
     }
     if(hasNote)dotsHTML+=`<div class="cal-note-indicator">✦</div>`;
+    if(holiday)dotsHTML+=`<div class="cal-holiday-badge">🏴</div>`;
     html+=`<div class="${cls}" onclick="openCalDayModal('${ds}')">${d}${dotsHTML}</div>`;
   }
   document.getElementById('cal-days').innerHTML=html;
 }
 
+// ── Cal Day Modal ─────────────────────────────────────────
 function openCalDayModal(ds){
   currentCalDay=ds;const isToday=ds===todayStr();
   const titleEl=document.getElementById('cal-day-modal-title');
   titleEl.innerHTML=isToday?`<span class="today-lbl" style="font-size:9px;color:#475569;font-weight:500;letter-spacing:0.5px;text-transform:uppercase">Today</span><span class="today-date-txt" style="font-size:13px;color:#7dd3fc;font-weight:700">${ds}</span><span class="live-dot" style="width:5px;height:5px;margin-left:2px"></span>`:ds;
+  // Show holiday name banner if applicable
+  const holidayName=getHoliday(ds);
+  const holidayBanner=document.getElementById('cal-holiday-banner');
+  if(holidayBanner){
+    if(holidayName){holidayBanner.textContent='🏴 '+holidayName;holidayBanner.style.display='block';}
+    else holidayBanner.style.display='none';
+  }
   renderCalDayTags();
   const files=allApps.filter(a=>a.apply_date===ds);
   const filesEl=document.getElementById('cal-day-files');
@@ -681,6 +754,7 @@ function toggleCalTag(idx){
 }
 function closeCalDayModal(){document.getElementById('cal-day-modal').classList.remove('open');currentCalDay=null;}
 
+// ── Date Modal ────────────────────────────────────────────
 function openDateModal(dateStr,prefix,sourceField,editRef){
   dateModalSourceField=sourceField;dateModalDateStr=dateStr;dateModalEditRef=editRef;
   const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>getEffectivePrintDate(a.ref)===dateStr);
@@ -715,6 +789,7 @@ async function confirmInlineDateChange(val){
 }
 function closeDateModal(){document.getElementById('date-modal').classList.remove('open');document.getElementById('date-picker-inline').style.display='none';dateModalSourceField=null;dateModalDateStr=null;dateModalEditRef=null;}
 
+// ── Timeline ──────────────────────────────────────────────
 function openTimelineModal(ref){
   const app=allApps.find(a=>a.ref===ref);if(!app)return;
   const s=stars[ref]||0;const si=s===2?'🔴':s===1?'⭐':'';
@@ -730,6 +805,7 @@ function openTimelineModal(ref){
 }
 function closeTimelineModal(){document.getElementById('timeline-modal').classList.remove('open');}
 
+// ── Note Modal ────────────────────────────────────────────
 function openNoteModal(ref){
   noteModalRef=ref;const app=allApps.find(a=>a.ref===ref);const s=stars[ref]||0;const si=s===2?'🔴':s===1?'⭐':'';
   document.getElementById('note-modal-title').textContent=(si?si+' ':'')+( app?app.name:ref)+' — নোট';
@@ -739,6 +815,7 @@ function openNoteModal(ref){
 function closeNoteModal(){document.getElementById('note-modal').classList.remove('open');noteModalRef=null;}
 function saveNoteModal(){if(!noteModalRef)return;notes[noteModalRef]=document.getElementById('note-modal-textarea').value.trim();save();closeNoteModal();render();}
 
+// ── Archive ───────────────────────────────────────────────
 function openArchive(){archYearFilter=null;archMonthFilter=null;renderArchiveFilters();renderArchiveContent();document.getElementById('archive-modal').classList.add('open');}
 function closeArchive(){document.getElementById('archive-modal').classList.remove('open');}
 function setArchTab(tab){
@@ -850,6 +927,7 @@ function renderArchiveContent(){
   }
 }
 
+// ── Delete ────────────────────────────────────────────────
 async function deleteSelected(){
   if(!selected.size)return;
   const ok=await showConfirm(`${selected.size}টি ফাইল মুছবেন?`,'আর্কাইভের "মুছে ফেলা" ট্যাবে চলে যাবে');
@@ -859,6 +937,7 @@ async function deleteSelected(){
   clearSelection();saveLocal();render();showToast(`🗑 ${toDelete.length}টি মুছে ফেলা হয়েছে`);
 }
 
+// ── Archive search ────────────────────────────────────────
 function searchInArchive(q){
   if(!q)return[];const results=[];
   resetArchive.forEach(r=>{
@@ -872,6 +951,7 @@ function searchInArchive(q){
   return results;
 }
 
+// ── Police ────────────────────────────────────────────────
 function openPoliceFilterModal(){
   const list=document.getElementById('police-filter-list');
   let html=`<span class="police-filter-pill police-filter-all ${!activePoliceFilter?'active':''}" onclick="setPoliceFilter(null)">সব</span>`;
@@ -900,6 +980,7 @@ function openPickModal(ref){
 function closePickModal(){document.getElementById('pick-modal').classList.remove('open');pickRef=null;}
 function assignPoliceTag(name){if(!pickRef)return;if(name)policeTags[pickRef]=name;else delete policeTags[pickRef];save();closePickModal();render();}
 
+// ── Count Modal ───────────────────────────────────────────
 function openModal(type){
   modalType=type;
   document.getElementById('modal-title-text').textContent=type==='urgent'?'🔴 Urgent':'⭐ Important';
@@ -948,6 +1029,7 @@ async function resetCounts(){
   }
 }
 
+// ── Multi-select ──────────────────────────────────────────
 function toggleSelect(ref){if(selected.has(ref))selected.delete(ref);else selected.add(ref);updateSelectBar();const w=document.getElementById('wrap-'+ref);if(w)w.classList.toggle('selected',selected.has(ref));}
 function updateSelectBar(){const bar=document.getElementById('select-bar');if(selected.size>0){selectMode=true;bar.classList.add('visible');document.getElementById('sel-count').textContent=selected.size;}else{selectMode=false;bar.classList.remove('visible');}}
 function clearSelection(){selected.forEach(r=>{const w=document.getElementById('wrap-'+r);if(w)w.classList.remove('selected');});selected.clear();selectMode=false;document.getElementById('select-bar').classList.remove('visible');}
@@ -959,6 +1041,7 @@ function copySelected(){
   clearSelection();render();
 }
 
+// ── Filter ────────────────────────────────────────────────
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
 function matchesFilter(app){
   const num=parseInt((app.status||'').split('/')[0])||0;const isDraft=(app.status||'').toLowerCase().includes('draft');
@@ -990,6 +1073,7 @@ function startEditDeu(ref){editingDeu[ref]=true;render();setTimeout(()=>{const i
 function updateCode(ref,val){codes[ref]=val;editingDeu[ref]=false;save();render();}
 function toggleExpandNormal(ref){if(expandedNormal.has(ref))expandedNormal.delete(ref);else expandedNormal.add(ref);saveLocal();render();}
 
+// ── Card HTML ─────────────────────────────────────────────
 function cardHTML(app){
   const s=stars[app.ref]||0;const isDelivered=delivered[app.ref]||false;
   const si=s===2?'🔴':s===1?'⭐':'☆';
@@ -1003,6 +1087,7 @@ function cardHTML(app){
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
   const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
   const stage=isCol?2:isFwd?1:0;const stageIcon=stage===0?'▴':stage===1?'▲':'▼';const stageCls=stage===0?'':stage===1?'fwd':'col';
+  // Due code + collected → blink
   const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
   let dayClass='day-normal';
   if(days){if(s===2&&days>=5)dayClass='day-warn-urgent';else if(s===1&&days>=12)dayClass='day-warn-important';}
@@ -1017,6 +1102,7 @@ function cardHTML(app){
   const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
+  // Ref clickable; police tag shown after apply_date before day count
   const policeTagHTML=policeTag?`<span class="police-inline-tag" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`:'';
   const refHTML=`<span class="ref-link" onclick="openPickModal('${app.ref}');event.stopPropagation()">${refSVG} ${app.ref}</span>`;
 
@@ -1051,6 +1137,7 @@ function cardHTML(app){
     </div>`;
 }
 
+// ── Swipe & Press ─────────────────────────────────────────
 let touchStartX={},touchStartY={},touching={};
 function swipeStart(e,ref){touchStartX[ref]=e.touches[0].clientX;touchStartY[ref]=e.touches[0].clientY;touching[ref]=true;}
 function swipeMove(e,ref){
@@ -1069,6 +1156,7 @@ async function swipeEnd(e,ref){
   if(card){card.style.transition='transform 0.2s ease';card.style.transform='';}
   if(hl)hl.style.opacity=0;if(hr)hr.style.opacity=0;if(selectMode)return;
   if(dx<-80){
+    // Block delivery if collected + Due code present
     if(collected[ref]&&codes[ref]&&!delivered[ref]){showToast('⚠️ Due code মুছুন আগে Delivered করুন');return;}
     const s=stars[ref]||0;
     if(s>0&&!delivered[ref]){const ok=await showConfirm('Delivered করবেন?');if(!ok)return;}
@@ -1082,6 +1170,7 @@ function pressStart(ref){pressTimer[ref]=setTimeout(()=>{toggleSelect(ref);},600
 function pressEnd(ref){clearTimeout(pressTimer[ref]);}
 function handleTap(ref){if(selectMode)toggleSelect(ref);}
 
+// ── Render ────────────────────────────────────────────────
 function render(){
   const q=(document.getElementById('search-bar').value||'').toLowerCase().trim();
   const displayApps=getDisplayApps().filter(a=>{
@@ -1093,6 +1182,7 @@ function render(){
   const star1=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1);
   const normal=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
   const done=displayApps.filter(a=>delivered[a.ref]);
+  // Date chip only shown when calendar is closed
   const dateChip=!calOpen?todayDateChipHTML():'';
   let html='';let dateShown=false;
   function secRow(title,count,titleCls,countCls){
@@ -1107,6 +1197,7 @@ function render(){
   if(star1.length){html+=secRow('⭐ Important',star1.length,'important-title','important-count');star1.forEach(a=>html+=cardHTML(a));}
   if(normal.length){html+=secRow('Normal',null,'','');normal.forEach(a=>html+=cardHTML(a));}
   if(done.length){html+=`<div class="section-row"><div class="section-title">✓ Delivered</div></div>`;done.forEach(a=>html+=cardHTML(a));}
+  // Archive search
   if(q){
     const archResults=searchInArchive(q);
     if(archResults.length){

@@ -73,8 +73,8 @@
   .cal-day.holiday { background: rgba(239,68,68,0.13); border-color: rgba(239,68,68,0.35); color: #fca5a5; }
   .cal-day.holiday.has-file { background: rgba(239,68,68,0.22); border-color: #ef4444; color: #fca5a5; }
   .cal-day.holiday.today { background: #7f1d1d; border-color: #ef4444; color: #fff; }
-  .cal-holiday-badge { font-size: 6px; line-height: 1; margin-top: 1px; color: #f87171; text-align: center; max-width: 32px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .holiday-name-tag { display: inline-block; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; margin-bottom: 8px; width: 100%; text-align: center; }
+  .cal-holiday-badge { font-size: 9px; line-height: 1; margin-top: 2px; color: #fb923c; text-align: center; }
+  .holiday-name-tag { display: flex; align-items: center; gap: 7px; background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.3); border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px; color: #f1f5f9; }
   .cal-dots { display: flex; gap: 1px; justify-content: center; margin-top: 2px; flex-wrap: wrap; max-width: 32px; }
   .cal-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
   .cal-dot.normal { background: #60a5fa; } .cal-dot.important { background: #f59e0b; }
@@ -704,7 +704,7 @@ function renderCal(){
       dotsHTML=`<div class="cal-dots">${dotSpans}${plus}</div>`;
     }
     if(hasNote)dotsHTML+=`<div class="cal-note-indicator">✦</div>`;
-    if(holiday)dotsHTML+=`<div class="cal-holiday-badge">🏴</div>`;
+    if(holiday)dotsHTML+=`<div class="cal-holiday-badge">✿</div>`;
     html+=`<div class="${cls}" onclick="openCalDayModal('${ds}')">${d}${dotsHTML}</div>`;
   }
   document.getElementById('cal-days').innerHTML=html;
@@ -719,7 +719,7 @@ function openCalDayModal(ds){
   const holidayName=getHoliday(ds);
   const holidayBanner=document.getElementById('cal-holiday-banner');
   if(holidayBanner){
-    if(holidayName){holidayBanner.textContent='🏴 '+holidayName;holidayBanner.style.display='block';}
+    if(holidayName){holidayBanner.innerHTML=`<span style="color:#fb923c;font-size:12px">✿</span><span>${holidayName}</span>`;holidayBanner.style.display='flex';}
     else holidayBanner.style.display='none';
   }
   renderCalDayTags();

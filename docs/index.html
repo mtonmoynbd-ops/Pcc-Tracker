@@ -1377,51 +1377,20 @@ function render(){
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
 }
 
-let loadLock=false;
 async function load(){
-  if(loadLock)return;loadLock=true;
   try{
-    // Fetch data.json and userdata.json in parallel
-    const [dataRes, udRes] = await Promise.allSettled([
-      fetch('data.json?t='+Date.now()),
-      fetch('userdata.json?t='+Date.now())
-    ]);
-
-    // Process userdata first (stars, print dates, status history)
-    if(udRes.status==='fulfilled'&&udRes.value.ok){
-      try{
-        const ud=await udRes.value.json();
-        printDates=ud.print_dates||{};
-        statusHistory=ud.status_history||{};
-        // Merge cloud stars with local (local takes priority)
-        if(ud.stars){
-          Object.keys(ud.stars).forEach(ref=>{
-            if(!(ref in stars))stars[ref]=ud.stars[ref];
-          });
-        }
-      }catch(e){}
-    }
-
-    // Process main data
-    if(dataRes.status==='fulfilled'&&dataRes.value.ok){
-      const d=await dataRes.value.json();
-      document.getElementById('updated').textContent='আপডেট: '+d.updated;
-      // Deduplicate by ref
-      const seen=new Set();
-      allApps=(d.applications||[]).filter(a=>{
-        if(seen.has(a.ref))return false;seen.add(a.ref);return true;
-      });
-      render();
-    } else {
-      // data.json failed — show cached data if available, else error
-      if(allApps.length>0){render();}
-      else{document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি — নেটওয়ার্ক চেক করুন</div>';}
-    }
-  }catch(e){
-    if(allApps.length>0){render();}
-    else{document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
-  }
-  finally{loadLock=false;}
+    const r=await fetch('data.json?t='+Date.now());
+    const d=await r.json();
+    document.getElementById('updated').textContent='আপডেট: '+d.updated;
+    // Deduplicate by ref to prevent double display
+    const seen=new Set();
+    allApps=(d.applications||[]).filter(a=>{if(seen.has(a.ref))return false;seen.add(a.ref);return true;});
+    try{
+      const ur=await fetch('userdata.json?t='+Date.now());
+      if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}
+    }catch(e){}
+    render();
+  }catch(e){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
 }
 load();
 setInterval(load,30000);

@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PCC Tracker</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  button, a { -webkit-tap-highlight-color: transparent; outline: none; }
   body { background: #0a1628; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 16px; overflow-x: hidden; }
   body.light { background: #e8edf5; color: #1e293b; }
   /* Cards */
@@ -43,6 +44,7 @@
   /* Search & filters */
   body.light .search-bar { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
   body.light .search-bar::placeholder { color: #94a3b8; }
+  body.light .search-bar { caret-color: #1d4ed8; }
   body.light .filter-btn { background: #ffffff; border-color: #cbd5e1; color: #64748b; }
   body.light .filter-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
   body.light .icon-filter-btn { background: #dbeafe; border-color: #93c5fd; }
@@ -83,6 +85,8 @@
   body.light .note-modal-textarea { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
   body.light .note-tpl-btn { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
   body.light .note-modal-clear { border-color: #cbd5e1; color: #64748b; }
+  body.light [style*="background:#0f1a2e"] { background: #f1f5f9 !important; }
+  body.light [style*="background: #0f1a2e"] { background: #f1f5f9 !important; }
   /* Date modal */
   body.light .date-modal-date-line { color: #1d4ed8; }
   body.light .dm-name { color: #0f172a; }
@@ -95,6 +99,9 @@
   body.light .arch-item-name { color: #475569; }
   body.light .arch-item-ref { color: #64748b; }
   body.light .arch-item-date { color: #94a3b8; }
+  body.light .arch-search-result { background: #ffffff; border-color: #cbd5e1; }
+  body.light .arch-search-tag { background: #f1f5f9; color: #475569; }
+  body.light .arch-item { border-color: #e2e8f0; }
   body.light .arch-tab { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
   body.light .arch-tab.active { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
   body.light .arch-year-chip { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
@@ -118,6 +125,45 @@
   body.light .settings-input { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
   body.light .theme-opt { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
   body.light .theme-opt.active { background: #dbeafe; border-color: #2563eb; color: #1d4ed8; }
+  /* AMOLED theme — pure black backgrounds */
+  body.amoled { background: #000000; color: #e2e8f0; }
+  body.amoled .card { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .card.star1 { border-color: #f59e0b; }
+  body.amoled .card.star2 { border-color: #ef4444; border-width: 2px; }
+  body.amoled .card.delivered { opacity: 0.35; }
+  body.amoled .card.collected-card { background: #001a0a; }
+  body.amoled .search-bar { background: #0a0a0a; border-color: #1a1a1a; color: #e2e8f0; }
+  body.amoled .filter-btn { background: #0a0a0a; border-color: #1a1a1a; color: #475569; }
+  body.amoled .filter-btn.active { background: #001433; color: #60a5fa; border-color: #2563eb; }
+  body.amoled .icon-filter-btn { background: #001433; border-color: #2563eb; }
+  body.amoled .icon-filter-btn.police { background: #0d0a1f; border-color: #4c1d95; }
+  body.amoled .icon-filter-btn.archive-btn { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .cal-box { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .cal-day.has-file { background: #001433; border-color: #2563eb; }
+  body.amoled .cal-day.today { background: #1d4ed8; }
+  body.amoled .modal-box, body.amoled .confirm-box { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .adj-btn { background: #111111; border-color: #222222; }
+  body.amoled .modal-add-input { background: #111111; border-color: #222222; }
+  body.amoled .modal-list-item { border-color: #1a1a1a; background: #0d0d0d; }
+  body.amoled .note-modal-textarea { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .note-tpl-btn { background: #001433; border-color: #1e3a5f; }
+  body.amoled .arch-section { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .arch-tab { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .arch-tab.active { background: #001433; border-color: #2563eb; }
+  body.amoled .arch-year-chip { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .arch-copy-btn { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .arch-search-result { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .pick-item { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .client-name-row { background: #0a0a0a; }
+  body.amoled .client-name-bottom-btn { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .select-bar { background: #000000; border-color: #1a1a1a; }
+  body.amoled .settings-input { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .cal-tag-btn { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled [style*="background:#0f1f3d"] { background: #0a0a0a !important; }
+  body.amoled [style*="background:#1e293b"] { background: #0d0d0d !important; }
+  body.amoled [style*="background:#0f1a2e"] { background: #050505 !important; }
+  body.amoled .theme-opt { background: #0a0a0a; border-color: #1a1a1a; color: #475569; }
+  body.amoled .theme-opt.active { background: #001433; border-color: #2563eb; color: #60a5fa; }
   /* Swipe hints */
   body.light .swipe-hint.left-hint { background: #dcfce7; color: #15803d; }
   body.light .swipe-hint.right-hint { background: #fef2f2; color: #dc2626; }
@@ -134,6 +180,45 @@
   .theme-opt.active { border-color: #2563eb; background: #1e3a5f; color: #60a5fa; }
   body.light .theme-opt { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
   body.light .theme-opt.active { background: #dbeafe; border-color: #2563eb; color: #1d4ed8; }
+  /* AMOLED theme — pure black backgrounds */
+  body.amoled { background: #000000; color: #e2e8f0; }
+  body.amoled .card { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .card.star1 { border-color: #f59e0b; }
+  body.amoled .card.star2 { border-color: #ef4444; border-width: 2px; }
+  body.amoled .card.delivered { opacity: 0.35; }
+  body.amoled .card.collected-card { background: #001a0a; }
+  body.amoled .search-bar { background: #0a0a0a; border-color: #1a1a1a; color: #e2e8f0; }
+  body.amoled .filter-btn { background: #0a0a0a; border-color: #1a1a1a; color: #475569; }
+  body.amoled .filter-btn.active { background: #001433; color: #60a5fa; border-color: #2563eb; }
+  body.amoled .icon-filter-btn { background: #001433; border-color: #2563eb; }
+  body.amoled .icon-filter-btn.police { background: #0d0a1f; border-color: #4c1d95; }
+  body.amoled .icon-filter-btn.archive-btn { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .cal-box { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .cal-day.has-file { background: #001433; border-color: #2563eb; }
+  body.amoled .cal-day.today { background: #1d4ed8; }
+  body.amoled .modal-box, body.amoled .confirm-box { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .adj-btn { background: #111111; border-color: #222222; }
+  body.amoled .modal-add-input { background: #111111; border-color: #222222; }
+  body.amoled .modal-list-item { border-color: #1a1a1a; background: #0d0d0d; }
+  body.amoled .note-modal-textarea { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .note-tpl-btn { background: #001433; border-color: #1e3a5f; }
+  body.amoled .arch-section { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .arch-tab { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .arch-tab.active { background: #001433; border-color: #2563eb; }
+  body.amoled .arch-year-chip { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .arch-copy-btn { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .arch-search-result { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .pick-item { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .client-name-row { background: #0a0a0a; }
+  body.amoled .client-name-bottom-btn { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .select-bar { background: #000000; border-color: #1a1a1a; }
+  body.amoled .settings-input { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled .cal-tag-btn { background: #0a0a0a; border-color: #1a1a1a; }
+  body.amoled [style*="background:#0f1f3d"] { background: #0a0a0a !important; }
+  body.amoled [style*="background:#1e293b"] { background: #0d0d0d !important; }
+  body.amoled [style*="background:#0f1a2e"] { background: #050505 !important; }
+  body.amoled .theme-opt { background: #0a0a0a; border-color: #1a1a1a; color: #475569; }
+  body.amoled .theme-opt.active { background: #001433; border-color: #2563eb; color: #60a5fa; }
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .header-left { display: flex; align-items: center; gap: 8px; }
   .shield-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; flex-shrink: 0; }
@@ -580,6 +665,7 @@
       <button class="theme-opt" id="theme-system" onclick="setTheme('system')">⚙️ System</button>
       <button class="theme-opt" id="theme-light" onclick="setTheme('light')">☀️ Light</button>
       <button class="theme-opt" id="theme-dark" onclick="setTheme('dark')">🌙 Dark</button>
+      <button class="theme-opt" id="theme-amoled" onclick="setTheme('amoled')">⚫ AMOLED</button>
     </div>
     <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-bottom:4px">
       <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
@@ -817,9 +903,10 @@ function closeSettings(){document.getElementById('settings-modal').classList.rem
 let themeMode=localStorage.getItem('pcc_theme')||'system';
 const _sysDark=window.matchMedia('(prefers-color-scheme: dark)');
 function _applyTheme(){
-  const isDark=themeMode==='dark'||(themeMode==='system'&&_sysDark.matches);
+  const isDark=themeMode==='dark'||themeMode==='amoled'||(themeMode==='system'&&_sysDark.matches);
   document.body.classList.toggle('light',!isDark);
-  ['system','light','dark'].forEach(m=>{
+  document.body.classList.toggle('amoled',themeMode==='amoled');
+  ['system','light','dark','amoled'].forEach(m=>{
     const el=document.getElementById('theme-'+m);
     if(el)el.classList.toggle('active',m===themeMode);
   });
@@ -830,6 +917,7 @@ _sysDark.addEventListener('change',_applyTheme);
 // Fallback poll for Android WebView which may not fire the event
 let _lastSysDark=_sysDark.matches;
 setInterval(()=>{if(themeMode==='system'&&_sysDark.matches!==_lastSysDark){_lastSysDark=_sysDark.matches;_applyTheme();}},1000);
+['system','light','dark','amoled'].forEach(m=>{const el=document.getElementById('theme-'+m);if(el)el.classList.toggle('active',m===themeMode);});
 _applyTheme();
 async function savePAT(){
   const pat=document.getElementById('pat-input').value.trim();

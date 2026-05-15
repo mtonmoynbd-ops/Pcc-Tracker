@@ -717,10 +717,10 @@ function renderCal(){
     const hasNote=calNotes[ds]&&calNotes[ds].length>0;
     const holiday=getHoliday(ds);
     const holidayCls=holiday?(holiday.type==='public'?' holiday':' national'):'';
-    const friSatCls=(isFriSat&&!isT&&!holiday)?' frisat':'';
-    let cls='cal-day'+(isT?' today':hasF?' has-file':'')+(hasNote&&!isT?' has-note':'')+holidayCls+friSatCls;
     const dayOfWeek=new Date(y,m,d).getDay(); // 5=Fri, 6=Sat
     const isFriSat=dayOfWeek===5||dayOfWeek===6;
+    const friSatCls=(isFriSat&&!isT&&!holiday)?' frisat':'';
+    let cls='cal-day'+(isT?' today':hasF?' has-file':'')+(hasNote&&!isT?' has-note':'')+holidayCls+friSatCls;
     let dotsHTML='';
     if(hasF){
       const shown=dots.slice(0,5);

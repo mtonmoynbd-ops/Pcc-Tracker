@@ -1354,4 +1354,47 @@ function render(){
   if(q){
     const archResults=searchInArchive(q);
     if(archResults.length){
-      html+=`<div class="section-row" style="margin-top:16p
+      html+=`<div class="section-row" style="margin-top:16px"><div class="section-title" style="color:#7c3aed">📦 আর্কাইভে পাওয়া</div></div>`;
+      archResults.forEach(r=>{
+        html+=`<div class="arch-search-result"><span class="arch-search-tag">${r.source}</span>
+          <div class="arch-list">${r.items.map(a=>{
+            const nameEsc=(a.name||'').replace(/'/g,"\\'");const phone=a.phone||'';
+            return `<div class="arch-item">
+              <span class="arch-item-name" onclick="archPhoneClick('${nameEsc}','${phone}')">${a.name||''}</span>
+              <span class="arch-item-ref">${a.ref||''}</span>
+              <span class="arch-item-date">${a.applyDate||''}</span>
+            </div>`;
+          }).join('')}</div></div>`;
+      });
+    }
+  }
+  if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
+  document.getElementById('list').innerHTML=html;
+  document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
+  document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
+  const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));
+  const draftBtn=document.getElementById('draft-btn');
+  if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
+}
+
+let loadLock=false;
+async function load(){
+  if(loadLock)return;loadLock=true;
+  try{
+    const r=await fetch('data.json?t='+Date.now());const d=await r.json();
+    document.getElementById('updated').textContent='আপডেট: '+d.updated;
+    // Deduplicate by ref
+    const seen=new Set();
+    allApps=(d.applications||[]).filter(a=>{if(seen.has(a.ref))return false;seen.add(a.ref);return true;});
+    try{const ur=await fetch('userdata.json?t='+Date.now());if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};
+      if(ud.stars)stars={...ud.stars,...stars};
+    }}catch(e){}
+    render();
+  }catch(e){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
+  finally{loadLock=false;}
+}
+load();
+setInterval(load,30000);
+</script>
+</body>
+</html>

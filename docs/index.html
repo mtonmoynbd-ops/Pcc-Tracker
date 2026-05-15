@@ -1379,12 +1379,13 @@ function render(){
 
 async function load(){
   try{
-    await syncFromCloud();
     const r=await fetch('data.json?t='+Date.now());const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
     allApps=d.applications;
     try{const ur=await fetch('userdata.json?t='+Date.now());if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
     render();
+    // Sync cloud data in background after render (non-blocking)
+    syncFromCloud().catch(()=>{});
   }catch(e){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
 }
 load();

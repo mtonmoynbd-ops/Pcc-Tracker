@@ -79,7 +79,7 @@
   .cal-holiday-badge { font-size: 9px; line-height: 1; margin-top: 1px; text-align: center; flex-shrink: 0; }
   .cal-holiday-badge.public { color: #fb923c; }
   .cal-holiday-badge.national { color: #a78bfa; }
-  .holiday-name-tag { display: flex; align-items: center; gap: 7px; border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px; color: #f1f5f9; }
+  .holiday-name-tag { display: flex; align-items: center; justify-content: center; gap: 7px; border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px; color: #f1f5f9; text-align: center; }
   .holiday-name-tag.public { background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.35); }
   .holiday-name-tag.national { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.35); }
   .cal-dots { display: flex; gap: 1px; justify-content: center; margin-top: 2px; flex-wrap: wrap; max-width: 32px; }
@@ -207,14 +207,14 @@
   .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
   .card-top-right { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
   /* Stage btn — icon only, no circle, same size as star btn */
-  .stage-btn { width: 16px; height: 16px; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; color: #1e3a5f; font-size: 11px; line-height: 1; padding: 0; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
+  .stage-btn { width: 16px; height: 16px; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; font-size: 12px; line-height: 1; padding: 0; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
   .stage-btn.fwd { color: #eab308; }
   .stage-btn.col { color: #22c55e; }
   .stage-btn.pressing { transform: scale(0.85); opacity: 0.6; }
   /* Star btn — 11px (one size smaller) */
   .star-btn { background: none; border: none; cursor: pointer; font-size: 11px; opacity: 0.4; line-height: 1; padding: 0; flex-shrink: 0; }
   .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
-  .name { font-weight: 700; font-size: 15px; color: #f1f5f9; flex: 1; cursor: pointer; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 6px; }
+  .name { font-weight: 700; font-size: 13px; color: #f1f5f9; flex: 1; cursor: pointer; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 6px; }
   .info { font-size: 12px; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; }
   .ref-icon { display: inline-block; vertical-align: middle; margin-right: 1px; flex-shrink: 0; }
   .cal-icon { display: inline-block; vertical-align: middle; flex-shrink: 0; }
@@ -447,7 +447,7 @@ const WORKFLOW_API='https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/acti
 const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_UP=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const MONTHS_BN=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
-const PRESET_TAGS=['ওসি নেই','এসপি নেই','Mofa প্রবলেম','মেইন সার্ভার ডাউন','প্রিন্টিং প্রবলেম','চালান সার্ভার ডাউন','সাধারন ছুটি','ভিআইপি ডিউটি'];
+const PRESET_TAGS=['ওসি নেই','এসপি নেই','Mofa প্রবলেম','মেইন সার্ভার ডাউন','প্রিন্টিং প্রবলেম','চালান সার্ভার ডাউন','সাধারন ছুটি','ভিআইপি ডিউটি','ডিএসবি রিসিভিং ডিলেয়'];
 
 // Bangladesh Holidays 2025-2026
 // Type 'public' = PCC office closed | Type 'national' = national day, office may open
@@ -1112,7 +1112,7 @@ function cardHTML(app){
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
   const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
-  const stage=isCol?2:isFwd?1:0;const stageIcon=stage===0?'▴':stage===1?'▲':'▼';const stageCls=stage===0?'':stage===1?'fwd':'col';
+  const stage=isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':'📥';const stageCls=stage===0?'':stage===1?'fwd':'col';
   // Due code + collected → blink
   const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
   let dayClass='day-normal';

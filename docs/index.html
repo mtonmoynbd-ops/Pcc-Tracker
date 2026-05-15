@@ -70,10 +70,10 @@
   @keyframes cal-note-blink { 0%,100%{border-color:rgba(251,191,36,0.15)} 50%{border-color:rgba(251,191,36,0.65)} }
   .cal-day.has-note { animation: cal-note-blink 3s ease-in-out infinite; border-color: rgba(251,191,36,0.15); }
   .cal-day.has-note.today { animation: none; }
-  .cal-day.holiday { background: rgba(239,68,68,0.13); border-color: rgba(239,68,68,0.35); color: #fca5a5; }
-  .cal-day.holiday.has-file { background: rgba(239,68,68,0.22); border-color: #ef4444; color: #fca5a5; }
+  .cal-day.holiday { background: rgba(239,68,68,0.13); border-color: rgba(239,68,68,0.35); color: #f1f5f9; justify-content: center; padding-top: 0; }
+  .cal-day.holiday.has-file { background: rgba(239,68,68,0.22); border-color: #ef4444; color: #f1f5f9; }
   .cal-day.holiday.today { background: #7f1d1d; border-color: #ef4444; color: #fff; }
-  .cal-holiday-badge { font-size: 9px; line-height: 1; margin-top: 2px; color: #fb923c; text-align: center; }
+  .cal-holiday-badge { font-size: 9px; line-height: 1; margin-top: 1px; color: #fb923c; text-align: center; flex-shrink: 0; }
   .holiday-name-tag { display: flex; align-items: center; gap: 7px; background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.3); border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px; color: #f1f5f9; }
   .cal-dots { display: flex; gap: 1px; justify-content: center; margin-top: 2px; flex-wrap: wrap; max-width: 32px; }
   .cal-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }

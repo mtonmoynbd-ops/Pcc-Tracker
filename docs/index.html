@@ -7,6 +7,41 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0a1628; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 16px; overflow-x: hidden; }
+  body.light { background: #f1f5f9; color: #1e293b; }
+  body.light .card { background: #ffffff; border-color: #cbd5e1; }
+  body.light .card.star1 { border-color: #f59e0b; }
+  body.light .card.star2 { border-color: #ef4444; border-width: 2px; }
+  body.light .card.delivered { background: #f8fafc; border-color: #e2e8f0; opacity: 0.6; }
+  body.light .name { color: #0f172a; }
+  body.light .search-bar { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
+  body.light .filter-btn { background: #ffffff; border-color: #cbd5e1; color: #64748b; }
+  body.light .filter-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+  body.light .modal-box, body.light .confirm-box { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
+  body.light .modal-title { color: #0f172a; }
+  body.light .cal-box { background: #ffffff; border-color: #cbd5e1; }
+  body.light .cal-day { color: #94a3b8; }
+  body.light .cal-day.has-file { background: #dbeafe; border-color: #93c5fd; color: #1e3a5f; }
+  body.light .cal-day.today { background: #1d4ed8; color: #fff; }
+  body.light .cal-weekdays { color: #475569; }
+  body.light h1 { color: #1d4ed8; }
+  body.light .updated { color: #64748b; }
+  body.light .shield-btn, body.light .web-btn { background: #dbeafe; border-color: #93c5fd; }
+  body.light .info { color: #475569; }
+  body.light .section-title { color: #64748b; }
+  body.light .section-count { color: #475569; }
+  body.light .arch-section { background: #f8fafc; border-color: #e2e8f0; }
+  body.light .arch-month-label { color: #0f172a; }
+  body.light .modal-list-item { color: #475569; border-color: #e2e8f0; }
+  body.light .note-tpl-btn { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+  body.light .section-row { border-color: #e2e8f0; }
+  body.light .ref-link { color: #475569; }
+  body.light .bottom-row .status { filter: brightness(0.85); }
+  /* Theme toggle buttons */
+  .theme-row { display: flex; gap: 6px; margin-bottom: 16px; }
+  .theme-opt { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #64748b; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
+  .theme-opt.active { border-color: #2563eb; background: #1e3a5f; color: #60a5fa; }
+  body.light .theme-opt { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
+  body.light .theme-opt.active { background: #dbeafe; border-color: #2563eb; color: #1d4ed8; }
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .header-left { display: flex; align-items: center; gap: 8px; }
   .shield-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; flex-shrink: 0; }
@@ -448,10 +483,18 @@
 <div class="modal" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title">🛡️ Settings<button class="modal-close" onclick="closeSettings()">✕</button></div>
-    <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
-    <input class="settings-input" type="password" id="pat-input" placeholder="GitHub PAT (ghp_xxx...)">
-    <button class="settings-save-btn" onclick="savePAT()">Save & Backup</button>
-    <div id="settings-status" style="font-size:11px;color:#475569;margin-top:10px"></div>
+    <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">থিম</div>
+    <div class="theme-row">
+      <button class="theme-opt" id="theme-system" onclick="setTheme('system')">⚙️ System</button>
+      <button class="theme-opt" id="theme-light" onclick="setTheme('light')">☀️ Light</button>
+      <button class="theme-opt" id="theme-dark" onclick="setTheme('dark')">🌙 Dark</button>
+    </div>
+    <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-bottom:4px">
+      <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
+      <input class="settings-input" type="password" id="pat-input" placeholder="GitHub PAT (ghp_xxx...)">
+      <button class="settings-save-btn" onclick="savePAT()">Save & Backup</button>
+      <div id="settings-status" style="font-size:11px;color:#475569;margin-top:10px"></div>
+    </div>
   </div>
 </div>
 
@@ -670,8 +713,28 @@ async function syncFromCloud(){
     saveLocal();
   }catch(e){}
 }
-function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-status').textContent='';document.getElementById('settings-modal').classList.add('open');}
+function openSettings(){
+  document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';
+  document.getElementById('settings-status').textContent='';
+  _applyTheme();
+  document.getElementById('settings-modal').classList.add('open');
+}
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
+
+// ── Theme ──
+let themeMode=localStorage.getItem('pcc_theme')||'system';
+const _sysDark=window.matchMedia('(prefers-color-scheme: dark)');
+function _applyTheme(){
+  const isDark=themeMode==='dark'||(themeMode==='system'&&_sysDark.matches);
+  document.body.classList.toggle('light',!isDark);
+  ['system','light','dark'].forEach(m=>{
+    const el=document.getElementById('theme-'+m);
+    if(el)el.classList.toggle('active',m===themeMode);
+  });
+}
+function setTheme(m){themeMode=m;localStorage.setItem('pcc_theme',m);_applyTheme();}
+_sysDark.addEventListener('change',_applyTheme);
+_applyTheme();
 async function savePAT(){
   const pat=document.getElementById('pat-input').value.trim();
   if(pat)localStorage.setItem('pcc_pat',pat);else localStorage.removeItem('pcc_pat');

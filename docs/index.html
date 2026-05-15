@@ -7,35 +7,127 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0a1628; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 16px; overflow-x: hidden; }
-  body.light { background: #f1f5f9; color: #1e293b; }
+  body.light { background: #e8edf5; color: #1e293b; }
+  /* Cards */
   body.light .card { background: #ffffff; border-color: #cbd5e1; }
   body.light .card.star1 { border-color: #f59e0b; }
   body.light .card.star2 { border-color: #ef4444; border-width: 2px; }
-  body.light .card.delivered { background: #f8fafc; border-color: #e2e8f0; opacity: 0.6; }
+  body.light .card.delivered { background: #f1f5f9; border-color: #e2e8f0; opacity: 0.65; }
+  body.light .card.collected-card { background: #f0fdf4; }
   body.light .name { color: #0f172a; }
-  body.light .search-bar { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
-  body.light .filter-btn { background: #ffffff; border-color: #cbd5e1; color: #64748b; }
-  body.light .filter-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
-  body.light .modal-box, body.light .confirm-box { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
-  body.light .modal-title { color: #0f172a; }
-  body.light .cal-box { background: #ffffff; border-color: #cbd5e1; }
-  body.light .cal-day { color: #94a3b8; }
-  body.light .cal-day.has-file { background: #dbeafe; border-color: #93c5fd; color: #1e3a5f; }
-  body.light .cal-day.today { background: #1d4ed8; color: #fff; }
-  body.light .cal-weekdays { color: #475569; }
+  body.light .info { color: #475569; }
+  body.light .ref-link { color: #64748b; }
+  body.light .day-normal { color: #2563eb; }
+  body.light .day-warn-urgent { color: #dc2626; }
+  body.light .day-warn-important { color: #ea580c; }
+  body.light .note-preview { color: #475569; }
+  body.light .phone-link { color: #0284c7; }
+  body.light .police-inline-tag { color: #7c3aed; background: #f5f3ff; border-color: #c4b5fd; }
+  body.light .print-badge { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  body.light .deu-text { background: #fef2f2; color: #dc2626; }
+  /* Status badges — keep colored, just slightly adjusted */
+  body.light .s1, body.light .s2 { background: #dbeafe; color: #1d4ed8; }
+  body.light .s3, body.light .s4, body.light .s5 { background: #fef3c7; color: #b45309; }
+  body.light .s6, body.light .s7 { background: #ede9fe; color: #6d28d9; }
+  body.light .s8, body.light .s9 { background: #dcfce7; color: #15803d; }
+  /* Header */
   body.light h1 { color: #1d4ed8; }
   body.light .updated { color: #64748b; }
-  body.light .shield-btn, body.light .web-btn { background: #dbeafe; border-color: #93c5fd; }
-  body.light .info { color: #475569; }
+  body.light .shield-btn { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+  body.light .web-btn { background: #dbeafe; border-color: #93c5fd; }
+  body.light .counts .urgent { color: #dc2626; }
+  body.light .counts .important { color: #d97706; }
+  body.light .backup-dot { background: #94a3b8; }
+  body.light .backup-dot.ok { background: #16a34a; }
+  body.light .backup-dot.err { background: #dc2626; }
+  /* Search & filters */
+  body.light .search-bar { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
+  body.light .search-bar::placeholder { color: #94a3b8; }
+  body.light .filter-btn { background: #ffffff; border-color: #cbd5e1; color: #64748b; }
+  body.light .filter-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+  body.light .icon-filter-btn { background: #dbeafe; border-color: #93c5fd; }
+  body.light .icon-filter-btn.police { background: #f5f3ff; border-color: #c4b5fd; }
+  body.light .icon-filter-btn.archive-btn { background: #f1f5f9; border-color: #cbd5e1; }
+  /* Section row */
   body.light .section-title { color: #64748b; }
-  body.light .section-count { color: #475569; }
+  body.light .section-title.urgent-title { color: #dc2626; }
+  body.light .section-title.important-title { color: #d97706; }
+  body.light .section-count { color: #64748b; }
+  body.light .section-date-chip .today-lbl { color: #64748b; }
+  body.light .today-date-txt { color: #1d4ed8; }
+  /* Calendar */
+  body.light .cal-box { background: #ffffff; border-color: #cbd5e1; }
+  body.light .cal-weekdays { color: #64748b; }
+  body.light .cal-day { color: #94a3b8; border-color: transparent; }
+  body.light .cal-day:hover { background: #f1f5f9; }
+  body.light .cal-day.has-file { background: #dbeafe; border-color: #93c5fd; color: #1e3a5f; font-weight: 700; }
+  body.light .cal-day.today { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+  body.light .cal-day.frisat { color: #0d9488; }
+  body.light .cal-nav { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  body.light .cal-title-text { color: #1d4ed8; }
+  body.light .cal-title-lbl { color: #64748b; }
+  /* Modals */
+  body.light .modal-box, body.light .confirm-box { background: #ffffff; border-color: #cbd5e1; }
+  body.light .modal-title { color: #0f172a; }
+  body.light .modal-close { color: #64748b; }
+  body.light .modal-list-item { color: #475569; border-color: #e2e8f0; background: #f8fafc; }
+  body.light .modal-list-item span { color: #1e293b; }
+  body.light .adj-btn { background: #f1f5f9; border-color: #cbd5e1; color: #1e293b; }
+  body.light .adj-num { color: #1e293b; }
+  body.light .modal-add-input { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
+  body.light .modal-copy-btn { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  body.light .confirm-msg { color: #1e293b; }
+  body.light .confirm-sub { color: #2563eb; }
+  body.light .confirm-cancel { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  /* Note modal */
+  body.light .note-modal-textarea { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
+  body.light .note-tpl-btn { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+  body.light .note-modal-clear { border-color: #cbd5e1; color: #64748b; }
+  /* Date modal */
+  body.light .date-modal-date-line { color: #1d4ed8; }
+  body.light .dm-name { color: #0f172a; }
+  body.light .dm-info { color: #64748b; }
+  /* Archive */
   body.light .arch-section { background: #f8fafc; border-color: #e2e8f0; }
   body.light .arch-month-label { color: #0f172a; }
-  body.light .modal-list-item { color: #475569; border-color: #e2e8f0; }
-  body.light .note-tpl-btn { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
-  body.light .section-row { border-color: #e2e8f0; }
-  body.light .ref-link { color: #475569; }
-  body.light .bottom-row .status { filter: brightness(0.85); }
+  body.light .arch-date-range { color: #64748b; }
+  body.light .arch-copy-btn { background: #ffffff; border-color: #cbd5e1; color: #475569; }
+  body.light .arch-item-name { color: #475569; }
+  body.light .arch-item-ref { color: #64748b; }
+  body.light .arch-item-date { color: #94a3b8; }
+  body.light .arch-tab { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
+  body.light .arch-tab.active { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+  body.light .arch-year-chip { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
+  body.light .arch-year-chip.active { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+  body.light .arch-month-chip { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
+  body.light .arch-month-chip.active { background: #ede9fe; border-color: #c4b5fd; color: #6d28d9; }
+  /* Police / Client modals */
+  body.light .police-filter-pill { background: #f5f3ff; border-color: #c4b5fd; color: #6d28d9; }
+  body.light .police-filter-pill.active { background: #ede9fe; color: #4c1d95; }
+  body.light .police-filter-all { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  body.light .client-name-row { background: #f8fafc; }
+  body.light .client-name-row span { color: #6d28d9; }
+  body.light .pick-item { background: #f8fafc; border-color: #e2e8f0; color: #6d28d9; }
+  body.light .pick-item.active-pick { background: #ede9fe; border-color: #c4b5fd; }
+  body.light .client-name-bottom-btn { background: #ffffff; border-color: #cbd5e1; color: #475569; }
+  /* Select bar */
+  body.light .select-bar { background: #ffffff; border-color: #e2e8f0; }
+  body.light .select-bar-info { color: #475569; }
+  /* Settings */
+  body.light .settings-info { color: #64748b; }
+  body.light .settings-input { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
+  body.light .theme-opt { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
+  body.light .theme-opt.active { background: #dbeafe; border-color: #2563eb; color: #1d4ed8; }
+  /* Swipe hints */
+  body.light .swipe-hint.left-hint { background: #dcfce7; color: #15803d; }
+  body.light .swipe-hint.right-hint { background: #fef2f2; color: #dc2626; }
+  /* Cal day modal */
+  body.light .cal-tag-btn { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  body.light .cal-tag-btn.active { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
+  body.light .cal-day-file-item { border-color: #e2e8f0; }
+  body.light .cal-day-file-name { color: #475569; }
+  body.light .holiday-name-tag.public { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.4); }
+  body.light .holiday-name-tag.national { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.4); }
   /* Theme toggle buttons */
   .theme-row { display: flex; gap: 6px; margin-bottom: 16px; }
   .theme-opt { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #64748b; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
@@ -733,7 +825,11 @@ function _applyTheme(){
   });
 }
 function setTheme(m){themeMode=m;localStorage.setItem('pcc_theme',m);_applyTheme();}
+// Listen for system theme change (works on most browsers)
 _sysDark.addEventListener('change',_applyTheme);
+// Fallback poll for Android WebView which may not fire the event
+let _lastSysDark=_sysDark.matches;
+setInterval(()=>{if(themeMode==='system'&&_sysDark.matches!==_lastSysDark){_lastSysDark=_sysDark.matches;_applyTheme();}},1000);
 _applyTheme();
 async function savePAT(){
   const pat=document.getElementById('pat-input').value.trim();

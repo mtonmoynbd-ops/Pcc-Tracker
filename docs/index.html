@@ -7,30 +7,6 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0a1628; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 16px; overflow-x: hidden; }
-  body.light { background: #f1f5f9; color: #1e293b; }
-  body.light .card { background: #ffffff; border-color: #cbd5e1; }
-  body.light .card.star1 { border-color: #f59e0b; }
-  body.light .card.star2 { border-color: #ef4444; }
-  body.light .card.delivered { background: #f8fafc; border-color: #e2e8f0; }
-  body.light .name { color: #0f172a; }
-  body.light .search-bar { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
-  body.light .filter-btn { background: #ffffff; border-color: #cbd5e1; color: #64748b; }
-  body.light .filter-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
-  body.light .modal-box, body.light .confirm-box { background: #ffffff; border-color: #cbd5e1; }
-  body.light .cal-box { background: #ffffff; border-color: #cbd5e1; }
-  body.light .cal-day { color: #94a3b8; }
-  body.light .cal-day.has-file { background: #dbeafe; border-color: #93c5fd; color: #1e3a5f; }
-  body.light .cal-day.today { background: #1d4ed8; color: #fff; }
-  body.light h1 { color: #1d4ed8; }
-  body.light .updated { color: #64748b; }
-  body.light .shield-btn, body.light .web-btn { background: #dbeafe; border-color: #93c5fd; }
-  body.light .status { background: #dbeafe !important; }
-  body.light .info { color: #475569; }
-  body.light .section-title { color: #64748b; }
-  body.light .arch-section { background: #f8fafc; border-color: #e2e8f0; }
-  body.light .modal-list-item { color: #475569; border-color: #e2e8f0; }
-  body.light .pick-item { background: #f8fafc; border-color: #e2e8f0; color: #7c3aed; }
-  body.light .note-tpl-btn { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .header-left { display: flex; align-items: center; gap: 8px; }
   .shield-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; flex-shrink: 0; }
@@ -100,8 +76,8 @@
   .cal-day.national { background: rgba(167,139,250,0.13); border-color: rgba(167,139,250,0.4); color: #f1f5f9; justify-content: center; padding-top: 0; }
   .cal-day.national.has-file { background: rgba(167,139,250,0.2); border-color: #a78bfa; color: #f1f5f9; }
   .cal-day.national.today { background: #3b1f6e; border-color: #a78bfa; color: #fff; }
-  .cal-day.frisat { color: #2dd4bf; }
-  .cal-day.frisat.has-file { color: #2dd4bf; background: #1e3a5f; border-color: #2563eb; }
+  .cal-day.frisat { color: #7c9cbf; }
+  .cal-day.frisat.has-file { color: #7c9cbf; background: #1e3a5f; border-color: #2563eb; }
   .cal-holiday-badge { font-size: 9px; line-height: 1; margin-top: 1px; text-align: center; flex-shrink: 0; }
   .cal-holiday-badge.public { color: #fb923c; }
   .cal-holiday-badge.national { color: #a78bfa; }
@@ -152,8 +128,6 @@
   .note-modal-textarea { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: #e2e8f0; font-size: 13px; outline: none; resize: none; margin-bottom: 10px; min-height: 80px; }
   .note-modal-save { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .note-modal-clear { background: none; border: 1px solid #334155; color: #64748b; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-left: 8px; }
-  .note-tpl-btn { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #60a5fa; cursor: pointer; white-space: nowrap; }
-  .note-tpl-btn:active { background: #1e3a5f; }
   #confirm-modal { z-index: 200; }
   .confirm-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 14px; padding: 20px; width: 100%; max-width: 280px; }
   .confirm-msg { font-size: 13px; color: #e2e8f0; line-height: 1.7; margin-bottom: 16px; }
@@ -209,9 +183,6 @@
   .pick-item { background: #1e293b; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #c4b5fd; cursor: pointer; border: 1px solid #334155; margin-bottom: 6px; }
   .pick-item.active-pick { background: #2d1f5e; border-color: #7c3aed; }
   .settings-info { font-size: 11px; color: #475569; margin-bottom: 12px; line-height: 1.6; }
-  .theme-row { display: flex; gap: 6px; margin-bottom: 16px; }
-  .theme-opt { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #64748b; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s; }
-  .theme-opt.active { border-color: #2563eb; background: #1e3a5f; color: #60a5fa; }
   .settings-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; margin-bottom: 10px; }
   .settings-save-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .select-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1f3d; border-top: 1px solid #1e3a5f; padding: 12px 16px; z-index: 50; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; }
@@ -256,7 +227,6 @@
   .day-normal { color: #60a5fa; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
   .day-warn-urgent { color: #ef4444; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
   .day-warn-important { color: #f97316; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
-  .day-collected { color: #34d399; font-size: 12px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
   .bottom-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
   .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; cursor: pointer; }
   .s1,.s2{background:#1e3a5f;color:#60a5fa} .s3,.s4,.s5{background:#1e3a5f;color:#f59e0b}
@@ -331,7 +301,7 @@
     <div class="cal-title-wrap" id="cal-title-wrap" onclick="toggleCal()"></div>
     <button class="cal-nav" onclick="calNav(1)">›</button>
   </div>
-  <div class="cal-weekdays"><div>রবি</div><div>সোম</div><div>মঙ্গল</div><div>বুধ</div><div>বৃহ</div><div style="color:#2dd4bf">শুক্র</div><div style="color:#2dd4bf">শনি</div></div>
+  <div class="cal-weekdays"><div>রবি</div><div>সোম</div><div>মঙ্গল</div><div>বুধ</div><div>বৃহ</div><div style="color:#7c9cbf">শুক্র</div><div style="color:#7c9cbf">শনি</div></div>
   <div class="cal-days" id="cal-days"></div>
 </div>
 
@@ -411,21 +381,7 @@
 
 <div class="modal" id="note-modal">
   <div class="modal-box">
-    <div class="modal-title">
-      <div style="display:flex;align-items:center;gap:6px">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        <span id="note-modal-title"></span>
-      </div>
-      <button class="modal-close" onclick="closeNoteModal()">✕</button>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
-      <div style="font-size:9px;color:#475569;width:100%;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">টেমপ্লেট</div>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('মামলা ম্যাচ করছে')">মামলা ম্যাচ করছে</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('ডকুমেন্ট অসম্পূর্ণ')">ডকুমেন্ট অসম্পূর্ণ</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('ওয়েট ফর কনফার্মেশন')">ওয়েট ফর কনফার্মেশন</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('মামলা সনাক্ত হয়েছে')">মামলা সনাক্ত হয়েছে</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('নিষ্পত্তির অপেক্ষায়')">নিষ্পত্তির অপেক্ষায়</button>
-    </div>
+    <div class="modal-title"><span id="note-modal-title"></span><button class="modal-close" onclick="closeNoteModal()">✕</button></div>
     <textarea class="note-modal-textarea" id="note-modal-textarea" placeholder="নোট লিখুন..."></textarea>
     <div style="display:flex">
       <button class="note-modal-save" onclick="saveNoteModal()">সংরক্ষণ</button>
@@ -475,18 +431,10 @@
 <div class="modal" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title">🛡️ Settings<button class="modal-close" onclick="closeSettings()">✕</button></div>
-    <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">থিম</div>
-    <div class="theme-row">
-      <button class="theme-opt" id="theme-system" onclick="setTheme('system')">⚙️ System</button>
-      <button class="theme-opt" id="theme-light" onclick="setTheme('light')">☀️ Light</button>
-      <button class="theme-opt" id="theme-dark" onclick="setTheme('dark')">🌙 Dark</button>
-    </div>
-    <div style="border-top:1px solid #1e3a5f;margin-bottom:14px;padding-top:14px">
-      <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
-      <input class="settings-input" type="password" id="pat-input" placeholder="GitHub PAT (ghp_xxx...)">
-      <button class="settings-save-btn" onclick="savePAT()">Save & Backup</button>
-      <div id="settings-status" style="font-size:11px;color:#475569;margin-top:10px"></div>
-    </div>
+    <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
+    <input class="settings-input" type="password" id="pat-input" placeholder="GitHub PAT (ghp_xxx...)">
+    <button class="settings-save-btn" onclick="savePAT()">Save & Backup</button>
+    <div id="settings-status" style="font-size:11px;color:#475569;margin-top:10px"></div>
   </div>
 </div>
 
@@ -574,7 +522,6 @@ let history=JSON.parse(localStorage.getItem('pcc_history')||'{"urgent":[],"impor
 let forwarded=JSON.parse(localStorage.getItem('pcc_forwarded')||'{}');
 let collected=JSON.parse(localStorage.getItem('pcc_collected')||'{}');
 let collectedDay=JSON.parse(localStorage.getItem('pcc_collected_day')||'{}');
-let collectedDate=JSON.parse(localStorage.getItem('pcc_collected_date')||'{}');
 let manualPrintDates=JSON.parse(localStorage.getItem('pcc_manual_print_dates')||'{}');
 let expandedNormal=new Set(JSON.parse(localStorage.getItem('pcc_expanded_normal')||'[]'));
 let resetArchive=JSON.parse(localStorage.getItem('pcc_reset_archive')||'[]');
@@ -664,7 +611,6 @@ function saveLocal(){
   localStorage.setItem('pcc_forwarded',JSON.stringify(forwarded));
   localStorage.setItem('pcc_collected',JSON.stringify(collected));
   localStorage.setItem('pcc_collected_day',JSON.stringify(collectedDay));
-  localStorage.setItem('pcc_collected_date',JSON.stringify(collectedDate));
   localStorage.setItem('pcc_manual_print_dates',JSON.stringify(manualPrintDates));
   localStorage.setItem('pcc_expanded_normal',JSON.stringify([...expandedNormal]));
   localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
@@ -679,7 +625,7 @@ function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=s
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
   try{
-    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes};
+    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,manualPrintDates,resetArchive,calNotes};
     const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
     let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
@@ -701,31 +647,13 @@ async function syncFromCloud(){
     if(d.showDeu)showDeu=d.showDeu;if(d.notes)notes=d.notes;if(d.blinkStopped)blinkStopped=d.blinkStopped;
     if(d.policeTags)policeTags=d.policeTags;if(d.clientNames)clientNames=d.clientNames;
     if(d.counts)counts=d.counts;if(d.history)history=d.history;
-    if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;if(d.collectedDate)collectedDate=d.collectedDate;
+    if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;
     if(d.manualPrintDates)manualPrintDates=d.manualPrintDates;
     if(d.resetArchive)resetArchive=d.resetArchive;if(d.calNotes)calNotes=d.calNotes;
     saveLocal();
   }catch(e){}
 }
-// ── Theme ──────────────────────────────────────────────────
-let themeMode=localStorage.getItem('pcc_theme')||'system';
-const sysDark=window.matchMedia('(prefers-color-scheme: dark)');
-function applyTheme(mode){
-  themeMode=mode;localStorage.setItem('pcc_theme',mode);
-  const isDark=mode==='dark'||(mode==='system'&&sysDark.matches);
-  document.body.classList.toggle('light',!isDark);
-  ['system','light','dark'].forEach(m=>document.getElementById('theme-'+m)?.classList.toggle('active',m===mode));
-}
-function setTheme(mode){applyTheme(mode);}
-sysDark.addEventListener('change',()=>{if(themeMode==='system')applyTheme('system');});
-applyTheme(themeMode);
-
-function openSettings(){
-  document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';
-  document.getElementById('settings-status').textContent='';
-  ['system','light','dark'].forEach(m=>document.getElementById('theme-'+m)?.classList.toggle('active',m===themeMode));
-  document.getElementById('settings-modal').classList.add('open');
-}
+function openSettings(){document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';document.getElementById('settings-status').textContent='';document.getElementById('settings-modal').classList.add('open');}
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 async function savePAT(){
   const pat=document.getElementById('pat-input').value.trim();
@@ -743,8 +671,8 @@ function stagePressStart(e,ref){
   stageTimer[ref]=setTimeout(()=>{
     if(btn)btn.classList.remove('pressing');
     if(stage===0){forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↑ Forwarded');}
-    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);collectedDate[ref]=todayStr();save();render();showToast('↓ Collected');}
-    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];delete collectedDate[ref];save();render();showToast('↺ Reset');}
+    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);save();render();showToast('↓ Collected');}
+    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↺ Reset');}
   },stage===2?2000:600);
 }
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
@@ -931,7 +859,6 @@ function openNoteModal(ref){
   document.getElementById('note-modal').classList.add('open');setTimeout(()=>document.getElementById('note-modal-textarea').focus(),100);
 }
 function closeNoteModal(){document.getElementById('note-modal').classList.remove('open');noteModalRef=null;}
-function addNoteTemplate(txt){const ta=document.getElementById('note-modal-textarea');const cur=ta.value.trim();ta.value=cur?cur+' · '+txt:txt;ta.focus();}
 function saveNoteModal(){if(!noteModalRef)return;notes[noteModalRef]=document.getElementById('note-modal-textarea').value.trim();save();closeNoteModal();render();}
 
 // ── Archive ───────────────────────────────────────────────
@@ -1010,7 +937,7 @@ function renderArchiveContent(){
         <div style="display:flex;gap:12px;font-size:10px;color:#64748b;margin-bottom:8px;padding:6px 8px;background:#0f1a2e;border-radius:6px">
           <span>📤 Fwd: ${[...m.urgent,...m.important,...m.normal].filter(a=>forwarded[a.ref]).length}</span>
           <span>📥 Col: ${[...m.urgent,...m.important,...m.normal].filter(a=>collected[a.ref]).length}</span>
-          <span>✅ Del: ${[...m.urgent,...m.important,...m.normal].filter(a=>delivered[a.ref]).length}</span>
+          <span>✓ Del: ${[...m.urgent,...m.important,...m.normal].filter(a=>delivered[a.ref]).length}</span>
         </div>
         <div class="arch-list">${m.urgent.map(a=>archItemHTML(a,'🔴')).join('')}${m.important.map(a=>archItemHTML(a,'⭐')).join('')}${m.normal.map(a=>archItemHTML(a,'·')).join('')}</div>
       </div>`;
@@ -1138,31 +1065,17 @@ async function resetCounts(){
     resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);
   } else {
     clearTimeout(resetTimer);resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');
-    // Starred files from allApps
-    const urgentStarred=allApps.filter(a=>(stars[a.ref]||0)===2).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,phone:a.phone||'',type:'urgent'}));
-    const importantStarred=allApps.filter(a=>(stars[a.ref]||0)===1).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,phone:a.phone||'',type:'important'}));
-    // Manually added history entries not in allApps
-    const starredUrgentRefs=new Set(urgentStarred.map(a=>a.ref));
-    const starredImportantRefs=new Set(importantStarred.map(a=>a.ref));
-    const manualUrgent=(history.urgent||[]).filter(e=>{const ref=(e.match(/([A-Z0-9]{6,})/)||[])[1];return !ref||!starredUrgentRefs.has(ref);}).map(e=>({ref:'',name:e,applyDate:'',phone:'',type:'urgent'}));
-    const manualImportant=(history.important||[]).filter(e=>{const ref=(e.match(/([A-Z0-9]{6,})/)||[])[1];return !ref||!starredImportantRefs.has(ref);}).map(e=>({ref:'',name:e,applyDate:'',phone:'',type:'important'}));
-    const urgentItems=[...urgentStarred,...manualUrgent];
-    const importantItems=[...importantStarred,...manualImportant];
-    // Read actual displayed counts from DOM (source of truth)
-    const displayUrgent=parseInt(document.getElementById('cnt-urgent').textContent)||0;
-    const displayImportant=parseInt(document.getElementById('cnt-important').textContent)||0;
-    const total=displayUrgent+displayImportant;
-    const ok=await showConfirm('কাউন্ট রিসেট করবেন?',`Urgent ${displayUrgent} + Important ${displayImportant} = ${total} file আর্কাইভে (রিসেট ট্যাব) চলে যাবে।`);
+    const urgentItems=allApps.filter(a=>(stars[a.ref]||0)===2).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,phone:a.phone||'',type:'urgent'}));
+    const importantItems=allApps.filter(a=>(stars[a.ref]||0)===1).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,phone:a.phone||'',type:'important'}));
+    const total=urgentItems.length+importantItems.length;
+    const ok=await showConfirm('কাউন্ট রিসেট করবেন?',`Urgent ${urgentItems.length} + Important ${importantItems.length} = ${total} file আর্কাইভে (রিসেট ট্যাব) চলে যাবে।`);
     if(!ok)return;
     if(urgentItems.length||importantItems.length){
       const allItems=[...urgentItems,...importantItems];const dates=allItems.map(a=>a.applyDate).filter(Boolean);let fromDate='';
       if(dates.length){const parsed=dates.map(d=>toInputDate(d)).filter(Boolean).sort();if(parsed.length)fromDate=fromInputDate(parsed[0]);}
-      resetArchive.unshift({id:Date.now(),resetDate:todayStr(),fromDate,urgentItems,importantItems,urgentCount:displayUrgent,importantCount:displayImportant});
+      resetArchive.unshift({id:Date.now(),resetDate:todayStr(),fromDate,urgentItems,importantItems,urgentCount:urgentItems.length,importantCount:importantItems.length});
       localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
     }
-    // Reset stars for starred files
-    urgentStarred.forEach(a=>{stars[a.ref]=0;});
-    importantStarred.forEach(a=>{stars[a.ref]=0;});
     counts={urgent:0,important:0};history={urgent:[],important:[]};save();render();showToast('✅ রিসেট সম্পন্ন');
   }
 }
@@ -1187,19 +1100,6 @@ function matchesFilter(app){
   if(activeFilter==='all')return true;if(activeFilter==='draft')return isDraft;
   if(activeFilter==='1-3')return !isDraft&&num>=1&&num<=3;if(activeFilter==='4-6')return !isDraft&&num>=4&&num<=6;
   if(activeFilter==='7-9')return !isDraft&&num>=7&&num<=9;return true;
-}
-function daysSinceCollected(ref){
-  // Days since the file was collected (from today)
-  if(!collected[ref]||collectedDay[ref]===undefined)return null;
-  // collectedDay stores apply_date days at collection time
-  // We need to track the actual collection date separately
-  const cd=collectedDate[ref];if(!cd)return null;
-  const p=cd.split('-');if(p.length!==3)return null;
-  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const dd=parseInt(p[0]),m=mo.indexOf(p[1]),y=2000+parseInt(p[2]);
-  if(isNaN(dd)||m<0||isNaN(y))return null;
-  const cDate=new Date(y,m,dd),today=new Date();today.setHours(0,0,0,0);
-  const diff=Math.floor((today-cDate)/86400000);return diff>=0?diff:null;
 }
 function daysSince(ds,ref){
   if(collected[ref]&&collectedDay[ref]!==undefined)return collectedDay[ref];
@@ -1233,7 +1133,6 @@ function cardHTML(app){
   const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded;
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const days=(!isDelivered&&showDetails)?daysSince(app.apply_date,app.ref):null;
-  const daysCol=isCol?daysSinceCollected(app.ref):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
@@ -1248,11 +1147,10 @@ function cardHTML(app){
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
   const showPrint=showDetails&&printDate&&!isDelivered;
   const printBadge=showPrint?`<span class="print-badge" onclick="openDateModal('${printDate}','📅','print_date','${app.ref}');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
-  const notePreview=(s>0&&!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>${noteVal}</div>`:'';
+  const notePreview=(s>0&&!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()">📝 ${noteVal}</div>`:'';
   const nameClick=`${s>0?`openNoteModal('${app.ref}');`:''}event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
   const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
-  const colDaySpan=daysCol!==null?`<span class="day-collected" title="Collected থেকে">📥${String(daysCol).padStart(2,'0')}d</span>`:'';
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count
@@ -1278,7 +1176,7 @@ function cardHTML(app){
           ${refHTML} &nbsp;|&nbsp;
           ${calSVG} ${app.apply_date}
           ${policeTagHTML?`&nbsp;${policeTagHTML}`:''}
-          &nbsp;${daySpan}${colDaySpan?'&nbsp;'+colDaySpan:''}
+          &nbsp;${daySpan}
         </div>
         <div class="bottom-row">
           <span class="status ${scls}${shouldBlink?' status-blink':''}" onclick="${statusClick}">${app.status}</span>

@@ -63,7 +63,7 @@
   .cal-title-lbl { font-size: 9px; color: #475569; font-weight: 500; text-transform: uppercase; }
   .cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; text-align: center; font-size: 11px; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
   .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; text-align: center; }
-  .cal-day { padding: 2px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #475569; border: 1px solid transparent; min-height: 36px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 3px; cursor: pointer; }
+  .cal-day { padding: 2px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #475569; border: 1px solid transparent; min-height: 28px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 2px; cursor: pointer; }
   .cal-day:hover { background: #1e293b; }
   .cal-day.has-file { color: #e2e8f0; font-weight: 700; background: #1e3a5f; border-color: #2563eb; }
   .cal-day.today { background: #1d4ed8; color: #fff; font-weight: 700; }
@@ -76,8 +76,8 @@
   .cal-day.national { background: rgba(167,139,250,0.13); border-color: rgba(167,139,250,0.4); color: #f1f5f9; justify-content: center; padding-top: 0; }
   .cal-day.national.has-file { background: rgba(167,139,250,0.2); border-color: #a78bfa; color: #f1f5f9; }
   .cal-day.national.today { background: #3b1f6e; border-color: #a78bfa; color: #fff; }
-  .cal-day.frisat { background: rgba(148,163,184,0.07); border-color: rgba(148,163,184,0.2); color: #64748b; }
-  .cal-day.frisat.has-file { background: #1e3a5f; border-color: #2563eb; color: #e2e8f0; }
+  .cal-day.frisat { color: #7c9cbf; }
+  .cal-day.frisat.has-file { color: #7c9cbf; background: #1e3a5f; border-color: #2563eb; }
   .cal-holiday-badge { font-size: 9px; line-height: 1; margin-top: 1px; text-align: center; flex-shrink: 0; }
   .cal-holiday-badge.public { color: #fb923c; }
   .cal-holiday-badge.national { color: #a78bfa; }
@@ -279,7 +279,7 @@
   </div>
 </div>
 
-<input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম বা Ref খুঁজুন..." oninput="render()">
+<input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম, Ref বা ফোন খুঁজুন..." oninput="render()">
 
 <div class="filter-row">
   <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
@@ -301,7 +301,7 @@
     <div class="cal-title-wrap" id="cal-title-wrap" onclick="toggleCal()"></div>
     <button class="cal-nav" onclick="calNav(1)">›</button>
   </div>
-  <div class="cal-weekdays"><div>রবি</div><div>সোম</div><div>মঙ্গল</div><div>বুধ</div><div>বৃহ</div><div>শুক্র</div><div>শনি</div></div>
+  <div class="cal-weekdays"><div>রবি</div><div>সোম</div><div>মঙ্গল</div><div>বুধ</div><div>বৃহ</div><div style="color:#7c9cbf">শুক্র</div><div style="color:#7c9cbf">শনি</div></div>
   <div class="cal-days" id="cal-days"></div>
 </div>
 
@@ -934,11 +934,10 @@ function renderArchiveContent(){
           ${m.normal.length?`<span class="arch-badge normal">📄 ${m.normal.length}</span>`:''}
           <span class="arch-badge total">Total ${total}</span>
         </div>
-        <div style="display:flex;gap:10px;font-size:10px;color:#475569;margin-bottom:8px;padding:6px 8px;background:#0f1a2e;border-radius:6px">
-          <span>⬆ Fwd: ${[...m.urgent,...m.important,...m.normal].filter(a=>forwarded[a.ref]).length}</span>
-          <span>⬇ Col: ${[...m.urgent,...m.important,...m.normal].filter(a=>collected[a.ref]).length}</span>
+        <div style="display:flex;gap:12px;font-size:10px;color:#64748b;margin-bottom:8px;padding:6px 8px;background:#0f1a2e;border-radius:6px">
+          <span>📤 Fwd: ${[...m.urgent,...m.important,...m.normal].filter(a=>forwarded[a.ref]).length}</span>
+          <span>📥 Col: ${[...m.urgent,...m.important,...m.normal].filter(a=>collected[a.ref]).length}</span>
           <span>✓ Del: ${[...m.urgent,...m.important,...m.normal].filter(a=>delivered[a.ref]).length}</span>
-          <span>📝 Note: ${[...m.urgent,...m.important,...m.normal].filter(a=>notes[a.ref]).length}</span>
         </div>
         <div class="arch-list">${m.urgent.map(a=>archItemHTML(a,'🔴')).join('')}${m.important.map(a=>archItemHTML(a,'⭐')).join('')}${m.normal.map(a=>archItemHTML(a,'·')).join('')}</div>
       </div>`;
@@ -1276,15 +1275,21 @@ function render(){
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
 }
 
+let loadLock=false;
 async function load(){
+  if(loadLock)return;loadLock=true;
   try{
-    await syncFromCloud();
     const r=await fetch('data.json?t='+Date.now());const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
-    allApps=d.applications;
-    try{const ur=await fetch('userdata.json?t='+Date.now());if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
+    // Deduplicate by ref
+    const seen=new Set();
+    allApps=(d.applications||[]).filter(a=>{if(seen.has(a.ref))return false;seen.add(a.ref);return true;});
+    try{const ur=await fetch('userdata.json?t='+Date.now());if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};
+      if(ud.stars)stars={...ud.stars,...stars};
+    }}catch(e){}
     render();
   }catch(e){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
+  finally{loadLock=false;}
 }
 load();
 setInterval(load,30000);

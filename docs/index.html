@@ -1379,16 +1379,11 @@ function render(){
 
 async function load(){
   try{
-    const r=await fetch('data.json?t='+Date.now());
-    const d=await r.json();
+    await syncFromCloud();
+    const r=await fetch('data.json?t='+Date.now());const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
-    // Deduplicate by ref to prevent double display
-    const seen=new Set();
-    allApps=(d.applications||[]).filter(a=>{if(seen.has(a.ref))return false;seen.add(a.ref);return true;});
-    try{
-      const ur=await fetch('userdata.json?t='+Date.now());
-      if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}
-    }catch(e){}
+    allApps=d.applications;
+    try{const ur=await fetch('userdata.json?t='+Date.now());if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
     render();
   }catch(e){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
 }

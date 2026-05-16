@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -234,6 +235,8 @@
   .web-btn { width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; border: 1px solid #2563eb; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; text-decoration: none; }
   .counts-wrap { display: flex; align-items: flex-start; gap: 6px; flex-shrink: 0; }
   .reset-btn { width: 14px; height: 14px; border-radius: 50%; background: #0f1f3d; border: 1px solid #1e3a5f; color: #334155; font-size: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.3; margin-top: 2px; }
+  body.light .reset-btn { background: #e2e8f0; border-color: #94a3b8; color: #475569; opacity: 0.6; }
+  body.light .reset-btn.confirm { background: #fef2f2; border-color: #ef4444; color: #ef4444; opacity: 1; }
   .reset-btn.confirm { background: #7f1d1d; border-color: #ef4444; color: #ef4444; opacity: 1; }
   .counts { text-align: right; font-size: 11px; line-height: 1.7; font-weight: 700; }
   .counts .urgent { color: #ef4444; cursor: pointer; white-space: nowrap; }
@@ -248,6 +251,7 @@
   .icon-filter-btn.police { border-color: #a78bfa; background: #1e1a3a; margin-left: auto; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
   .icon-filter-btn.archive-btn { border-color: #334155; background: #1e293b; }
+  body.light .icon-filter-btn.archive-btn { background: #f1f5f9; border-color: #cbd5e1; }
 
   /* Live dot */
   @keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
@@ -272,6 +276,8 @@
   .cal-nav { background: #1e293b; border: 1px solid #334155; color: #94a3b8; border-radius: 6px; padding: 2px 10px; cursor: pointer; font-size: 14px; }
   .cal-title-wrap { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
   .cal-title-text { font-size: 13px; font-weight: 700; color: #7dd3fc; }
+  body.light .cal-title-text { color: #1d4ed8; }
+  body.light .cal-title-wrap span[style*="color:#f1f5f9"] { color: #1e293b !important; }
   .cal-title-lbl { font-size: 9px; color: #475569; font-weight: 500; text-transform: uppercase; }
   .cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; text-align: center; font-size: 11px; color: #94a3b8; margin-bottom: 6px; font-weight: 600; }
   .cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; text-align: center; }
@@ -371,6 +377,9 @@
   .arch-badge.important { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
   .arch-badge.normal { background: rgba(96,165,250,0.1); color: #60a5fa; border: 1px solid rgba(96,165,250,0.2); }
   .arch-badge.total { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+  body.light .arch-badge.total { background: #e2e8f0; color: #475569; border-color: #cbd5e1; }
+  body.light .arch-badge.normal { background: rgba(37,99,235,0.1); color: #1d4ed8; border-color: rgba(37,99,235,0.3); }
+  body.amoled .arch-badge.total { background: #111; color: #64748b; border-color: #222; }
   .arch-badge.deleted { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
   .arch-list { display: flex; flex-direction: column; gap: 2px; max-height: 180px; overflow-y: auto; }
   .arch-item { display: flex; align-items: center; gap: 5px; padding: 4px 0; border-bottom: 1px solid rgba(30,41,59,0.6); font-size: 11px; }
@@ -457,6 +466,28 @@
   .expand-toggle.open{background:rgba(250,204,21,0.6);height:2px}
   .loading{text-align:center;padding:40px;color:#475569}
   #toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+
+  /* Archive summary bar — theme-aware */
+  .arch-sum-bar { display:flex;gap:12px;font-size:10px;color:#64748b;margin-bottom:8px;padding:6px 8px;background:#0f1a2e;border-radius:6px; }
+  body.light .arch-sum-bar { background:#e2e8f0;color:#475569; }
+  body.amoled .arch-sum-bar { background:#050505;color:#475569; }
+  /* Search highlight */
+  .search-hl { background:rgba(251,191,36,0.35);border-radius:2px;color:inherit;font-weight:700; }
+  body.light .search-hl { background:rgba(234,179,8,0.3); }
+  body.amoled .search-hl { background:rgba(251,191,36,0.2); }
+  /* Collected day span */
+  .day-collected { color:#34d399;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0; }
+  body.light .day-collected { color:#16a34a; }
+  /* Tap highlight fix */
+  button,a { -webkit-tap-highlight-color:transparent;outline:none; }
+  /* Theme toggle */
+  .theme-row { display:flex;gap:5px;margin-bottom:16px; }
+  .theme-opt { flex:1;padding:7px 2px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#64748b;font-size:10px;font-weight:600;cursor:pointer;text-align:center; }
+  .theme-opt.active { border-color:#2563eb;background:#1e3a5f;color:#60a5fa; }
+  body.light .theme-opt { background:#f1f5f9;border-color:#cbd5e1;color:#64748b; }
+  body.light .theme-opt.active { background:#dbeafe;border-color:#2563eb;color:#1d4ed8; }
+  body.amoled .theme-opt { background:#0a0a0a;border-color:#1a1a1a;color:#475569; }
+  body.amoled .theme-opt.active { background:#001433;border-color:#2563eb;color:#60a5fa; }
 </style>
 </head>
 <body>
@@ -610,6 +641,7 @@
       <button class="note-tpl-btn" onclick="addNoteTemplate('ওয়েট ফর কনফার্মেশন')">ওয়েট ফর কনফার্মেশন</button>
       <button class="note-tpl-btn" onclick="addNoteTemplate('মামলা সনাক্ত হয়েছে')">মামলা সনাক্ত হয়েছে</button>
       <button class="note-tpl-btn" onclick="addNoteTemplate('নিষ্পত্তির অপেক্ষায়')">নিষ্পত্তির অপেক্ষায়</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate('ঠিকানার ডকুমেন্ট')">ঠিকানার ডকুমেন্ট</button>
     </div>
     <textarea class="note-modal-textarea" id="note-modal-textarea" placeholder="নোট লিখুন..."></textarea>
     <div style="display:flex">
@@ -760,6 +792,7 @@ let history=JSON.parse(localStorage.getItem('pcc_history')||'{"urgent":[],"impor
 let forwarded=JSON.parse(localStorage.getItem('pcc_forwarded')||'{}');
 let collected=JSON.parse(localStorage.getItem('pcc_collected')||'{}');
 let collectedDay=JSON.parse(localStorage.getItem('pcc_collected_day')||'{}');
+let collectedDate=JSON.parse(localStorage.getItem('pcc_collected_date')||'{}');
 let manualPrintDates=JSON.parse(localStorage.getItem('pcc_manual_print_dates')||'{}');
 let expandedNormal=new Set(JSON.parse(localStorage.getItem('pcc_expanded_normal')||'[]'));
 let resetArchive=JSON.parse(localStorage.getItem('pcc_reset_archive')||'[]');
@@ -849,6 +882,7 @@ function saveLocal(){
   localStorage.setItem('pcc_forwarded',JSON.stringify(forwarded));
   localStorage.setItem('pcc_collected',JSON.stringify(collected));
   localStorage.setItem('pcc_collected_day',JSON.stringify(collectedDay));
+  localStorage.setItem('pcc_collected_date',JSON.stringify(collectedDate));
   localStorage.setItem('pcc_manual_print_dates',JSON.stringify(manualPrintDates));
   localStorage.setItem('pcc_expanded_normal',JSON.stringify([...expandedNormal]));
   localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
@@ -863,7 +897,7 @@ function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=s
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
   try{
-    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,manualPrintDates,resetArchive,calNotes};
+    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes};
     const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
     let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
@@ -885,7 +919,7 @@ async function syncFromCloud(){
     if(d.showDeu)showDeu=d.showDeu;if(d.notes)notes=d.notes;if(d.blinkStopped)blinkStopped=d.blinkStopped;
     if(d.policeTags)policeTags=d.policeTags;if(d.clientNames)clientNames=d.clientNames;
     if(d.counts)counts=d.counts;if(d.history)history=d.history;
-    if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;
+    if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;if(d.collectedDate)collectedDate=d.collectedDate;
     if(d.manualPrintDates)manualPrintDates=d.manualPrintDates;
     if(d.resetArchive)resetArchive=d.resetArchive;if(d.calNotes)calNotes=d.calNotes;
     saveLocal();
@@ -933,10 +967,11 @@ function stagePressStart(e,ref){
   const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.add('pressing');
   const isCol=collected[ref]||false,isFwd=forwarded[ref]||false;const stage=isCol?2:isFwd?1:0;
   stageTimer[ref]=setTimeout(()=>{
+    haptic(40);
     if(btn)btn.classList.remove('pressing');
     if(stage===0){forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↑ Forwarded');}
-    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);save();render();showToast('↓ Collected');}
-    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↺ Reset');}
+    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);collectedDate[ref]=todayStr();save();render();showToast('↓ Collected');}
+    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];delete collectedDate[ref];save();render();showToast('↺ Reset');}
   },stage===2?2000:600);
 }
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
@@ -1055,7 +1090,7 @@ function openDateModal(dateStr,prefix,sourceField,editRef){
   const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>getEffectivePrintDate(a.ref)===dateStr);
   const dateLine=document.getElementById('date-modal-date-line');const pickerWrap=document.getElementById('date-picker-inline');
   document.getElementById('date-modal-date-text').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
-  if(sourceField==='print_date'){dateLine.style.cursor='pointer';pickerWrap.style.display='none';document.getElementById('inline-date-picker').value=toInputDate(dateStr);}
+  if(sourceField==='print_date'){dateLine.style.cursor='pointer';pickerWrap.style.display='none';document.getElementById('inline-date-picker').value=toInputDate(dateStr);}else{dateLine.style.cursor='default';}
   else{dateLine.style.cursor='default';pickerWrap.style.display='none';}
   const getStarIcon=s=>s===2?'🔴':s===1?'⭐':'';
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
@@ -1199,7 +1234,7 @@ function renderArchiveContent(){
           ${m.normal.length?`<span class="arch-badge normal">📄 ${m.normal.length}</span>`:''}
           <span class="arch-badge total">Total ${total}</span>
         </div>
-        <div style="display:flex;gap:12px;font-size:10px;color:#64748b;margin-bottom:8px;padding:6px 8px;background:#0f1a2e;border-radius:6px">
+        <div class="arch-sum-bar">
           <span>📤 Fwd: ${[...m.urgent,...m.important,...m.normal].filter(a=>forwarded[a.ref]).length}</span>
           <span>📥 Col: ${[...m.urgent,...m.important,...m.normal].filter(a=>collected[a.ref]).length}</span>
           <span>✅ Del: ${[...m.urgent,...m.important,...m.normal].filter(a=>delivered[a.ref]).length}</span>
@@ -1380,6 +1415,95 @@ function matchesFilter(app){
   if(activeFilter==='1-3')return !isDraft&&num>=1&&num<=3;if(activeFilter==='4-6')return !isDraft&&num>=4&&num<=6;
   if(activeFilter==='7-9')return !isDraft&&num>=7&&num<=9;return true;
 }
+// ── Helpers ──────────────────────────────────────────────
+function haptic(ms=30){try{navigator.vibrate&&navigator.vibrate(ms);}catch(e){}}
+
+function hlText(str,q){
+  if(!q)return str;
+  const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\]/g,'\$&')+')','gi');
+  return str.replace(re,'<mark class="search-hl">$1</mark>');
+}
+
+function addDaysToStr(ds,n){
+  // ds: dd-Mon-yy, returns dd-Mon-yy
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const p=ds.toUpperCase().split('-');if(p.length!==3)return ds;
+  const MO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const d=new Date(2000+parseInt(p[2]),MO.indexOf(p[1]),parseInt(p[0]));
+  d.setDate(d.getDate()+n);
+  return String(d.getDate()).padStart(2,'0')+'-'+mo[d.getMonth()]+'-'+String(d.getFullYear()).slice(2);
+}
+
+function daysSinceStr(ds){
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const p=ds.toUpperCase().split('-');if(p.length!==3)return null;
+  const d=new Date(2000+parseInt(p[2]),MO.indexOf(p[1]),parseInt(p[0]));
+  const today=new Date();today.setHours(0,0,0,0);
+  return Math.floor((today-d)/86400000);
+}
+
+// Day count click popup
+function openDayPopup(ref,days,star){
+  const app=allApps.find(a=>a.ref===ref);if(!app)return;
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let html='';
+  if(star===2||star===1){
+    // Urgent: 7 days, Important: 14 days
+    const limit=star===2?7:14;
+    const expDate=addDaysToStr(app.apply_date,limit);
+    const remaining=limit-days;
+    const color=star===2?'#ef4444':'#f59e0b';
+    const icon=star===2?'🔴':'⭐';
+    const statusTxt=remaining>0
+      ?`<span style="color:${color};font-weight:700">${remaining} দিন বাকি</span>`
+      :`<span style="color:#ef4444;font-weight:700">⚠️ ${Math.abs(remaining)} দিন পার</span>`;
+    html=`<div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#f1f5f9">${icon} ${app.name}</div>
+      <div style="font-size:12px;line-height:2.2;color:#94a3b8">
+        আবেদন: <b style="color:#f1f5f9">${app.apply_date}</b><br>
+        অতিবাহিত: <b style="color:#f1f5f9">${days} দিন</b><br>
+        সীমা: ${limit} দিন &nbsp;|&nbsp; ${statusTxt}<br>
+        সম্ভাব্য ডেলিভারি: <b style="color:${color}">${expDate}</b>
+      </div>`;
+  } else {
+    // Normal: police call at 12d, delivery at 24d
+    const callDate=addDaysToStr(app.apply_date,12);
+    const delivDate=addDaysToStr(app.apply_date,24);
+    const daysToCall=12-days;const daysToDel=24-days;
+    html=`<div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#f1f5f9">📄 ${app.name}</div>
+      <div style="font-size:12px;line-height:2.2;color:#94a3b8">
+        আবেদন: <b style="color:#f1f5f9">${app.apply_date}</b><br>
+        অতিবাহিত: <b style="color:#f1f5f9">${days} দিন</b><br>
+        সম্ভাব্য পুলিশ কল: <b style="color:#a78bfa">${callDate}</b>
+        ${daysToCall>0?`<span style="color:#64748b;font-size:10px"> (${daysToCall}d বাকি)</span>`:`<span style="color:#ef4444;font-size:10px"> (পার হয়েছে)</span>`}<br>
+        সম্ভাব্য ডেলিভারি: <b style="color:#34d399">${delivDate}</b>
+        ${daysToDel>0?`<span style="color:#64748b;font-size:10px"> (${daysToDel}d বাকি)</span>`:`<span style="color:#ef4444;font-size:10px"> (পার হয়েছে)</span>`}
+      </div>`;
+  }
+  document.getElementById('confirm-msg').innerHTML=html;
+  const btns=document.getElementById('confirm-modal').querySelector('.confirm-btns');
+  btns.innerHTML='<button class="confirm-ok" onclick="confirmCancel()" style="width:100%">ঠিক আছে</button>';
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+// Theme system
+let themeMode=localStorage.getItem('pcc_theme')||'system';
+const _sysDark=window.matchMedia('(prefers-color-scheme: dark)');
+function _applyTheme(){
+  const isDark=themeMode==='dark'||themeMode==='amoled'||(themeMode==='system'&&_sysDark.matches);
+  document.body.classList.toggle('light',!isDark);
+  document.body.classList.toggle('amoled',themeMode==='amoled');
+  ['system','light','dark','amoled'].forEach(m=>{
+    const el=document.getElementById('theme-'+m);
+    if(el)el.classList.toggle('active',m===themeMode);
+  });
+}
+function setTheme(m){themeMode=m;localStorage.setItem('pcc_theme',m);_applyTheme();}
+_sysDark.addEventListener('change',_applyTheme);
+let _lastSys=_sysDark.matches;
+setInterval(()=>{if(themeMode==='system'&&_sysDark.matches!==_lastSys){_lastSys=_sysDark.matches;_applyTheme();}},1000);
+_applyTheme();
+
 function daysSince(ds,ref){
   if(collected[ref]&&collectedDay[ref]!==undefined)return collectedDay[ref];
   try{
@@ -1412,6 +1536,7 @@ function cardHTML(app){
   const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded;
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const days=(!isDelivered&&showDetails)?daysSince(app.apply_date,app.ref):null;
+  const daysCol=(isCol&&collectedDate[app.ref])?daysSinceStr(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
@@ -1429,7 +1554,8 @@ function cardHTML(app){
   const notePreview=(s>0&&!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>${noteVal}</div>`:'';
   const nameClick=`${s>0?`openNoteModal('${app.ref}');`:''}event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
-  const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
+  const daySpan=days?`<span class="${dayClass}" onclick="openDayPopup('${app.ref}',${days},${s});event.stopPropagation()" style="cursor:pointer">Day:${String(days).padStart(2,'0')}</span>`:'';
+  const colDaySpan=daysCol!==null?`<span class="day-collected">📥${String(daysCol).padStart(2,'0')}d</span>`:'';
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count
@@ -1448,14 +1574,14 @@ function cardHTML(app){
         ontouchcancel="pressEnd('${app.ref}')"
         onclick="handleTap('${app.ref}')">
         <div class="card-top">
-          <div class="name" onclick="${nameClick}">${app.name}</div>
+          <div class="name" onclick="${nameClick}">${app._hl?hlText(app.name,app._hl):app.name}</div>
           <div class="card-top-right">${stageBtn}<button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${si}</button></div>
         </div>
         <div class="info">
           ${refHTML} &nbsp;|&nbsp;
-          ${calSVG} ${app.apply_date}
+          <span onclick="openDateModal('${app.apply_date}','📅','apply_date','');event.stopPropagation()" style="cursor:pointer;display:inline-flex;align-items:center;gap:2px">${calSVG} ${app.apply_date}</span>
           ${policeTagHTML?`&nbsp;${policeTagHTML}`:''}
-          &nbsp;${daySpan}
+          &nbsp;${daySpan}${colDaySpan?'&nbsp;'+colDaySpan:''}
         </div>
         <div class="bottom-row">
           <span class="status ${scls}${shouldBlink?' status-blink':''}" onclick="${statusClick}">${app.status}</span>
@@ -1480,23 +1606,24 @@ function swipeMove(e,ref){
   if(dx>30&&hr)hr.style.opacity=Math.min(1,dx/80);else if(hr)hr.style.opacity=0;
 }
 async function swipeEnd(e,ref){
+  const _dx=e.changedTouches[0].clientX-touchStartX[ref];
   if(!touching[ref])return;touching[ref]=false;
-  const dx=e.changedTouches[0].clientX-touchStartX[ref];
+  const dx=_dx;
   const card=document.getElementById('card-'+ref);const hl=document.getElementById('hint-left-'+ref),hr=document.getElementById('hint-right-'+ref);
   if(card){card.style.transition='transform 0.2s ease';card.style.transform='';}
   if(hl)hl.style.opacity=0;if(hr)hr.style.opacity=0;if(selectMode)return;
-  if(dx<-80){
+  if(dx<-80){haptic(40);
     // Block delivery if collected + Due code present
     if(collected[ref]&&codes[ref]&&!delivered[ref]){showToast('⚠️ Due code মুছুন আগে Delivered করুন');return;}
     const s=stars[ref]||0;
     if(s>0&&!delivered[ref]){const ok=await showConfirm('Delivered করবেন?');if(!ok)return;}
     delivered[ref]=!delivered[ref];if(delivered[ref])showDeu[ref]=false;save();render();
-  } else if(dx>80){
+  } else if(dx>80){haptic(30);
     if(!delivered[ref]){showDeu[ref]=!showDeu[ref];if(showDeu[ref])editingDeu[ref]=true;save();render();if(showDeu[ref])setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}
   }
 }
 let pressTimer={};
-function pressStart(ref){pressTimer[ref]=setTimeout(()=>{toggleSelect(ref);},600);}
+function pressStart(ref){pressTimer[ref]=setTimeout(()=>{haptic(50);toggleSelect(ref);},600);}
 function pressEnd(ref){clearTimeout(pressTimer[ref]);}
 function handleTap(ref){if(selectMode)toggleSelect(ref);}
 
@@ -1506,8 +1633,10 @@ function render(){
   const displayApps=getDisplayApps().filter(a=>{
     if(!matchesFilter(a))return false;
     if(q&&!a.name.toLowerCase().includes(q)&&!a.ref.toLowerCase().includes(q)&&!(policeTags[a.ref]||'').toLowerCase().includes(q)&&!(a.phone||'').includes(q))return false;
+    a._hl=q||'';
     return true;
   });
+  if(!q)displayApps.forEach(a=>a._hl='');
   const star2=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2);
   const star1=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1);
   const normal=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);

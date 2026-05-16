@@ -1586,9 +1586,8 @@ function swipeMove(e,ref){
   if(dx>30&&hr)hr.style.opacity=Math.min(1,dx/80);else if(hr)hr.style.opacity=0;
 }
 async function swipeEnd(e,ref){
-  const _dx=e.changedTouches[0].clientX-touchStartX[ref];
   if(!touching[ref])return;touching[ref]=false;
-  const dx=_dx;
+  const dx=e.changedTouches[0].clientX-touchStartX[ref];
   const card=document.getElementById('card-'+ref);const hl=document.getElementById('hint-left-'+ref),hr=document.getElementById('hint-right-'+ref);
   if(card){card.style.transition='transform 0.2s ease';card.style.transform='';}
   if(hl)hl.style.opacity=0;if(hr)hr.style.opacity=0;if(selectMode)return;

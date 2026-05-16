@@ -1071,8 +1071,7 @@ function openDateModal(dateStr,prefix,sourceField,editRef){
   const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>getEffectivePrintDate(a.ref)===dateStr);
   const dateLine=document.getElementById('date-modal-date-line');const pickerWrap=document.getElementById('date-picker-inline');
   document.getElementById('date-modal-date-text').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
-  if(sourceField==='print_date'){dateLine.style.cursor='pointer';pickerWrap.style.display='none';document.getElementById('inline-date-picker').value=toInputDate(dateStr);}else{dateLine.style.cursor='default';}
-  else{dateLine.style.cursor='default';pickerWrap.style.display='none';}
+  if(sourceField==='print_date'){dateLine.style.cursor='pointer';pickerWrap.style.display='none';document.getElementById('inline-date-picker').value=toInputDate(dateStr);}else{dateLine.style.cursor='default';pickerWrap.style.display='none';}
   const getStarIcon=s=>s===2?'🔴':s===1?'⭐':'';
   document.getElementById('date-modal-list').innerHTML=same.map(a=>{
     const n=parseInt((a.status||'').split('/')[0])||0;const sc='s'+Math.min(n,10);

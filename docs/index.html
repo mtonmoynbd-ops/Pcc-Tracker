@@ -933,26 +933,7 @@ function openSettings(){
 }
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 
-// ── Theme ──
-let themeMode=localStorage.getItem('pcc_theme')||'system';
-const _sysDark=window.matchMedia('(prefers-color-scheme: dark)');
-function _applyTheme(){
-  const isDark=themeMode==='dark'||themeMode==='amoled'||(themeMode==='system'&&_sysDark.matches);
-  document.body.classList.toggle('light',!isDark);
-  document.body.classList.toggle('amoled',themeMode==='amoled');
-  ['system','light','dark','amoled'].forEach(m=>{
-    const el=document.getElementById('theme-'+m);
-    if(el)el.classList.toggle('active',m===themeMode);
-  });
-}
-function setTheme(m){themeMode=m;localStorage.setItem('pcc_theme',m);_applyTheme();}
-// Listen for system theme change (works on most browsers)
-_sysDark.addEventListener('change',_applyTheme);
-// Fallback poll for Android WebView which may not fire the event
-let _lastSysDark=_sysDark.matches;
-setInterval(()=>{if(themeMode==='system'&&_sysDark.matches!==_lastSysDark){_lastSysDark=_sysDark.matches;_applyTheme();}},1000);
-['system','light','dark','amoled'].forEach(m=>{const el=document.getElementById('theme-'+m);if(el)el.classList.toggle('active',m===themeMode);});
-_applyTheme();
+// theme handled below
 async function savePAT(){
   const pat=document.getElementById('pat-input').value.trim();
   if(pat)localStorage.setItem('pcc_pat',pat);else localStorage.removeItem('pcc_pat');

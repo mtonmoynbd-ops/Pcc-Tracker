@@ -1,8 +1,7 @@
 
 <!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="UTF-8">
+<html lang="bn"><head><meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PCC Tracker</title>
 <style>
@@ -497,10 +496,10 @@
 
 <svg style="display:none">
   <symbol id="ico-archive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+    <polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line>
   </symbol>
   <symbol id="ico-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    <rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
   </symbol>
 </svg>
 
@@ -511,8 +510,8 @@
       <h1 onclick="manualRefresh()" title="ট্যাপ করে Refresh করুন">
         PCC Tracker
         <svg id="refresh-spin" class="title-refresh-ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          <polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
         </svg>
       </h1>
       <div class="updated" id="updated">লোড হচ্ছে...<span class="backup-dot" id="backup-dot"></span></div>
@@ -522,8 +521,8 @@
   <div class="counts-wrap">
     <button class="reset-btn" id="reset-btn" onclick="resetCounts()">R</button>
     <div class="counts">
-      <div class="urgent" onclick="openModal('urgent')">Urgent: <span id="cnt-urgent">00</span></div>
-      <div class="important" onclick="openModal('important')">Important: <span id="cnt-important">00</span></div>
+      <div class="urgent" onclick="openModal(&#39;urgent&#39;)">Urgent: <span id="cnt-urgent">00</span></div>
+      <div class="important" onclick="openModal(&#39;important&#39;)">Important: <span id="cnt-important">00</span></div>
     </div>
   </div>
 </div>
@@ -531,16 +530,16 @@
 <input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম, Ref বা ফোন খুঁজুন..." oninput="render()">
 
 <div class="filter-row">
-  <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-  <button class="filter-btn" onclick="setFilter('1-3',this)">1-3</button>
-  <button class="filter-btn" onclick="setFilter('4-6',this)">4-6</button>
-  <button class="filter-btn" onclick="setFilter('7-9',this)">7-9</button>
-  <button class="filter-btn" id="draft-btn" onclick="setFilter('draft',this)">Draft</button>
+  <button class="filter-btn active" onclick="setFilter(&#39;all&#39;,this)">All</button>
+  <button class="filter-btn" onclick="setFilter(&#39;1-3&#39;,this)">1-3</button>
+  <button class="filter-btn" onclick="setFilter(&#39;4-6&#39;,this)">4-6</button>
+  <button class="filter-btn" onclick="setFilter(&#39;7-9&#39;,this)">7-9</button>
+  <button class="filter-btn" id="draft-btn" onclick="setFilter(&#39;draft&#39;,this)">Draft</button>
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <span style="font-size:13px">🏷️</span>
   </button>
   <button class="icon-filter-btn archive-btn" onclick="openArchive()">
-    <svg width="16" height="16"><use href="#ico-archive" stroke="#60a5fa"/></svg>
+    <svg width="16" height="16"><use href="#ico-archive" stroke="#60a5fa"></use></svg>
   </button>
 </div>
 
@@ -554,7 +553,7 @@
   <div class="cal-days" id="cal-days"></div>
 </div>
 
-<div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
+<div id="list"><div class="loading">❌ লোড হয়নি</div></div>
 <button class="client-name-bottom-btn" onclick="openClientModal()">🏷️ Add Clients</button>
 <div id="toast"></div>
 
@@ -584,7 +583,7 @@
       <button class="adj-btn" onclick="adjustCount(-1)">−</button>
       <div class="adj-num" id="modal-count">0</div>
       <button class="adj-btn" onclick="adjustCount(1)">+</button>
-      <input class="modal-add-input" id="modal-add-input" type="text" placeholder="নাম রেফ..." onkeydown="if(event.key==='Enter')addModalEntry()">
+      <input class="modal-add-input" id="modal-add-input" type="text" placeholder="নাম রেফ..." onkeydown="if(event.key===&#39;Enter&#39;)addModalEntry()">
       <button class="modal-add-btn" onclick="addModalEntry()">+</button>
       <button class="modal-copy-btn" onclick="copyModalList()">📋</button>
     </div>
@@ -627,7 +626,7 @@
     <textarea class="note-modal-textarea" id="client-note-textarea" placeholder="এই ক্লায়েন্ট সম্পর্কে নোট লিখুন..."></textarea>
     <div style="display:flex;gap:8px">
       <button class="note-modal-save" onclick="saveClientNoteFromModal()">সংরক্ষণ</button>
-      <button class="note-modal-clear" onclick="document.getElementById('client-note-textarea').value=''">মুছুন</button>
+      <button class="note-modal-clear" onclick="document.getElementById(&#39;client-note-textarea&#39;).value=&#39;&#39;">মুছুন</button>
     </div>
   </div>
 </div>
@@ -643,24 +642,24 @@
   <div class="modal-box">
     <div class="modal-title">
       <div style="display:flex;align-items:center;gap:6px">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         <span id="note-modal-title"></span>
       </div>
       <button class="modal-close" onclick="closeNoteModal()">✕</button>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
       <div style="font-size:9px;color:#475569;width:100%;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">টেমপ্লেট</div>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('মামলা ম্যাচ করছে')">মামলা ম্যাচ করছে</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('ডকুমেন্ট অসম্পূর্ণ')">ডকুমেন্ট অসম্পূর্ণ</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('ওয়েট ফর কনফার্মেশন')">ওয়েট ফর কনফার্মেশন</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('মামলা সনাক্ত হয়েছে')">মামলা সনাক্ত হয়েছে</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('নিষ্পত্তির অপেক্ষায়')">নিষ্পত্তির অপেক্ষায়</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate('ঠিকানার ডকুমেন্ট')">ঠিকানার ডকুমেন্ট</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;মামলা ম্যাচ করছে&#39;)">মামলা ম্যাচ করছে</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ডকুমেন্ট অসম্পূর্ণ&#39;)">ডকুমেন্ট অসম্পূর্ণ</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েট ফর কনফার্মেশন&#39;)">ওয়েট ফর কনফার্মেশন</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;মামলা সনাক্ত হয়েছে&#39;)">মামলা সনাক্ত হয়েছে</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;নিষ্পত্তির অপেক্ষায়&#39;)">নিষ্পত্তির অপেক্ষায়</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ঠিকানার ডকুমেন্ট&#39;)">ঠিকানার ডকুমেন্ট</button>
     </div>
     <textarea class="note-modal-textarea" id="note-modal-textarea" placeholder="নোট লিখুন..."></textarea>
     <div style="display:flex">
       <button class="note-modal-save" onclick="saveNoteModal()">সংরক্ষণ</button>
-      <button class="note-modal-clear" onclick="document.getElementById('note-modal-textarea').value=''">মুছুন</button>
+      <button class="note-modal-clear" onclick="document.getElementById(&#39;note-modal-textarea&#39;).value=&#39;&#39;">মুছুন</button>
     </div>
   </div>
 </div>
@@ -669,9 +668,9 @@
   <div class="modal-box" style="max-width:400px">
     <div class="modal-title"><span>📦 আর্কাইভ</span><button class="modal-close" onclick="closeArchive()">✕</button></div>
     <div class="arch-tabs">
-      <button class="arch-tab active" id="arch-tab-month" onclick="setArchTab('month')">মাস</button>
-      <button class="arch-tab" id="arch-tab-reset" onclick="setArchTab('reset')">রিসেট</button>
-      <button class="arch-tab" id="arch-tab-deleted" onclick="setArchTab('deleted')">মুছে ফেলা</button>
+      <button class="arch-tab active" id="arch-tab-month" onclick="setArchTab(&#39;month&#39;)">মাস</button>
+      <button class="arch-tab" id="arch-tab-reset" onclick="setArchTab(&#39;reset&#39;)">রিসেট</button>
+      <button class="arch-tab" id="arch-tab-deleted" onclick="setArchTab(&#39;deleted&#39;)">মুছে ফেলা</button>
     </div>
     <div class="arch-filter-wrap" id="arch-filter-wrap"></div>
     <div id="arch-content"></div>
@@ -689,8 +688,8 @@
   <div class="modal-box">
     <div class="modal-title">🏷️ Add Clients<button class="modal-close" onclick="closeClientModal()">✕</button></div>
     <div class="client-add-row">
-      <input class="client-add-input" id="client-add-input" type="text" placeholder="ক্লায়েন্ট নাম..." onkeydown="if(event.key==='Enter')document.getElementById('client-add-phone').focus()">
-      <input class="client-add-input" id="client-add-phone" type="tel" placeholder="ফোন নম্বর..." style="margin-top:6px" onkeydown="if(event.key==='Enter')addClientName()">
+      <input class="client-add-input" id="client-add-input" type="text" placeholder="ক্লায়েন্ট নাম..." onkeydown="if(event.key===&#39;Enter&#39;)document.getElementById(&#39;client-add-phone&#39;).focus()">
+      <input class="client-add-input" id="client-add-phone" type="tel" placeholder="ফোন নম্বর..." style="margin-top:6px" onkeydown="if(event.key===&#39;Enter&#39;)addClientName()">
       <button class="client-add-btn" onclick="addClientName()" style="margin-top:6px">+ যোগ</button>
     </div>
     <div class="client-name-list" id="client-name-list"></div>
@@ -727,15 +726,15 @@
     <div class="modal-title">🛡️ Settings<button class="modal-close" onclick="closeSettings()">✕</button></div>
     <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">থিম</div>
     <div class="theme-row">
-      <button class="theme-opt" id="theme-system" onclick="setTheme('system')">⚙️ System</button>
-      <button class="theme-opt" id="theme-light" onclick="setTheme('light')">☀️ Light</button>
-      <button class="theme-opt" id="theme-dark" onclick="setTheme('dark')">🌙 Dark</button>
-      <button class="theme-opt" id="theme-amoled" onclick="setTheme('amoled')">⚫ AMOLED</button>
+      <button class="theme-opt" id="theme-system" onclick="setTheme(&#39;system&#39;)">⚙️ System</button>
+      <button class="theme-opt" id="theme-light" onclick="setTheme(&#39;light&#39;)">☀️ Light</button>
+      <button class="theme-opt" id="theme-dark" onclick="setTheme(&#39;dark&#39;)">🌙 Dark</button>
+      <button class="theme-opt" id="theme-amoled" onclick="setTheme(&#39;amoled&#39;)">⚫ AMOLED</button>
     </div>
     <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-bottom:4px">
       <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
       <input class="settings-input" type="password" id="pat-input" placeholder="GitHub PAT (ghp_xxx...)">
-      <button class="settings-save-btn" onclick="savePAT()">Save & Backup</button>
+      <button class="settings-save-btn" onclick="savePAT()">Save &amp; Backup</button>
       <div id="settings-status" style="font-size:11px;color:#475569;margin-top:10px"></div>
     </div>
   </div>
@@ -1646,13 +1645,13 @@ function cardHTML(app){
   const num=parseInt((app.status||'').split('/')[0])||0;const scls='s'+Math.min(num,10);
   const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded;
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
+  const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
+  const stage=isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':'✅';const stageCls=stage===0?'':stage===1?'fwd':'col';
   const days=(!isDelivered&&showDetails)?daysSince(app.apply_date,app.ref):null;
   const daysCol=(isCol&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
-  const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
-  const stage=isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':'✅';const stageCls=stage===0?'':stage===1?'fwd':'col';
   // Due code + collected → blink
   const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
   let dayClass='day-normal';
@@ -1818,5 +1817,5 @@ load();
 setInterval(load,30000);
 setInterval(()=>syncFromCloud().catch(()=>{}),300000);
 </script>
-</body>
-</html>
+
+</body></html>

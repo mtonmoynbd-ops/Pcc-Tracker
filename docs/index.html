@@ -263,7 +263,11 @@
   .section-count.urgent-count { color: #ef4444; }
   .section-count.important-count { color: #f59e0b; }
   /* Date chip — same size as cal heading, live dot RIGHT */
-  .section-date-chip { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; flex: 1; justify-content: center; padding: 2px 0; }
+  .section-date-chip { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; flex: 1; justify-content: flex-start; padding: 2px 0; padding-left: 4px; }
+  .ready-chip { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid #22c55e; color: #22c55e; cursor: pointer; flex-shrink: 0; margin-left: 4px; }
+  @keyframes ready-blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .ready-chip { animation: ready-blink 1.2s ease-in-out infinite; }
+  body.light .ready-chip { border-color: #16a34a; color: #16a34a; }
   .section-date-chip .today-lbl { font-size: 9px; color: #475569; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
   .section-date-chip .today-date-txt { font-size: 13px; color: #7dd3fc; font-weight: 700; }
 
@@ -443,6 +447,35 @@
   .day-normal { color: #60a5fa; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
   .day-warn-urgent { color: #ef4444; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
   .day-warn-important { color: #f97316; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+  .day-collected { color: #34d399; font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+  body.light .day-collected { color: #16a34a; }
+  .search-hl { background: rgba(251,191,36,0.35); border-radius: 2px; color: inherit; font-weight: 700; }
+  body.light .search-hl { background: rgba(234,179,8,0.3); }
+  body.amoled .search-hl { background: rgba(251,191,36,0.2); }
+  .arch-sum-bar { display:flex;gap:12px;font-size:10px;color:#64748b;margin-bottom:8px;padding:6px 8px;background:#0f1a2e;border-radius:6px; }
+  body.light .arch-sum-bar { background:#e2e8f0;color:#475569; }
+  body.amoled .arch-sum-bar { background:#050505;color:#475569; }
+  body.light .arch-badge.total { background:#e2e8f0;color:#475569;border-color:#cbd5e1; }
+  body.amoled .arch-badge.total { background:#111;color:#64748b;border-color:#222; }
+  .theme-row { display:flex;gap:5px;margin-bottom:16px; }
+  .theme-opt { flex:1;padding:7px 2px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#64748b;font-size:10px;font-weight:600;cursor:pointer;text-align:center; }
+  .theme-opt.active { border-color:#2563eb;background:#1e3a5f;color:#60a5fa; }
+  body.light .theme-opt { background:#f1f5f9;border-color:#cbd5e1;color:#64748b; }
+  body.light .theme-opt.active { background:#dbeafe;border-color:#2563eb;color:#1d4ed8; }
+  body.amoled .theme-opt { background:#0a0a0a;border-color:#1a1a1a;color:#475569; }
+  body.amoled .theme-opt.active { background:#001433;border-color:#2563eb;color:#60a5fa; }
+  button, a { -webkit-tap-highlight-color: transparent; outline: none; }
+  /* Collected filter blink */
+  @keyframes blink-col { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .filter-btn.collected-blink { animation: blink-col 1.2s ease-in-out infinite; border-color:#22c55e; color:#22c55e; }
+  .filter-btn.collected-active { background:#14532d; color:#22c55e; border-color:#22c55e; }
+  /* Phone blink on collected card */
+  @keyframes blink-phone { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .phone-blink { animation: blink-phone 1s ease-in-out infinite; }
+  /* Client popup */
+  .client-popup-box { background:#0f1f3d; border:1px solid #1e3a5f; border-radius:12px; padding:14px; }
+  .client-note-input { width:100%; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:7px 10px; color:#e2e8f0; font-size:12px; outline:none; resize:none; min-height:50px; margin-top:6px; }
+  body.light .client-note-input { background:#f8fafc; border-color:#cbd5e1; color:#1e293b; }
   .bottom-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
   .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; flex-shrink: 0; cursor: pointer; }
   .s1,.s2{background:#1e3a5f;color:#60a5fa} .s3,.s4,.s5{background:#1e3a5f;color:#f59e0b}
@@ -522,7 +555,7 @@
 </div>
 
 <div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
-<button class="client-name-bottom-btn" onclick="openClientModal()">🏷️ Client's Name</button>
+<button class="client-name-bottom-btn" onclick="openClientModal()">🏷️ Add Clients</button>
 <div id="toast"></div>
 
 <div class="select-bar" id="select-bar">
@@ -588,6 +621,17 @@
   </div>
 </div>
 
+<div class="modal" id="client-note-modal">
+  <div class="modal-box">
+    <div class="modal-title"><span id="client-note-modal-title"></span><button class="modal-close" onclick="closeClientNoteModal()">✕</button></div>
+    <textarea class="note-modal-textarea" id="client-note-textarea" placeholder="এই ক্লায়েন্ট সম্পর্কে নোট লিখুন..."></textarea>
+    <div style="display:flex;gap:8px">
+      <button class="note-modal-save" onclick="saveClientNoteFromModal()">সংরক্ষণ</button>
+      <button class="note-modal-clear" onclick="document.getElementById('client-note-textarea').value=''">মুছুন</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="timeline-modal">
   <div class="modal-box">
     <div class="modal-title"><span id="timeline-modal-title"></span><button class="modal-close" onclick="closeTimelineModal()">✕</button></div>
@@ -611,6 +655,7 @@
       <button class="note-tpl-btn" onclick="addNoteTemplate('ওয়েট ফর কনফার্মেশন')">ওয়েট ফর কনফার্মেশন</button>
       <button class="note-tpl-btn" onclick="addNoteTemplate('মামলা সনাক্ত হয়েছে')">মামলা সনাক্ত হয়েছে</button>
       <button class="note-tpl-btn" onclick="addNoteTemplate('নিষ্পত্তির অপেক্ষায়')">নিষ্পত্তির অপেক্ষায়</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate('ঠিকানার ডকুমেন্ট')">ঠিকানার ডকুমেন্ট</button>
     </div>
     <textarea class="note-modal-textarea" id="note-modal-textarea" placeholder="নোট লিখুন..."></textarea>
     <div style="display:flex">
@@ -642,12 +687,31 @@
 
 <div class="modal" id="client-modal">
   <div class="modal-box">
-    <div class="modal-title">🏷️ Client's Name<button class="modal-close" onclick="closeClientModal()">✕</button></div>
+    <div class="modal-title">🏷️ Add Clients<button class="modal-close" onclick="closeClientModal()">✕</button></div>
     <div class="client-add-row">
-      <input class="client-add-input" id="client-add-input" type="text" placeholder="নাম লিখুন..." onkeydown="if(event.key==='Enter')addClientName()">
-      <button class="client-add-btn" onclick="addClientName()">+ যোগ</button>
+      <input class="client-add-input" id="client-add-input" type="text" placeholder="ক্লায়েন্ট নাম..." onkeydown="if(event.key==='Enter')document.getElementById('client-add-phone').focus()">
+      <input class="client-add-input" id="client-add-phone" type="tel" placeholder="ফোন নম্বর..." style="margin-top:6px" onkeydown="if(event.key==='Enter')addClientName()">
+      <button class="client-add-btn" onclick="addClientName()" style="margin-top:6px">+ যোগ</button>
     </div>
     <div class="client-name-list" id="client-name-list"></div>
+  </div>
+</div>
+
+<div class="modal" id="client-detail-modal">
+  <div class="modal-box">
+    <div class="modal-title"><span id="client-detail-title"></span><button class="modal-close" onclick="closeClientDetailModal()">✕</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:#c4b5fd" id="client-detail-name"></div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px" id="client-detail-phone"></div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:6px;font-style:italic" id="client-detail-note-preview"></div>
+      </div>
+      <button onclick="openClientNoteEdit()" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0">✏️ নোট</button>
+    </div>
+    <div style="border-top:1px solid #1e3a5f;margin-top:4px;padding-top:10px">
+      <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">ট্যাগ করা ফাইল</div>
+      <div id="client-detail-files"></div>
+    </div>
   </div>
 </div>
 
@@ -761,6 +825,9 @@ let history=JSON.parse(localStorage.getItem('pcc_history')||'{"urgent":[],"impor
 let forwarded=JSON.parse(localStorage.getItem('pcc_forwarded')||'{}');
 let collected=JSON.parse(localStorage.getItem('pcc_collected')||'{}');
 let collectedDay=JSON.parse(localStorage.getItem('pcc_collected_day')||'{}');
+let collectedDate=JSON.parse(localStorage.getItem('pcc_collected_date')||'{}');
+let clientPhones=JSON.parse(localStorage.getItem('pcc_client_phones')||'{}');
+let clientNotes=JSON.parse(localStorage.getItem('pcc_client_notes')||'{}');
 let manualPrintDates=JSON.parse(localStorage.getItem('pcc_manual_print_dates')||'{}');
 let expandedNormal=new Set(JSON.parse(localStorage.getItem('pcc_expanded_normal')||'[]'));
 let resetArchive=JSON.parse(localStorage.getItem('pcc_reset_archive')||'[]');
@@ -806,8 +873,9 @@ function todayStr(){const d=new Date();return String(d.getDate()).padStart(2,'0'
 function getTodayDisplay(){const d=new Date();return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;}
 function trimStatus(s){
   if(!s)return '';const m=s.match(/\d+\/\d+/);if(m)return m[0];const low=s.toLowerCase();
-  if(low.includes('pending for payment'))return 'Pending For Payment';if(low.includes('draft'))return 'Draft';
-  return s.length>25?s.substring(0,25)+'…':s;
+  if(low.includes('pending for payment'))return 'Pending For Payment';
+  if(low.includes('draft'))return 'Draft';
+  return s.length>18?s.substring(0,18)+'…':s;
 }
 // Date chip: live dot on RIGHT, same font size as cal heading (13px)
 function todayDateChipHTML(){
@@ -850,6 +918,9 @@ function saveLocal(){
   localStorage.setItem('pcc_forwarded',JSON.stringify(forwarded));
   localStorage.setItem('pcc_collected',JSON.stringify(collected));
   localStorage.setItem('pcc_collected_day',JSON.stringify(collectedDay));
+  localStorage.setItem('pcc_collected_date',JSON.stringify(collectedDate));
+  localStorage.setItem('pcc_client_phones',JSON.stringify(clientPhones));
+  localStorage.setItem('pcc_client_notes',JSON.stringify(clientNotes));
   localStorage.setItem('pcc_manual_print_dates',JSON.stringify(manualPrintDates));
   localStorage.setItem('pcc_expanded_normal',JSON.stringify([...expandedNormal]));
   localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
@@ -864,7 +935,7 @@ function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=s
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
   try{
-    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,counts,history,forwarded,collected,collectedDay,manualPrintDates,resetArchive,calNotes};
+    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,clientPhones,clientNotes,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes};
     const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
     let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
@@ -886,7 +957,7 @@ async function syncFromCloud(){
     if(d.showDeu)showDeu=d.showDeu;if(d.notes)notes=d.notes;if(d.blinkStopped)blinkStopped=d.blinkStopped;
     if(d.policeTags)policeTags=d.policeTags;if(d.clientNames)clientNames=d.clientNames;
     if(d.counts)counts=d.counts;if(d.history)history=d.history;
-    if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;
+    if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;if(d.collectedDate)collectedDate=d.collectedDate;if(d.clientPhones)clientPhones=d.clientPhones;if(d.clientNotes)clientNotes=d.clientNotes;
     if(d.manualPrintDates)manualPrintDates=d.manualPrintDates;
     if(d.resetArchive)resetArchive=d.resetArchive;if(d.calNotes)calNotes=d.calNotes;
     saveLocal();
@@ -900,26 +971,168 @@ function openSettings(){
 }
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open');}
 
-// ── Theme ──
-let themeMode=localStorage.getItem('pcc_theme')||'system';
-const _sysDark=window.matchMedia('(prefers-color-scheme: dark)');
+// ── Helpers ──────────────────────────────────────
+function hlText(str,q){
+  if(!q)return str;
+  try{
+    const esc=q.replace(/[-[\]{}()*+?.,\^$|#\s]/g,'\$&');
+    const re=new RegExp('('+esc+')','gi');
+    return str.replace(re,'<mark class="search-hl">$1</mark>');
+  }catch(e){return str;}
+}
+
+function addDaysToDate(ds,n){
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const p=ds.toUpperCase().split('-');
+  if(p.length!==3)return ds;
+  const dt=new Date(2000+parseInt(p[2]),MO.indexOf(p[1]),parseInt(p[0]));
+  dt.setDate(dt.getDate()+n);
+  return String(dt.getDate()).padStart(2,'0')+'-'+mo[dt.getMonth()]+'-'+String(dt.getFullYear()).slice(2);
+}
+
+function daysSinceDate(ds){
+  const MO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const p=ds.toUpperCase().split('-');
+  if(p.length!==3)return null;
+  const dt=new Date(2000+parseInt(p[2]),MO.indexOf(p[1]),parseInt(p[0]));
+  const today=new Date();today.setHours(0,0,0,0);
+  const diff=Math.floor((today-dt)/86400000);
+  return diff>=0?diff:null;
+}
+
+// Day count popup
+function openDayPopup(ref,days,star){
+  const app=allApps.find(a=>a.ref===ref);
+  if(!app)return;
+  const color=star===2?'#ef4444':star===1?'#f59e0b':'#60a5fa';
+  const icon=star===2?'🔴':star===1?'⭐':'📄';
+  let html='';
+  if(star===2||star===1){
+    const limit=star===2?7:14;
+    const expDate=addDaysToDate(app.apply_date,limit);
+    const remaining=limit-days;
+    const remTxt=remaining>0
+      ?`<span style="color:${color};font-weight:700">${remaining} দিন বাকি</span>`
+      :`<span style="color:#ef4444;font-weight:700">⚠️ ${Math.abs(remaining)} দিন পার</span>`;
+    html=`<div style="font-weight:700;font-size:13px;margin-bottom:10px">${icon} ${app.name}</div>
+      <div style="font-size:12px;line-height:2.2;color:#94a3b8">
+        আবেদন: <b style="color:#e2e8f0">${app.apply_date}</b><br>
+        অতিবাহিত: <b style="color:#e2e8f0">${days} দিন</b><br>
+        সীমা: ${limit}d &nbsp;|&nbsp; ${remTxt}<br>
+        সম্ভাব্য ডেলিভারি: <b style="color:${color}">${expDate}</b>
+      </div>`;
+  } else {
+    const callDate=addDaysToDate(app.apply_date,12);
+    const delivDate=addDaysToDate(app.apply_date,24);
+    const daysToCall=12-days;
+    const daysToDel=24-days;
+    html=`<div style="font-weight:700;font-size:13px;margin-bottom:10px">${icon} ${app.name}</div>
+      <div style="font-size:12px;line-height:2.2;color:#94a3b8">
+        আবেদন: <b style="color:#e2e8f0">${app.apply_date}</b><br>
+        অতিবাহিত: <b style="color:#e2e8f0">${days} দিন</b><br>
+        সম্ভাব্য পুলিশ কল: <b style="color:#a78bfa">${callDate}</b> ${daysToCall>0?`(${daysToCall}d বাকি)`:'(পার)'}<br>
+        সম্ভাব্য ডেলিভারি: <b style="color:#34d399">${delivDate}</b> ${daysToDel>0?`(${daysToDel}d বাকি)`:'(পার)'}
+      </div>`;
+  }
+  document.getElementById('confirm-msg').innerHTML=html;
+  document.getElementById('confirm-modal').querySelector('.confirm-btns').innerHTML=
+    '<button class="confirm-ok" onclick="confirmCancel()" style="width:100%">ঠিক আছে</button>';
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+// Phone popup — show applicant + client number
+function openPhonePopup(ref,appPhone){
+  const policeTag=policeTags[ref]||'';
+  const clientPhone=policeTag&&clientPhones[policeTag]?clientPhones[policeTag]:'';
+  const app=allApps.find(a=>a.ref===ref);
+  const name=app?app.name:ref;
+  if(!clientPhone){
+    showConfirm(`📞 ${name}`,`${appPhone} নম্বরে কল করবেন?`).then(function(ok){if(ok)window.location.href='tel:'+appPhone;});
+    return;
+  }
+  document.getElementById('confirm-msg').innerHTML=`
+    <div style="font-weight:700;font-size:13px;margin-bottom:12px">📞 ${name}</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button onclick="window.location.href='tel:${appPhone}';confirmCancel()" style="background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:10px;border-radius:8px;font-size:13px;cursor:pointer;text-align:left">
+        👤 Applicant<br><span style="font-size:14px;font-weight:700">${appPhone}</span>
+      </button>
+      <button onclick="window.location.href='tel:${clientPhone}';confirmCancel()" style="background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd;padding:10px;border-radius:8px;font-size:13px;cursor:pointer;text-align:left">
+        🏷️ ${policeTag}<br><span style="font-size:14px;font-weight:700">${clientPhone}</span>
+      </button>
+    </div>`;
+  document.getElementById('confirm-modal').querySelector('.confirm-btns').innerHTML=
+    '<button class="confirm-cancel" onclick="confirmCancel()" style="width:100%">বাতিল</button>';
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+// Client detail popup
+let currentClientName='';
+function openClientDetailModal(name){
+  currentClientName=name;
+  document.getElementById('client-detail-title').textContent='🏷️ '+name;
+  document.getElementById('client-detail-name').textContent=name;
+  const phone=clientPhones[name]||'';
+  document.getElementById('client-detail-phone').textContent=phone?'📞 '+phone:'';
+  const notePreviewEl=document.getElementById('client-detail-note-preview');
+  if(notePreviewEl)notePreviewEl.textContent=clientNotes[name]?'📝 '+clientNotes[name]:'';
+  const tagged=allApps.filter(function(a){return policeTags[a.ref]===name;});
+  const filesEl=document.getElementById('client-detail-files');
+  if(tagged.length){
+    filesEl.innerHTML=tagged.map(function(a){
+      const s=stars[a.ref]||0;const si=s===2?'🔴':s===1?'⭐':'📄';
+      const n=parseInt((a.status||'').split('/')[0])||0;const sc='s'+Math.min(n,10);
+      return '<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #1e3a5f">'
+        +'<span>'+si+'</span>'
+        +'<span style="flex:1;font-size:12px;color:#94a3b8">'+a.name+'</span>'
+        +'<span class="status '+sc+'" style="font-size:10px;padding:2px 6px">'+trimStatus(a.status)+'</span>'
+        +'</div>';
+    }).join('');
+  } else {
+    filesEl.innerHTML='<div style="color:#475569;font-size:12px;text-align:center;padding:8px">কোনো ফাইল ট্যাগ নেই</div>';
+  }
+  document.getElementById('police-filter-modal').classList.remove('open');
+  document.getElementById('client-detail-modal').classList.add('open');
+}
+function closeClientDetailModal(){document.getElementById('client-detail-modal').classList.remove('open');currentClientName='';}
+function saveClientNote(){
+  if(!currentClientName)return;
+  const val=document.getElementById('client-detail-note').value||'';
+  if(val.trim())clientNotes[currentClientName]=val.trim();else delete clientNotes[currentClientName];
+  save();
+}
+function openClientNoteEdit(){
+  document.getElementById('client-note-modal-title').textContent='📝 '+currentClientName;
+  document.getElementById('client-note-textarea').value=clientNotes[currentClientName]||'';
+  document.getElementById('client-note-modal').classList.add('open');
+  setTimeout(function(){document.getElementById('client-note-textarea').focus();},100);
+}
+function closeClientNoteModal(){document.getElementById('client-note-modal').classList.remove('open');}
+function saveClientNoteFromModal(){
+  if(!currentClientName)return;
+  const val=document.getElementById('client-note-textarea').value.trim();
+  if(val)clientNotes[currentClientName]=val;else delete clientNotes[currentClientName];
+  save();
+  // Update preview
+  const prev=document.getElementById('client-detail-note-preview');
+  if(prev)prev.textContent=val?'📝 '+val:'';
+  closeClientNoteModal();
+}
+
+// Theme (manual only — no system)
+let themeMode=localStorage.getItem('pcc_theme')||'dark';
 function _applyTheme(){
-  const isDark=themeMode==='dark'||themeMode==='amoled'||(themeMode==='system'&&_sysDark.matches);
-  document.body.classList.toggle('light',!isDark);
+  document.body.classList.toggle('light',themeMode==='light');
   document.body.classList.toggle('amoled',themeMode==='amoled');
-  ['system','light','dark','amoled'].forEach(m=>{
+  ['light','dark','amoled'].forEach(function(m){
     const el=document.getElementById('theme-'+m);
     if(el)el.classList.toggle('active',m===themeMode);
   });
 }
 function setTheme(m){themeMode=m;localStorage.setItem('pcc_theme',m);_applyTheme();}
-// Listen for system theme change (works on most browsers)
-_sysDark.addEventListener('change',_applyTheme);
-// Fallback poll for Android WebView which may not fire the event
-let _lastSysDark=_sysDark.matches;
-setInterval(()=>{if(themeMode==='system'&&_sysDark.matches!==_lastSysDark){_lastSysDark=_sysDark.matches;_applyTheme();}},1000);
-['system','light','dark','amoled'].forEach(m=>{const el=document.getElementById('theme-'+m);if(el)el.classList.toggle('active',m===themeMode);});
 _applyTheme();
+
+
 async function savePAT(){
   const pat=document.getElementById('pat-input').value.trim();
   if(pat)localStorage.setItem('pcc_pat',pat);else localStorage.removeItem('pcc_pat');
@@ -936,8 +1149,8 @@ function stagePressStart(e,ref){
   stageTimer[ref]=setTimeout(()=>{
     if(btn)btn.classList.remove('pressing');
     if(stage===0){forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↑ Forwarded');}
-    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);save();render();showToast('↓ Collected');}
-    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↺ Reset');}
+    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);collectedDate[ref]=todayStr();save();render();showToast('✅ Collected');}
+    else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];delete collectedDate[ref];save();render();showToast('↺ Reset');}
   },stage===2?2000:600);
 }
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
@@ -1200,9 +1413,9 @@ function renderArchiveContent(){
           ${m.normal.length?`<span class="arch-badge normal">📄 ${m.normal.length}</span>`:''}
           <span class="arch-badge total">Total ${total}</span>
         </div>
-        <div style="display:flex;gap:12px;font-size:10px;color:#64748b;margin-bottom:8px;padding:6px 8px;background:#0f1a2e;border-radius:6px">
+        <div class="arch-sum-bar">
           <span>📤 Fwd: ${[...m.urgent,...m.important,...m.normal].filter(a=>forwarded[a.ref]).length}</span>
-          <span>📥 Col: ${[...m.urgent,...m.important,...m.normal].filter(a=>collected[a.ref]).length}</span>
+          <span>📦 Col: ${[...m.urgent,...m.important,...m.normal].filter(a=>collected[a.ref]).length}</span>
           <span>✅ Del: ${[...m.urgent,...m.important,...m.normal].filter(a=>delivered[a.ref]).length}</span>
         </div>
         <div class="arch-list">${m.urgent.map(a=>archItemHTML(a,'🔴')).join('')}${m.important.map(a=>archItemHTML(a,'⭐')).join('')}${m.normal.map(a=>archItemHTML(a,'·')).join('')}</div>
@@ -1271,9 +1484,13 @@ function searchInArchive(q){
 // ── Police ────────────────────────────────────────────────
 function openPoliceFilterModal(){
   const list=document.getElementById('police-filter-list');
-  let html=`<span class="police-filter-pill police-filter-all ${!activePoliceFilter?'active':''}" onclick="setPoliceFilter(null)">সব</span>`;
-  clientNames.forEach(n=>{html+=`<span class="police-filter-pill ${activePoliceFilter===n?'active':''}" onclick="setPoliceFilter('${n}')">${n}</span>`;});
-  if(!clientNames.length)html+='<div style="color:#475569;font-size:12px;margin-top:8px">Client\'s Name বাটনে নাম যোগ করুন</div>';
+  let html='<span class="police-filter-pill police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)">সব</span>';
+  clientNames.forEach(function(n){
+    const phone=clientPhones[n]?'<br><span style="font-size:10px;opacity:0.7">'+clientPhones[n]+'</span>':'';
+    const nSafe=n.replace(/'/g,"\'");
+    html+='<span class="police-filter-pill '+(activePoliceFilter===n?'active':'')+'" onclick="openClientDetailModal(\'' + nSafe + '\')">'+n+phone+'</span>';
+  });
+  if(!clientNames.length)html+='<div style="color:#475569;font-size:12px;margin-top:8px">Add Clients বাটনে নাম যোগ করুন</div>';
   list.innerHTML=html;document.getElementById('police-filter-modal').classList.add('open');
 }
 function closePoliceFilterModal(){document.getElementById('police-filter-modal').classList.remove('open');}
@@ -1285,8 +1502,25 @@ function renderClientModal(){
   if(!clientNames.length){list.innerHTML='<div style="font-size:12px;color:#475569;text-align:center;padding:12px">কোনো নাম নেই</div>';return;}
   list.innerHTML=clientNames.map(n=>`<div class="client-name-row"><span>${n}</span><button class="client-del-btn" onclick="deleteClientName('${n}')">×</button></div>`).join('');
 }
-function addClientName(){const inp=document.getElementById('client-add-input');const name=inp.value.trim();if(!name||clientNames.includes(name))return;clientNames.push(name);inp.value='';save();renderClientModal();}
-function deleteClientName(name){clientNames=clientNames.filter(n=>n!==name);Object.keys(policeTags).forEach(ref=>{if(policeTags[ref]===name)delete policeTags[ref];});if(activePoliceFilter===name){activePoliceFilter=null;document.getElementById('police-filter-btn').classList.remove('active');}save();renderClientModal();render();}
+function addClientName(){
+  const inp=document.getElementById('client-add-input');
+  const pinp=document.getElementById('client-add-phone');
+  const name=inp.value.trim();
+  const phone=(pinp?pinp.value.trim():'');
+  if(!name||clientNames.includes(name))return;
+  clientNames.push(name);
+  if(phone)clientPhones[name]=phone;
+  inp.value='';if(pinp)pinp.value='';
+  save();renderClientModal();
+}
+function deleteClientName(name){
+  clientNames=clientNames.filter(function(n){return n!==name;});
+  delete clientPhones[name];
+  delete clientNotes[name];
+  Object.keys(policeTags).forEach(function(ref){if(policeTags[ref]===name)delete policeTags[ref];});
+  if(activePoliceFilter===name){activePoliceFilter=null;document.getElementById('police-filter-btn').classList.remove('active');}
+  save();renderClientModal();render();
+}
 function openPickModal(ref){
   pickRef=ref;const list=document.getElementById('pick-list');
   if(!clientNames.length){list.innerHTML='<div class="pick-item" style="color:#475569">Client\'s Name বাটনে নাম যোগ করুন</div>';document.getElementById('pick-modal').classList.add('open');return;}
@@ -1377,7 +1611,7 @@ function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.filter-btn'
 function matchesFilter(app){
   const num=parseInt((app.status||'').split('/')[0])||0;const isDraft=(app.status||'').toLowerCase().includes('draft');
   if(activePoliceFilter&&policeTags[app.ref]!==activePoliceFilter)return false;
-  if(activeFilter==='all')return true;if(activeFilter==='draft')return isDraft;
+  if(activeFilter==='all')return true;if(activeFilter==='draft')return isDraft;if(activeFilter==='collected')return !!(collected[app.ref]);
   if(activeFilter==='1-3')return !isDraft&&num>=1&&num<=3;if(activeFilter==='4-6')return !isDraft&&num>=4&&num<=6;
   if(activeFilter==='7-9')return !isDraft&&num>=7&&num<=9;return true;
 }
@@ -1413,11 +1647,12 @@ function cardHTML(app){
   const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded;
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const days=(!isDelivered&&showDetails)?daysSince(app.apply_date,app.ref):null;
+  const daysCol=(isCol&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
   const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
-  const stage=isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':'📥';const stageCls=stage===0?'':stage===1?'fwd':'col';
+  const stage=isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':'✅';const stageCls=stage===0?'':stage===1?'fwd':'col';
   // Due code + collected → blink
   const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
   let dayClass='day-normal';
@@ -1427,11 +1662,17 @@ function cardHTML(app){
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
   const showPrint=showDetails&&printDate&&!isDelivered;
   const printBadge=showPrint?`<span class="print-badge" onclick="openDateModal('${printDate}','📅','print_date','${app.ref}');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
-  const notePreview=(s>0&&!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>${noteVal}</div>`:'';
-  const nameClick=`${s>0?`openNoteModal('${app.ref}');`:''}event.stopPropagation()`;
+  const noteSVG='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+  const notePreview=(!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()">${noteSVG}${noteVal}</div>`:'';
+  const nameClick=`openNoteModal('${app.ref}');event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
-  const daySpan=days?`<span class="${dayClass}">Day:${String(days).padStart(2,'0')}</span>`:'';
-  const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link" href="tel:${app.phone}" onclick="event.stopPropagation()">📞 ${app.phone}</a>`:'';
+  const daySpan=days?`<span class="${dayClass}" onclick="openDayPopup('${app.ref}',${days},${s});event.stopPropagation()" style="cursor:pointer">Day:${String(days).padStart(2,'0')}</span>`:'';
+  const colDaySpan=daysCol!==null?`<span class="day-collected">📦${String(daysCol).padStart(2,'0')}d</span>`:'';
+  const phoneTag=policeTags[app.ref]||'';
+  const clientPhone=phoneTag&&clientPhones[phoneTag]?clientPhones[phoneTag]:'';
+  const hasClientPhone=!!(clientPhone);
+  const phoneBlinkClass=(isCol&&!blinkStopped[app.ref])?'phone-blink':'';
+  const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link ${phoneBlinkClass}" onclick="openPhonePopup('${app.ref}','${app.phone}');event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count
   const policeTagHTML=policeTag?`<span class="police-inline-tag" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`:'';
@@ -1449,14 +1690,14 @@ function cardHTML(app){
         ontouchcancel="pressEnd('${app.ref}')"
         onclick="handleTap('${app.ref}')">
         <div class="card-top">
-          <div class="name" onclick="${nameClick}">${app.name}</div>
+          <div class="name" onclick="${nameClick}">${app._hl?hlText(app.name,app._hl):app.name}</div>
           <div class="card-top-right">${stageBtn}<button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${si}</button></div>
         </div>
         <div class="info">
           ${refHTML} &nbsp;|&nbsp;
-          ${calSVG} ${app.apply_date}
+          <span onclick="openDateModal('${app.apply_date}','📅','apply_date','');event.stopPropagation()" style="cursor:pointer;display:inline-flex;align-items:center;gap:2px">${calSVG} ${app.apply_date}</span>
           ${policeTagHTML?`&nbsp;${policeTagHTML}`:''}
-          &nbsp;${daySpan}
+          &nbsp;${daySpan}${colDaySpan?'&nbsp;'+colDaySpan:''}
         </div>
         <div class="bottom-row">
           <span class="status ${scls}${shouldBlink?' status-blink':''}" onclick="${statusClick}">${app.status}</span>
@@ -1507,8 +1748,10 @@ function render(){
   const displayApps=getDisplayApps().filter(a=>{
     if(!matchesFilter(a))return false;
     if(q&&!a.name.toLowerCase().includes(q)&&!a.ref.toLowerCase().includes(q)&&!(policeTags[a.ref]||'').toLowerCase().includes(q)&&!(a.phone||'').includes(q))return false;
+    a._hl=q||'';
     return true;
   });
+  if(!q)displayApps.forEach(function(a){a._hl='';});
   const star2=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2);
   const star1=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1);
   const normal=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
@@ -1516,11 +1759,14 @@ function render(){
   // Date chip only shown when calendar is closed
   const dateChip=!calOpen?todayDateChipHTML():'';
   let html='';let dateShown=false;
+  const collectedCount=getDisplayApps().filter(function(a){return collected[a.ref]&&!delivered[a.ref];}).length;
+  const readyChip=collectedCount>0?`<span class="ready-chip" onclick="setFilter('collected',document.getElementById('ready-chip-btn'))">
+    <span id="ready-chip-btn" style="display:none"></span>Ready ${collectedCount}</span>`:'';
   function secRow(title,count,titleCls,countCls){
     const dc=!dateShown?dateChip:'';if(!dateShown&&dateChip)dateShown=true;
     return `<div class="section-row">
       <div class="section-title ${titleCls||''}">${title}</div>
-      ${dc}
+      ${dc}${readyChip}
       ${count!==null?`<div class="section-count ${countCls||''}">${count} file</div>`:''}
     </div>`;
   }
@@ -1548,11 +1794,15 @@ function render(){
   }
   if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
-  document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
-  document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
+  // Subtract collected files from counts display
+  const collectedUrgent=getDisplayApps().filter(a=>collected[a.ref]&&!delivered[a.ref]&&(stars[a.ref]||0)===2).length;
+  const collectedImportant=getDisplayApps().filter(a=>collected[a.ref]&&!delivered[a.ref]&&(stars[a.ref]||0)===1).length;
+  document.getElementById('cnt-urgent').textContent=String(Math.max(0,counts.urgent-collectedUrgent)).padStart(2,'0');
+  document.getElementById('cnt-important').textContent=String(Math.max(0,counts.important-collectedImportant)).padStart(2,'0');
   const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));
   const draftBtn=document.getElementById('draft-btn');
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
+
 }
 
 async function load(){

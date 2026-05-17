@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn"><head><meta charset="UTF-8">
 
@@ -79,6 +78,9 @@
   body.light .modal-add-input { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
   body.light .modal-copy-btn { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
   body.light .confirm-msg { color: #1e293b; }
+  body.light .confirm-msg b { color: #0f172a; }
+  body.light .confirm-msg [style*='color:#94a3b8'] { color: #475569 !important; }
+  body.light .confirm-msg [style*='color:#e2e8f0'] { color: #0f172a !important; }
   body.light .confirm-sub { color: #2563eb; }
   body.light .confirm-cancel { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
   /* Note modal */
@@ -112,6 +114,7 @@
   body.light .police-filter-pill { background: #f5f3ff; border-color: #c4b5fd; color: #6d28d9; }
   body.light .police-filter-pill.active { background: #ede9fe; color: #4c1d95; }
   body.light .police-filter-all { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  body.light .client-note-btn { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
   body.light .client-name-row { background: #f8fafc; }
   body.light .client-name-row span { color: #6d28d9; }
   body.light .pick-item { background: #f8fafc; border-color: #e2e8f0; color: #6d28d9; }
@@ -172,8 +175,8 @@
   body.light .cal-tag-btn.active { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
   body.light .cal-day-file-item { border-color: #e2e8f0; }
   body.light .cal-day-file-name { color: #475569; }
-  body.light .holiday-name-tag.public { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.4); }
-  body.light .holiday-name-tag.national { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.4); }
+  body.light .holiday-name-tag.public { background: rgba(251,146,60,0.15); border-color: rgba(251,146,60,0.5); color: #c2410c; }
+  body.light .holiday-name-tag.national { background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.5); color: #6d28d9; }
   /* Theme toggle buttons */
   .theme-row { display: flex; gap: 6px; margin-bottom: 16px; }
   .theme-opt { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #64748b; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
@@ -262,7 +265,7 @@
   .section-count.urgent-count { color: #ef4444; }
   .section-count.important-count { color: #f59e0b; }
   /* Date chip — same size as cal heading, live dot RIGHT */
-  .section-date-chip { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; flex: 1; justify-content: flex-start; padding: 2px 0; padding-left: 4px; }
+  .section-date-chip { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; flex: 1; justify-content: center; padding: 2px 0; }
   .ready-chip { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid #22c55e; color: #22c55e; cursor: pointer; flex-shrink: 0; margin-left: 4px; }
   @keyframes ready-blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .ready-chip { animation: ready-blink 1.2s ease-in-out infinite; }
@@ -391,7 +394,7 @@
   .police-filter-pill.active { background: #4c1d95; color: #ede9fe; }
   .police-filter-all { border-color: #334155; background: #1e293b; color: #94a3b8; }
   .police-filter-all.active { background: #1e3a5f; color: #60a5fa; border-color: #2563eb; }
-  .client-add-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .client-add-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
   .client-add-input { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; }
   .client-add-btn { background: #7c3aed; border: none; color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .client-name-list { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
@@ -620,7 +623,7 @@
   </div>
 </div>
 
-<div class="modal" id="client-note-modal">
+<div class="modal" id="client-note-modal" style="z-index:200">
   <div class="modal-box">
     <div class="modal-title"><span id="client-note-modal-title"></span><button class="modal-close" onclick="closeClientNoteModal()">✕</button></div>
     <textarea class="note-modal-textarea" id="client-note-textarea" placeholder="এই ক্লায়েন্ট সম্পর্কে নোট লিখুন..."></textarea>
@@ -701,9 +704,8 @@
     <div class="modal-title"><span id="client-detail-title"></span><button class="modal-close" onclick="closeClientDetailModal()">✕</button></div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px">
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:#c4b5fd" id="client-detail-name"></div>
-        <div style="font-size:12px;color:#64748b;margin-top:2px" id="client-detail-phone"></div>
-        <div style="font-size:11px;color:#94a3b8;margin-top:6px;font-style:italic" id="client-detail-note-preview"></div>
+        <a id="client-detail-phone" href="#" onclick="callClientPhone();return false" style="font-size:14px;font-weight:700;color:#60a5fa;text-decoration:none;display:block;margin-bottom:4px"></a>
+        <div style="font-size:11px;color:#94a3b8;font-style:italic" id="client-detail-note-preview"></div>
       </div>
       <button onclick="openClientNoteEdit()" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0">✏️ নোট</button>
     </div>
@@ -874,7 +876,7 @@ function trimStatus(s){
   if(!s)return '';const m=s.match(/\d+\/\d+/);if(m)return m[0];const low=s.toLowerCase();
   if(low.includes('pending for payment'))return 'Pending For Payment';
   if(low.includes('draft'))return 'Draft';
-  return s.length>18?s.substring(0,18)+'…':s;
+  return s.length>20?s.substring(0,20)+'…':s;
 }
 // Date chip: live dot on RIGHT, same font size as cal heading (13px)
 function todayDateChipHTML(){
@@ -1070,9 +1072,11 @@ let currentClientName='';
 function openClientDetailModal(name){
   currentClientName=name;
   document.getElementById('client-detail-title').textContent='🏷️ '+name;
-  document.getElementById('client-detail-name').textContent=name;
   const phone=clientPhones[name]||'';
-  document.getElementById('client-detail-phone').textContent=phone?'📞 '+phone:'';
+  const phoneEl=document.getElementById('client-detail-phone');
+  phoneEl.textContent=phone?'📞 '+phone:'ফোন নম্বর নেই';
+  phoneEl.style.color=phone?'#60a5fa':'#475569';
+  phoneEl.style.pointerEvents=phone?'auto':'none';
   const notePreviewEl=document.getElementById('client-detail-note-preview');
   if(notePreviewEl)notePreviewEl.textContent=clientNotes[name]?'📝 '+clientNotes[name]:'';
   const tagged=allApps.filter(function(a){return policeTags[a.ref]===name;});
@@ -1094,6 +1098,11 @@ function openClientDetailModal(name){
   document.getElementById('client-detail-modal').classList.add('open');
 }
 function closeClientDetailModal(){document.getElementById('client-detail-modal').classList.remove('open');currentClientName='';}
+function callClientPhone(){
+  if(!currentClientName)return;
+  const phone=clientPhones[currentClientName];
+  if(phone)window.location.href='tel:'+phone;
+}
 function saveClientNote(){
   if(!currentClientName)return;
   const val=document.getElementById('client-detail-note').value||'';
@@ -1112,9 +1121,9 @@ function saveClientNoteFromModal(){
   const val=document.getElementById('client-note-textarea').value.trim();
   if(val)clientNotes[currentClientName]=val;else delete clientNotes[currentClientName];
   save();
-  // Update preview
   const prev=document.getElementById('client-detail-note-preview');
   if(prev)prev.textContent=val?'📝 '+val:'';
+  showToast('✅ সংরক্ষণ হয়েছে');
   closeClientNoteModal();
 }
 
@@ -1647,7 +1656,9 @@ function cardHTML(app){
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
   const stage=isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':'✅';const stageCls=stage===0?'':stage===1?'fwd':'col';
-  const days=(!isDelivered&&showDetails)?daysSince(app.apply_date,app.ref):null;
+  const statusNum=parseInt((app.status||'').split('/')[0])||0;
+  const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
+  const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
   const daysCol=(isCol&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
@@ -1656,7 +1667,7 @@ function cardHTML(app){
   const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
   let dayClass='day-normal';
   if(days){if(s===2&&days>=5)dayClass='day-warn-urgent';else if(s===1&&days>=12)dayClass='day-warn-important';}
-  const stageBtn=(s>0&&!isDelivered)?`<button class="stage-btn ${stageCls}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'';
+  const stageBtn=isDelivered?'<span style="font-size:11px;color:#34d399;flex-shrink:0">✅</span>':(s>0?`<button class="stage-btn ${stageCls}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'');
   let deuHTML='';
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
   const showPrint=showDetails&&printDate&&!isDelivered;
@@ -1671,7 +1682,7 @@ function cardHTML(app){
   const clientPhone=phoneTag&&clientPhones[phoneTag]?clientPhones[phoneTag]:'';
   const hasClientPhone=!!(clientPhone);
   const phoneBlinkClass=(isCol&&!blinkStopped[app.ref])?'phone-blink':'';
-  const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link ${phoneBlinkClass}" onclick="openPhonePopup('${app.ref}','${app.phone}');event.stopPropagation()">📞 ${app.phone}</a>`:'';
+  const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link ${phoneBlinkClass}" onclick="blinkStopped['${app.ref}']=true;save();render();openPhonePopup('${app.ref}','${app.phone}');event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count
   const policeTagHTML=policeTag?`<span class="police-inline-tag" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`:'';
@@ -1759,13 +1770,12 @@ function render(){
   const dateChip=!calOpen?todayDateChipHTML():'';
   let html='';let dateShown=false;
   const collectedCount=getDisplayApps().filter(function(a){return collected[a.ref]&&!delivered[a.ref];}).length;
-  const readyChip=collectedCount>0?`<span class="ready-chip" onclick="setFilter('collected',document.getElementById('ready-chip-btn'))">
-    <span id="ready-chip-btn" style="display:none"></span>Ready ${collectedCount}</span>`:'';
+  const readyChip=collectedCount>0?`<span class="ready-chip" onclick="setFilter('collected',document.getElementById('ready-chip-btn'))"><span id="ready-chip-btn" style="display:none"></span>📦 Ready ${collectedCount}</span>`:'';
   function secRow(title,count,titleCls,countCls){
-    const dc=!dateShown?dateChip:'';if(!dateShown&&dateChip)dateShown=true;
+    const dc=!dateShown?`${dateChip}${readyChip}`:'' ;if(!dateShown&&(dateChip||readyChip))dateShown=true;
     return `<div class="section-row">
       <div class="section-title ${titleCls||''}">${title}</div>
-      ${dc}${readyChip}
+      ${dc}
       ${count!==null?`<div class="section-count ${countCls||''}">${count} file</div>`:''}
     </div>`;
   }
@@ -1793,11 +1803,8 @@ function render(){
   }
   if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
-  // Subtract collected files from counts display
-  const collectedUrgent=getDisplayApps().filter(a=>collected[a.ref]&&!delivered[a.ref]&&(stars[a.ref]||0)===2).length;
-  const collectedImportant=getDisplayApps().filter(a=>collected[a.ref]&&!delivered[a.ref]&&(stars[a.ref]||0)===1).length;
-  document.getElementById('cnt-urgent').textContent=String(Math.max(0,counts.urgent-collectedUrgent)).padStart(2,'0');
-  document.getElementById('cnt-important').textContent=String(Math.max(0,counts.important-collectedImportant)).padStart(2,'0');
+  document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
+  document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
   const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));
   const draftBtn=document.getElementById('draft-btn');
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}

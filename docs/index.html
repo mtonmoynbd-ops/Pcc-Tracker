@@ -729,7 +729,6 @@
     <div class="modal-title">🛡️ Settings<button class="modal-close" onclick="closeSettings()">✕</button></div>
     <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">থিম</div>
     <div class="theme-row">
-      <button class="theme-opt" id="theme-system" onclick="setTheme(&#39;system&#39;)">⚙️ System</button>
       <button class="theme-opt" id="theme-light" onclick="setTheme(&#39;light&#39;)">☀️ Light</button>
       <button class="theme-opt" id="theme-dark" onclick="setTheme(&#39;dark&#39;)">🌙 Dark</button>
       <button class="theme-opt" id="theme-amoled" onclick="setTheme(&#39;amoled&#39;)">⚫ AMOLED</button>
@@ -879,9 +878,11 @@ function trimStatus(s){
   const low=s.toLowerCase();
   if(low.includes('pending for payment'))return 'Pending For Payment';
   if(low.includes('draft'))return 'Draft';
-  // Remove Bengali text after dash
-  const dashIdx=s.indexOf('-');
-  if(dashIdx>0){const before=s.substring(0,dashIdx).trim();if(before.length<=25)return before;}
+  // Remove Bengali/extra text after dash or space
+  // Bengali unicode range: \u0980-\u09FF
+  let cleaned=s.replace(/[-–].*$/,'').trim();
+  cleaned=cleaned.replace(/[\u0980-\u09FF\s]+$/,'').trim();
+  if(cleaned.length>0&&cleaned.length<=25)return cleaned;
   return s.length>20?s.substring(0,20)+'…':s;
 }
 // Date chip: live dot on RIGHT, same font size as cal heading (13px)
@@ -1522,7 +1523,16 @@ function closeClientModal(){document.getElementById('client-modal').classList.re
 function renderClientModal(){
   const list=document.getElementById('client-name-list');
   if(!clientNames.length){list.innerHTML='<div style="font-size:12px;color:#475569;text-align:center;padding:12px">কোনো নাম নেই</div>';return;}
-  list.innerHTML=clientNames.map(n=>`<div class="client-name-row"><span>${n}</span><button class="client-del-btn" onclick="deleteClientName('${n}')">×</button></div>`).join('');
+  list.innerHTML=clientNames.map(function(n){
+    const ph=clientPhones[n]?'<div style="font-size:10px;color:#64748b;margin-top:1px">'+clientPhones[n]+'</div>':'';
+    return '<div class="client-name-row" style="flex-direction:column;align-items:stretch;padding:8px 10px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<div style="flex:1"><div style="font-size:13px;color:#c4b5fd">'+n+'</div>'+ph+'</div>'
+      +'<div style="display:flex;gap:6px;flex-shrink:0">'
+      +'<button data-edit="'+n+'" onclick="editClient(this.dataset.edit)" style="background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:3px 8px;border-radius:6px;font-size:11px;cursor:pointer">✏️</button>'
+      +'<button class="client-del-btn" data-del="'+n+'" onclick="deleteClientName(this.dataset.del)">×</button>'
+      +'</div></div></div>';
+  }).join('');
 }
 function addClientName(){
   const inp=document.getElementById('client-add-input');

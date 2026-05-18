@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn"><head><meta charset="UTF-8">
 
@@ -70,6 +69,8 @@
   body.light .cal-title-lbl { color: #64748b; }
   /* Modals */
   body.light .modal-box, body.light .confirm-box { background: #ffffff; border-color: #cbd5e1; }
+  body.light .confirm-msg button[style*="background:#1e3a5f"] { background: #dbeafe !important; border-color: #93c5fd !important; color: #1d4ed8 !important; }
+  body.light .confirm-msg button[style*="background:#1e1a3a"] { background: #f5f3ff !important; border-color: #c4b5fd !important; color: #6d28d9 !important; }
   body.light .modal-title { color: #0f172a; }
   body.light .modal-close { color: #64748b; }
   body.light .modal-list-item { color: #475569; border-color: #e2e8f0; background: #f8fafc; }
@@ -79,6 +80,8 @@
   body.light .modal-add-input { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
   body.light .modal-copy-btn { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
   body.light .confirm-msg { color: #1e293b; }
+  body.light .confirm-msg button[onclick*="tel:"] { background: #dbeafe !important; border-color: #93c5fd !important; color: #1d4ed8 !important; }
+  body.light .confirm-msg button[onclick*="tel:"]:last-child { background: #ede9fe !important; border-color: #c4b5fd !important; color: #6d28d9 !important; }
   body.light .confirm-msg b { color: #0f172a; }
   body.light .confirm-msg [style*='color:#94a3b8'] { color: #475569 !important; }
   body.light .confirm-msg [style*='color:#e2e8f0'] { color: #0f172a !important; }
@@ -118,7 +121,13 @@
   body.light .client-note-btn { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
   body.light .client-name-row { background: #f8fafc; }
   body.light .client-name-row span { color: #6d28d9; }
+  body.light .client-add-input { background: #f8fafc; border-color: #cbd5e1; color: #1e293b; }
+  body.light #edit-cli-name, body.light #edit-cli-phone { background: #f8fafc !important; border-color: #93c5fd !important; color: #1e293b !important; }
+  body.light [onclick*="editClient"] { background: #dbeafe !important; border-color: #93c5fd !important; color: #1d4ed8 !important; }
   body.light .pick-item { background: #f8fafc; border-color: #e2e8f0; color: #6d28d9; }
+  body.light .client-add-input { background: #f8fafc !important; border-color: #cbd5e1 !important; color: #1e293b !important; }
+  body.light .client-name-row { background: #f8fafc; border-color: #e2e8f0; }
+  body.light #client-name-list button[onclick*='editClient'] { background: #dbeafe !important; border-color: #93c5fd !important; color: #1d4ed8 !important; }
   body.light .pick-item.active-pick { background: #ede9fe; border-color: #c4b5fd; }
   body.light .client-name-bottom-btn { background: #ffffff; border-color: #cbd5e1; color: #475569; }
   /* Select bar */
@@ -249,7 +258,8 @@
   @keyframes blink-draft { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .filter-btn.draft-blink { animation: blink-draft 1.2s ease-in-out infinite; border-color: #f59e0b; color: #f59e0b; }
   .icon-filter-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #2563eb; background: #1e3a5f; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; }
-  .icon-filter-btn.police { border-color: #a78bfa; background: #1e1a3a; margin-left: auto; }
+  .icon-filter-btn.police { border-color: #a78bfa; background: #2d1f5e; margin-left: auto; }
+  body.amoled .icon-filter-btn.police { border-color: #a78bfa; background: #1a0a3a; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
   .icon-filter-btn.archive-btn { border-color: #334155; background: #1e293b; }
 
@@ -392,6 +402,8 @@
   /* Police */
   .police-filter-list { display: flex; flex-wrap: wrap; gap: 8px; }
   .police-filter-pill { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #7c3aed; background: #1e1a3a; color: #c4b5fd; cursor: pointer; }
+  body.amoled .police-filter-pill { background: #0d0a1f; border-color: #6d28d9; color: #c4b5fd; }
+  body.amoled .police-filter-all { background: #0a0a0a; border-color: #334155; color: #94a3b8; }
   .police-filter-pill.active { background: #4c1d95; color: #ede9fe; }
   .police-filter-all { border-color: #334155; background: #1e293b; color: #94a3b8; }
   .police-filter-all.active { background: #1e3a5f; color: #60a5fa; border-color: #2563eb; }
@@ -437,6 +449,10 @@
   .stage-btn.col { color: #22c55e; }
   .stage-btn.del { color: #34d399; font-size: 12px; }
   .stage-btn.pressing { transform: scale(0.85); opacity: 0.6; }
+  @keyframes stage-blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .stage-btn.alert-blink { animation: stage-blink 0.8s ease-in-out infinite; color: #f59e0b !important; }
+  @keyframes stage-alert { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.2;transform:scale(0.85)} }
+  .stage-btn.alert-blink { animation: stage-alert 0.9s ease-in-out infinite; }
   /* Star btn — 11px (one size smaller) */
   .star-btn { background: none; border: none; cursor: pointer; font-size: 11px; opacity: 0.4; line-height: 1; padding: 0; flex-shrink: 0; }
   .card.star1 .star-btn, .card.star2 .star-btn { opacity: 1; }
@@ -877,14 +893,12 @@ function trimStatus(s){
   if(!s)return '';
   var m=s.match(/\d+\/\d+/);if(m)return m[0];
   var low=s.toLowerCase();
-  if(low.indexOf('pending for payment')>=0)return 'Pending For Payment';
+  if(low.indexOf('pending')>=0&&low.indexOf('payment')>=0)return 'Pending For Payment';
   if(low.indexOf('draft')>=0)return 'Draft';
-  var di=s.indexOf('-');
+  var di=s.indexOf(' - ');
   if(di>1){var b=s.substring(0,di).trim();if(b.length>=2&&b.length<=25)return b;}
-  var di2=s.indexOf('–');
+  var di2=s.indexOf('-');
   if(di2>1){var b2=s.substring(0,di2).trim();if(b2.length>=2&&b2.length<=25)return b2;}
-  var di3=s.indexOf('—');
-  if(di3>1){var b3=s.substring(0,di3).trim();if(b3.length>=2&&b3.length<=25)return b3;}
   return s.length>22?s.substring(0,22)+'…':s;
 }
 // Date chip: live dot on RIGHT, same font size as cal heading (13px)
@@ -1060,10 +1074,15 @@ function openPhonePopup(ref,appPhone){
   if(!clientPhone){
     // No client tag — direct call
     document.getElementById('confirm-msg').innerHTML=`
-      <div style="font-weight:700;font-size:13px;margin-bottom:12px">📞 ${name}</div>
-      <button onclick="window.location.href='tel:${appPhone}';confirmCancel()" style="width:100%;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">
-        📞 ${appPhone}
-      </button>`;
+      <div style="font-weight:700;font-size:13px;margin-bottom:10px">📞 ${name}</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="window.location.href='tel:${appPhone}';confirmCancel()" style="flex:1;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
+          📱 কল<br><span style="font-size:12px;font-weight:700">${appPhone}</span>
+        </button>
+        <button onclick="window.open('https://wa.me/88${appPhone}'.replace(/[^0-9]/g,''),'_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
+          💬 WhatsApp<br><span style="font-size:12px;font-weight:700">${appPhone}</span>
+        </button>
+      </div>`;
     document.getElementById('confirm-modal').querySelector('.confirm-btns').innerHTML=
       '<button class="confirm-cancel" onclick="confirmCancel()" style="width:100%">বাতিল</button>';
     document.getElementById('confirm-modal').classList.add('open');
@@ -1072,12 +1091,23 @@ function openPhonePopup(ref,appPhone){
   document.getElementById('confirm-msg').innerHTML=`
     <div style="font-weight:700;font-size:13px;margin-bottom:12px">📞 ${name}</div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <button onclick="window.location.href='tel:${appPhone}';confirmCancel()" style="background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:10px;border-radius:8px;font-size:13px;cursor:pointer;text-align:left">
-        👤 Applicant<br><span style="font-size:14px;font-weight:700">${appPhone}</span>
-      </button>
-      <button onclick="window.location.href='tel:${clientPhone}';confirmCancel()" style="background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd;padding:10px;border-radius:8px;font-size:13px;cursor:pointer;text-align:left">
-        🏷️ ${policeTag}<br><span style="font-size:14px;font-weight:700">${clientPhone}</span>
-      </button>
+      <div style="display:flex;gap:6px">
+        <button onclick="window.location.href='tel:${appPhone}';confirmCancel()" style="flex:1;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
+          📱<br>${appPhone}
+        </button>
+        <button onclick="window.open('https://wa.me/88${appPhone}'.replace(/[^0-9]/g,''),'_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
+          💬<br>${appPhone}
+        </button>
+      </div>
+      <div style="font-size:10px;color:#475569;text-align:center;margin:2px 0">🏷️ ${policeTag}</div>
+      <div style="display:flex;gap:6px">
+        <button onclick="window.location.href='tel:${clientPhone}';confirmCancel()" style="flex:1;background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
+          📱<br>${clientPhone}
+        </button>
+        <button onclick="window.open('https://wa.me/88${clientPhone}'.replace(/[^0-9]/g,''),'_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
+          💬<br>${clientPhone}
+        </button>
+      </div>
     </div>`;
   document.getElementById('confirm-modal').querySelector('.confirm-btns').innerHTML=
     '<button class="confirm-cancel" onclick="confirmCancel()" style="width:100%">বাতিল</button>';
@@ -1102,10 +1132,15 @@ function openClientDetailModal(name){
     filesEl.innerHTML=tagged.map(function(a){
       const s=stars[a.ref]||0;const si=s===2?'🔴':s===1?'⭐':'📄';
       const n=parseInt((a.status||'').split('/')[0])||0;const sc='s'+Math.min(n,10);
+      const isCol=collected[a.ref]||false;const isFwd=forwarded[a.ref]||false;const isDel=delivered[a.ref]||false;
+      const stg=isDel?3:isCol?2:isFwd?1:0;
+      const stgIco=stg===0?'⏳':stg===1?'📤':stg===2?'📦':'✅';
+      const stgHtml=(s>0)?'<span style="font-size:11px;margin-left:4px">'+stgIco+'</span>':'';
       return '<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #1e3a5f">'
         +'<span>'+si+'</span>'
         +'<span style="flex:1;font-size:12px;color:#94a3b8">'+a.name+'</span>'
         +'<span class="status '+sc+'" style="font-size:10px;padding:2px 6px">'+trimStatus(a.status)+'</span>'
+        +stgHtml
         +'</div>';
     }).join('');
   } else {
@@ -1118,7 +1153,20 @@ function closeClientDetailModal(){document.getElementById('client-detail-modal')
 function callClientPhone(){
   if(!currentClientName)return;
   const phone=clientPhones[currentClientName];
-  if(phone)window.location.href='tel:'+phone;
+  if(!phone)return;
+  document.getElementById('confirm-msg').innerHTML=`
+    <div style="font-weight:700;font-size:13px;margin-bottom:10px">📞 ${currentClientName}</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="window.location.href='tel:${phone}';confirmCancel()" style="flex:1;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
+        📱 কল<br><span style="font-size:12px;font-weight:700">${phone}</span>
+      </button>
+      <button onclick="window.open('https://wa.me/88${phone}'.replace(/[^0-9]/g,''),'_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
+        💬 WhatsApp<br><span style="font-size:12px;font-weight:700">${phone}</span>
+      </button>
+    </div>`;
+  document.getElementById('confirm-modal').querySelector('.confirm-btns').innerHTML=
+    '<button class="confirm-cancel" onclick="confirmCancel()" style="width:100%">বাতিল</button>';
+  document.getElementById('confirm-modal').classList.add('open');
 }
 function saveClientNote(){
   if(!currentClientName)return;
@@ -1726,7 +1774,9 @@ function cardHTML(app){
   const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
   let dayClass='day-normal';
   if(days){if(s===2&&days>=5)dayClass='day-warn-urgent';else if(s===1&&days>=12)dayClass='day-warn-important';}
-  const stageBtn=s>0?`<button class="stage-btn ${stageCls}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'';
+  const statusNum2=parseInt((app.status||'').split('/')[0])||0;
+  const alertBlink=(s===1&&statusNum2>=2&&stage===0)?'alert-blink':'';
+  const stageBtn=s>0?`<button class="stage-btn ${stageCls} ${alertBlink}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'';
   let deuHTML='';
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
   const showPrint=showDetails&&printDate&&!isDelivered;

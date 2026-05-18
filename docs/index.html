@@ -874,9 +874,14 @@ function getDisplayApps(){return allApps.filter(a=>a.status!=='10/10'&&!deletedR
 function todayStr(){const d=new Date();return String(d.getDate()).padStart(2,'0')+'-'+MONTHS_SHORT[d.getMonth()]+'-'+String(d.getFullYear()).slice(2);}
 function getTodayDisplay(){const d=new Date();return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;}
 function trimStatus(s){
-  if(!s)return '';const m=s.match(/\d+\/\d+/);if(m)return m[0];const low=s.toLowerCase();
+  if(!s)return '';
+  const m=s.match(/\d+\/\d+/);if(m)return m[0];
+  const low=s.toLowerCase();
   if(low.includes('pending for payment'))return 'Pending For Payment';
   if(low.includes('draft'))return 'Draft';
+  // Remove Bengali text after dash
+  const dashIdx=s.indexOf('-');
+  if(dashIdx>0){const before=s.substring(0,dashIdx).trim();if(before.length<=25)return before;}
   return s.length>20?s.substring(0,20)+'…':s;
 }
 // Date chip: live dot on RIGHT, same font size as cal heading (13px)
@@ -1168,7 +1173,7 @@ function stagePressStart(e,ref){
     if(stage===0){forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↑ Forwarded');}
     else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);collectedDate[ref]=todayStr();save();render();showToast('✅ Collected');}
     else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];delete collectedDate[ref];save();render();showToast('↺ Reset');}
-  },stage===2?2000:600);
+  },stage===2?2000:stage===3?3000:600);
 }
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
 
@@ -1664,7 +1669,7 @@ function cardHTML(app){
   const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded;
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
-  const stage=isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':'✅';const stageCls=stage===0?'':stage===1?'fwd':'col';
+  const stage=isDelivered?3:isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':stage===2?'📦':'✅';const stageCls=stage===0?'':stage===1?'fwd':stage===2?'col':'del';
   const statusNum=parseInt((app.status||'').split('/')[0])||0;
   const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
   const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
@@ -1686,7 +1691,7 @@ function cardHTML(app){
   const nameClick=`openNoteModal('${app.ref}');event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
   const daySpan=days?`<span class="${dayClass}" onclick="openDayPopup('${app.ref}',${days},${s});event.stopPropagation()" style="cursor:pointer">Day:${String(days).padStart(2,'0')}</span>`:'';
-  const colDaySpan=daysCol!==null?`<span class="day-collected">📦${String(daysCol).padStart(2,'0')}d</span>`:'';
+  const colDaySpan=daysCol!==null?`<span class="day-collected">+${String(daysCol).padStart(2,'0')}d</span>`:'';
   const phoneTag=policeTags[app.ref]||'';
   const clientPhone=phoneTag&&clientPhones[phoneTag]?clientPhones[phoneTag]:'';
   const hasClientPhone=!!(clientPhone);

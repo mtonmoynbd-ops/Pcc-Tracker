@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="bn"><head><meta charset="UTF-8">
 
@@ -874,22 +875,16 @@ function todayStr(){const d=new Date();return String(d.getDate()).padStart(2,'0'
 function getTodayDisplay(){const d=new Date();return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;}
 function trimStatus(s){
   if(!s)return '';
-  const m=s.match(/\d+\/\d+/);if(m)return m[0];
-  const low=s.toLowerCase();
-  if(low.includes('pending for payment'))return 'Pending For Payment';
-  if(low.includes('draft'))return 'Draft';
-  // Remove everything after dash (handles "Draft- খসরা" style)
-  const di=s.indexOf('-');
-  if(di>0){
-    const before=s.substring(0,di).trim();
-    if(before.length>=2&&before.length<=25)return before;
-  }
-  // Also handle em-dash
-  const di2=s.indexOf('–');
-  if(di2>0){
-    const before=s.substring(0,di2).trim();
-    if(before.length>=2&&before.length<=25)return before;
-  }
+  var m=s.match(/\d+\/\d+/);if(m)return m[0];
+  var low=s.toLowerCase();
+  if(low.indexOf('pending for payment')>=0)return 'Pending For Payment';
+  if(low.indexOf('draft')>=0)return 'Draft';
+  var di=s.indexOf('-');
+  if(di>1){var b=s.substring(0,di).trim();if(b.length>=2&&b.length<=25)return b;}
+  var di2=s.indexOf('–');
+  if(di2>1){var b2=s.substring(0,di2).trim();if(b2.length>=2&&b2.length<=25)return b2;}
+  var di3=s.indexOf('—');
+  if(di3>1){var b3=s.substring(0,di3).trim();if(b3.length>=2&&b3.length<=25)return b3;}
   return s.length>22?s.substring(0,22)+'…':s;
 }
 // Date chip: live dot on RIGHT, same font size as cal heading (13px)
@@ -1540,6 +1535,39 @@ function renderClientModal(){
       +'<button class="client-del-btn" data-del="'+n+'" onclick="event.stopPropagation();deleteClientName(this.dataset.del)">×</button>'
       +'</div></div></div>';
   }).join('');
+}
+function editClient(name){
+  const list=document.getElementById('client-name-list');
+  list.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'
+    +'<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px">✏️ সম্পাদনা</div>'
+    +'<input id="edit-cli-name" style="background:#1e293b;border:1px solid #2563eb;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;width:100%;box-sizing:border-box" value="'+name+'">'
+    +'<input id="edit-cli-phone" style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;width:100%;box-sizing:border-box" value="'+(clientPhones[name]||'')+'" placeholder="ফোন নম্বর...">'
+    +'<input type="hidden" id="edit-cli-name-hidden" value="'+name+'">'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="saveEditClient(document.getElementById("edit-cli-name-hidden").value)" style="flex:1;background:#2563eb;border:none;color:#fff;padding:9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">সংরক্ষণ</button>'
+    +'<button onclick="renderClientModal()" style="flex:1;background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:9px;border-radius:8px;font-size:13px;cursor:pointer">বাতিল</button>'
+    +'</div></div>';
+  setTimeout(function(){var el=document.getElementById('edit-cli-name');if(el){el.focus();el.select();}},80);
+}
+function saveEditClient(oldName){
+  var nameEl=document.getElementById('edit-cli-name');
+  var phoneEl=document.getElementById('edit-cli-phone');
+  if(!nameEl)return;
+  var newName=nameEl.value.trim();
+  var newPhone=phoneEl?phoneEl.value.trim():'';
+  if(!newName){showToast('নাম খালি রাখা যাবে না');return;}
+  var idx=clientNames.indexOf(oldName);
+  if(idx>=0)clientNames[idx]=newName;
+  if(newPhone)clientPhones[newName]=newPhone;
+  else delete clientPhones[newName];
+  if(oldName!==newName){
+    if(clientPhones[oldName]&&!clientPhones[newName])clientPhones[newName]=clientPhones[oldName];
+    delete clientPhones[oldName];
+    if(clientNotes[oldName]){clientNotes[newName]=clientNotes[oldName];delete clientNotes[oldName];}
+    Object.keys(policeTags).forEach(function(ref){if(policeTags[ref]===oldName)policeTags[ref]=newName;});
+    if(activePoliceFilter===oldName)activePoliceFilter=newName;
+  }
+  save();renderClientModal();render();showToast('✅ আপডেট হয়েছে');
 }
 function addClientName(){
   const inp=document.getElementById('client-add-input');

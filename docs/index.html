@@ -24,7 +24,7 @@
   body.light .phone-link { color: #0284c7; }
   body.light .police-inline-tag { color: #7c3aed; background: #f5f3ff; border-color: #c4b5fd; }
   body.light .print-badge { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
-  body.light .deu-text { background: #fef2f2; color: #dc2626; }
+  body.light .deu-text { background: #dc2626; color: #fff; }
   /* Status badges — keep colored, just slightly adjusted */
   body.light .s1, body.light .s2 { background: #dbeafe; color: #1d4ed8; }
   body.light .s3, body.light .s4, body.light .s5 { background: #fef3c7; color: #b45309; }
@@ -485,7 +485,7 @@
   .s6,.s7{background:#1e3a5f;color:#a78bfa} .s8,.s9{background:#1e3a5f;color:#34d399}
   @keyframes blink-imp{0%,100%{opacity:1;box-shadow:0 0 0 rgba(251,191,36,0)}50%{opacity:0.1;box-shadow:0 0 10px rgba(251,191,36,0.7)}}
   .status-blink{animation:blink-imp 0.9s ease-in-out infinite}
-  .deu-text{color:#ef4444;font-size:13px;font-weight:700;padding:2px 8px;border-radius:4px;background:#3b0a0a;cursor:pointer;flex-shrink:0}
+  .deu-text{color:#fff;font-size:13px;font-weight:700;padding:2px 8px;border-radius:4px;background:#dc2626;cursor:pointer;flex-shrink:0}
   .deu-input{background:none;border:none;border-bottom:1px solid #ef4444;color:#ef4444;font-size:13px;font-weight:700;width:60px;outline:none;text-align:center;flex-shrink:0}
   .print-badge{color:#94a3b8;font-size:11px;cursor:pointer;padding:2px 8px;border:1px solid #334155;border-radius:4px;background:#1e293b;flex-shrink:0;white-space:nowrap}
   .note-preview{font-size:12px;color:#94a3b8;margin-top:4px;cursor:pointer}
@@ -878,12 +878,19 @@ function trimStatus(s){
   const low=s.toLowerCase();
   if(low.includes('pending for payment'))return 'Pending For Payment';
   if(low.includes('draft'))return 'Draft';
-  // Remove Bengali/extra text after dash or space
-  // Bengali unicode range: \u0980-\u09FF
-  let cleaned=s.replace(/[-–].*$/,'').trim();
-  cleaned=cleaned.replace(/[\u0980-\u09FF\s]+$/,'').trim();
-  if(cleaned.length>0&&cleaned.length<=25)return cleaned;
-  return s.length>20?s.substring(0,20)+'…':s;
+  // Remove everything after dash (handles "Draft- খসরা" style)
+  const di=s.indexOf('-');
+  if(di>0){
+    const before=s.substring(0,di).trim();
+    if(before.length>=2&&before.length<=25)return before;
+  }
+  // Also handle em-dash
+  const di2=s.indexOf('–');
+  if(di2>0){
+    const before=s.substring(0,di2).trim();
+    if(before.length>=2&&before.length<=25)return before;
+  }
+  return s.length>22?s.substring(0,22)+'…':s;
 }
 // Date chip: live dot on RIGHT, same font size as cal heading (13px)
 function todayDateChipHTML(){
@@ -1529,8 +1536,8 @@ function renderClientModal(){
       +'<div style="display:flex;justify-content:space-between;align-items:center">'
       +'<div style="flex:1"><div style="font-size:13px;color:#c4b5fd">'+n+'</div>'+ph+'</div>'
       +'<div style="display:flex;gap:6px;flex-shrink:0">'
-      +'<button data-edit="'+n+'" onclick="editClient(this.dataset.edit)" style="background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:3px 8px;border-radius:6px;font-size:11px;cursor:pointer">✏️</button>'
-      +'<button class="client-del-btn" data-del="'+n+'" onclick="deleteClientName(this.dataset.del)">×</button>'
+      +'<button data-edit="'+n+'" onclick="event.stopPropagation();editClient(this.dataset.edit)" style="background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:3px 8px;border-radius:6px;font-size:11px;cursor:pointer">✏️</button>'
+      +'<button class="client-del-btn" data-del="'+n+'" onclick="event.stopPropagation();deleteClientName(this.dataset.del)">×</button>'
       +'</div></div></div>';
   }).join('');
 }

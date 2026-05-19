@@ -1419,7 +1419,7 @@ function openNoteModal(ref){
   document.getElementById('note-modal').classList.add('open');setTimeout(()=>document.getElementById('note-modal-textarea').focus(),100);
 }
 function closeNoteModal(){document.getElementById('note-modal').classList.remove('open');noteModalRef=null;}
-function addNoteTemplate(txt){const ta=document.getElementById('note-modal-textarea');const cur=ta.value.trim();ta.value=cur?cur+' · '+txt:ta.focus();}
+function addNoteTemplate(txt){const ta=document.getElementById('note-modal-textarea');const cur=ta.value.trim();ta.value=cur?cur+' · '+txt:txt;ta.focus();}
 function saveNoteModal(){if(!noteModalRef)return;notes[noteModalRef]=document.getElementById('note-modal-textarea').value.trim();save();closeNoteModal();render();}
 
 // ── Archive ───────────────────────────────────────────────
@@ -1935,7 +1935,6 @@ function render(){
 async function load(){
   try{
     const r=await fetch('data.json?t='+Date.now());
-    if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
     allApps=d.applications;
@@ -1943,16 +1942,7 @@ async function load(){
     render();
   }catch(e){
     if(allApps.length>0){render();}
-    else{
-      setTimeout(function(){
-        fetch('data.json?t='+Date.now()).then(function(r){return r.json();}).then(function(d){
-          document.getElementById('updated').textContent='আপডেট: '+d.updated;
-          allApps=d.applications;render();
-        }).catch(function(){
-          document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';
-        });
-      },2000);
-    }
+    else{document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
   }
 }
 load();

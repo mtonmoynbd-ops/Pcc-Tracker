@@ -261,7 +261,7 @@
   .icon-filter-btn.police { border-color: #a78bfa; background: #2d1f5e; margin-left: auto; }
   body.amoled .icon-filter-btn.police { border-color: #a78bfa; background: #1a0a3a; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
-  .icon-filter-btn.archive-btn { border-color: #334155; background: #1e293b; }
+  .icon-filter-btn.archive-btn { border-color: #60a5fa; background: #1e3a5f; }
 
   /* Live dot */
   @keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
@@ -714,6 +714,15 @@
       <button class="client-add-btn" onclick="addClientName()" style="margin-top:6px">+ যোগ</button>
     </div>
     <div class="client-name-list" id="client-name-list"></div>
+    <div id="client-edit-area" style="display:none;flex-direction:column;gap:8px;margin-top:8px">
+      <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px">✏️ সম্পাদনা</div>
+      <input id="edit-cli-name" style="background:#1e293b;border:1px solid #2563eb;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;width:100%;box-sizing:border-box" placeholder="নাম...">
+      <input id="edit-cli-phone" style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;width:100%;box-sizing:border-box" placeholder="ফোন নম্বর...">
+      <div style="display:flex;gap:8px">
+        <button onclick="saveEditClient()" style="flex:1;background:#2563eb;border:none;color:#fff;padding:9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">সংরক্ষণ</button>
+        <button onclick="cancelEditClient()" style="flex:1;background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:9px;border-radius:8px;font-size:13px;cursor:pointer">বাতিল</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1410,7 +1419,7 @@ function openNoteModal(ref){
   document.getElementById('note-modal').classList.add('open');setTimeout(()=>document.getElementById('note-modal-textarea').focus(),100);
 }
 function closeNoteModal(){document.getElementById('note-modal').classList.remove('open');noteModalRef=null;}
-function addNoteTemplate(txt){const ta=document.getElementById('note-modal-textarea');const cur=ta.value.trim();ta.value=cur?cur+' · '+txt:txt;ta.focus();}
+function addNoteTemplate(txt){const ta=document.getElementById('note-modal-textarea');const cur=ta.value.trim();ta.value=cur?cur+' · '+txt:ta.focus();}
 function saveNoteModal(){if(!noteModalRef)return;notes[noteModalRef]=document.getElementById('note-modal-textarea').value.trim();save();closeNoteModal();render();}
 
 // ── Archive ───────────────────────────────────────────────
@@ -1573,6 +1582,9 @@ function closeClientModal(){document.getElementById('client-modal').classList.re
 function renderClientModal(){
   const list=document.getElementById('client-name-list');
   if(!clientNames.length){list.innerHTML='<div style="font-size:12px;color:#475569;text-align:center;padding:12px">কোনো নাম নেই</div>';return;}
+  var editArea=document.getElementById('client-edit-area');
+  if(editArea)editArea.style.display='none';
+  list.style.display='';
   list.innerHTML=clientNames.map(function(n){
     const ph=clientPhones[n]?'<div style="font-size:10px;color:#64748b;margin-top:1px">'+clientPhones[n]+'</div>':'';
     return '<div class="client-name-row" style="flex-direction:column;align-items:stretch;padding:8px 10px">'
@@ -1766,7 +1778,7 @@ function cardHTML(app){
   const statusNum=parseInt((app.status||'').split('/')[0])||0;
   const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
   const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
-  const daysCol=(isCol&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
+  const daysCol=(isCol&&!isDelivered&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
@@ -1922,16 +1934,30 @@ function render(){
 
 async function load(){
   try{
-    const r=await fetch('data.json?t='+Date.now());const d=await r.json();
+    const r=await fetch('data.json?t='+Date.now());
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
     allApps=d.applications;
     try{const ur=await fetch('userdata.json?t='+Date.now());if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
     render();
-  }catch(e){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
+  }catch(e){
+    if(allApps.length>0){render();}
+    else{
+      setTimeout(function(){
+        fetch('data.json?t='+Date.now()).then(function(r){return r.json();}).then(function(d){
+          document.getElementById('updated').textContent='আপডেট: '+d.updated;
+          allApps=d.applications;render();
+        }).catch(function(){
+          document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';
+        });
+      },2000);
+    }
+  }
 }
 load();
 setInterval(load,30000);
 setInterval(()=>syncFromCloud().catch(()=>{}),300000);
 </script>
 
-</body></html> 
+</body></html>

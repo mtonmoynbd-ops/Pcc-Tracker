@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
-<html lang="bn"><head><meta charset="UTF-8">
+<!-- saved from url=(0052)file:///C:/Users/ADMIN/Downloads/pcc_tracker_10.html -->
+<html lang="bn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PCC Tracker</title>
@@ -514,6 +516,7 @@
 </style>
 </head>
 <body>
+<script>(function(){var t=localStorage.getItem('pcc_theme');if(t==='light'||t==='amoled')document.body.className=t;}())</script>
 
 <svg style="display:none">
   <symbol id="ico-archive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -574,7 +577,7 @@
   <div class="cal-days" id="cal-days"></div>
 </div>
 
-<div id="list"><div class="loading">❌ লোড হয়নি</div></div>
+<div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
 <button class="client-name-bottom-btn" onclick="openClientModal()">🏷️ Add Clients</button>
 <div id="toast"></div>
 
@@ -690,6 +693,7 @@
     <div class="modal-title"><span>📦 আর্কাইভ</span><button class="modal-close" onclick="closeArchive()">✕</button></div>
     <div class="arch-tabs">
       <button class="arch-tab active" id="arch-tab-month" onclick="setArchTab(&#39;month&#39;)">মাস</button>
+      <button class="arch-tab" id="arch-tab-delivered" onclick="setArchTab(&#39;delivered&#39;)">✅ ডেলিভারেড</button>
       <button class="arch-tab" id="arch-tab-reset" onclick="setArchTab(&#39;reset&#39;)">রিসেট</button>
       <button class="arch-tab" id="arch-tab-deleted" onclick="setArchTab(&#39;deleted&#39;)">মুছে ফেলা</button>
     </div>
@@ -731,7 +735,7 @@
     <div class="modal-title"><span id="client-detail-title"></span><button class="modal-close" onclick="closeClientDetailModal()">✕</button></div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px">
       <div style="flex:1">
-        <a id="client-detail-phone" href="#" onclick="callClientPhone();return false" style="font-size:14px;font-weight:700;color:#60a5fa;text-decoration:none;display:block;margin-bottom:4px"></a>
+        <a id="client-detail-phone" href="file:///C:/Users/ADMIN/Downloads/pcc_tracker_10.html#" onclick="callClientPhone();return false" style="font-size:14px;font-weight:700;color:#60a5fa;text-decoration:none;display:block;margin-bottom:4px"></a>
         <div style="font-size:11px;color:#94a3b8;font-style:italic" id="client-detail-note-preview"></div>
       </div>
       <button onclick="openClientNoteEdit()" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0">✏️ নোট</button>
@@ -861,6 +865,7 @@ let resetArchive=JSON.parse(localStorage.getItem('pcc_reset_archive')||'[]');
 let calNotes=JSON.parse(localStorage.getItem('pcc_cal_notes')||'{}');
 let deletedRefs=new Set(JSON.parse(localStorage.getItem('pcc_deleted_refs')||'[]'));
 let deletedAppsStore=JSON.parse(localStorage.getItem('pcc_deleted_apps')||'[]');
+let deliveredArchive=JSON.parse(localStorage.getItem('pcc_delivered_archive')||'[]');
 let editingDeu={};
 let resetConfirm=false,resetTimer=null;
 let modalType=null,activeFilter='all',activePoliceFilter=null;
@@ -960,6 +965,7 @@ function saveLocal(){
   localStorage.setItem('pcc_cal_notes',JSON.stringify(calNotes));
   localStorage.setItem('pcc_deleted_refs',JSON.stringify([...deletedRefs]));
   localStorage.setItem('pcc_deleted_apps',JSON.stringify(deletedAppsStore));
+  localStorage.setItem('pcc_delivered_archive',JSON.stringify(deliveredArchive));
 }
 function save(){saveLocal();scheduleBackup();}
 
@@ -1080,6 +1086,7 @@ function openPhonePopup(ref,appPhone){
   const clientPhone=policeTag&&clientPhones[policeTag]?clientPhones[policeTag]:'';
   const app=allApps.find(a=>a.ref===ref);
   const name=app?app.name:ref;
+  const waApp='https://wa.me/'+('88'+appPhone).replace(/[^0-9]/g,'');
   if(!clientPhone){
     // No client tag — direct call
     document.getElementById('confirm-msg').innerHTML=`
@@ -1088,7 +1095,7 @@ function openPhonePopup(ref,appPhone){
         <button onclick="window.location.href='tel:${appPhone}';confirmCancel()" style="flex:1;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
           📱 কল<br><span style="font-size:12px;font-weight:700">${appPhone}</span>
         </button>
-        <button onclick="window.open('https://wa.me/88${appPhone}'.replace(/[^0-9]/g,''),'_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
+        <button onclick="window.open('${waApp}','_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
           💬 WhatsApp<br><span style="font-size:12px;font-weight:700">${appPhone}</span>
         </button>
       </div>`;
@@ -1097,6 +1104,7 @@ function openPhonePopup(ref,appPhone){
     document.getElementById('confirm-modal').classList.add('open');
     return;
   }
+  const waClient='https://wa.me/'+('88'+clientPhone).replace(/[^0-9]/g,'');
   document.getElementById('confirm-msg').innerHTML=`
     <div style="font-weight:700;font-size:13px;margin-bottom:12px">📞 ${name}</div>
     <div style="display:flex;flex-direction:column;gap:8px">
@@ -1104,7 +1112,7 @@ function openPhonePopup(ref,appPhone){
         <button onclick="window.location.href='tel:${appPhone}';confirmCancel()" style="flex:1;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
           📱<br>${appPhone}
         </button>
-        <button onclick="window.open('https://wa.me/88${appPhone}'.replace(/[^0-9]/g,''),'_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
+        <button onclick="window.open('${waApp}','_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
           💬<br>${appPhone}
         </button>
       </div>
@@ -1113,7 +1121,7 @@ function openPhonePopup(ref,appPhone){
         <button onclick="window.location.href='tel:${clientPhone}';confirmCancel()" style="flex:1;background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
           📱<br>${clientPhone}
         </button>
-        <button onclick="window.open('https://wa.me/88${clientPhone}'.replace(/[^0-9]/g,''),'_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
+        <button onclick="window.open('${waClient}','_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:8px;border-radius:8px;font-size:11px;cursor:pointer;text-align:center">
           💬<br>${clientPhone}
         </button>
       </div>
@@ -1163,13 +1171,14 @@ function callClientPhone(){
   if(!currentClientName)return;
   const phone=clientPhones[currentClientName];
   if(!phone)return;
+  const waPhone='https://wa.me/'+('88'+phone).replace(/[^0-9]/g,'');
   document.getElementById('confirm-msg').innerHTML=`
     <div style="font-weight:700;font-size:13px;margin-bottom:10px">📞 ${currentClientName}</div>
     <div style="display:flex;gap:8px">
       <button onclick="window.location.href='tel:${phone}';confirmCancel()" style="flex:1;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
         📱 কল<br><span style="font-size:12px;font-weight:700">${phone}</span>
       </button>
-      <button onclick="window.open('https://wa.me/88${phone}'.replace(/[^0-9]/g,''),'_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
+      <button onclick="window.open('${waPhone}','_blank');confirmCancel()" style="flex:1;background:#14532d;border:1px solid #22c55e;color:#4ade80;padding:10px;border-radius:8px;font-size:13px;cursor:pointer">
         💬 WhatsApp<br><span style="font-size:12px;font-weight:700">${phone}</span>
       </button>
     </div>`;
@@ -1427,11 +1436,12 @@ function openArchive(){archYearFilter=null;archMonthFilter=null;renderArchiveFil
 function closeArchive(){document.getElementById('archive-modal').classList.remove('open');}
 function setArchTab(tab){
   archTab=tab;archYearFilter=null;archMonthFilter=null;
-  ['month','reset','deleted'].forEach(t=>document.getElementById('arch-tab-'+t).classList.toggle('active',t===tab));
+  ['month','delivered','reset','deleted'].forEach(t=>{const el=document.getElementById('arch-tab-'+t);if(el)el.classList.toggle('active',t===tab);});
   renderArchiveFilters();renderArchiveContent();
 }
 function getArchiveYears(){
   if(archTab==='month'){const yrs=new Set();allApps.forEach(a=>{const p=(a.apply_date||'').toUpperCase().split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}});return [...yrs].sort((a,b)=>b-a);}
+  else if(archTab==='delivered'){const yrs=new Set();deliveredArchive.forEach(a=>{if(a.deliveredDate){const p=a.deliveredDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
   else if(archTab==='reset'){const yrs=new Set();resetArchive.forEach(r=>{if(r.resetDate){const p=r.resetDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
   else{const yrs=new Set();deletedAppsStore.forEach(a=>{if(a.deletedDate){const p=a.deletedDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
 }
@@ -1469,6 +1479,29 @@ function archItemHTML(a,si){
 }
 function renderArchiveContent(){
   const el=document.getElementById('arch-content');
+  if(archTab==='delivered'){
+    let filtered=deliveredArchive;
+    if(archYearFilter){filtered=deliveredArchive.filter(a=>{const p=(a.deliveredDate||'').split('-');return p.length===3&&(2000+parseInt(p[2]))===archYearFilter;});}
+    if(!filtered.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো Delivered রেকর্ড নেই</div>';return;}
+    // Group by deliveredDate
+    const byDate={};
+    filtered.forEach(a=>{const k=a.deliveredDate||'অজানা';if(!byDate[k])byDate[k]=[];byDate[k].push(a);});
+    el.innerHTML=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,items])=>{
+      const urgents=items.filter(a=>a.starLevel===2);const importants=items.filter(a=>a.starLevel===1);
+      const copyStr=JSON.stringify(items).replace(/"/g,'&quot;');
+      return `<div class="arch-section">
+        <div class="arch-header"><span class="arch-month-label">✅ ${date}</span>
+          <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
+        <div class="arch-badges">
+          ${urgents.length?`<span class="arch-badge urgent">🔴 ${urgents.length}</span>`:''}
+          ${importants.length?`<span class="arch-badge important">⭐ ${importants.length}</span>`:''}
+          <span class="arch-badge total">Total ${items.length}</span>
+        </div>
+        <div class="arch-list">${urgents.map(a=>archItemHTML(a,'🔴')).join('')}${importants.map(a=>archItemHTML(a,'⭐')).join('')}</div>
+      </div>`;
+    }).join('');
+    return;
+  }
   if(archTab==='month'){
     const groups={};
     allApps.forEach(a=>{
@@ -1552,6 +1585,8 @@ async function deleteSelected(){
 // ── Archive search ────────────────────────────────────────
 function searchInArchive(q){
   if(!q)return[];const results=[];
+  const delv=deliveredArchive.filter(a=>(a.name||'').toLowerCase().includes(q)||(a.ref||'').toLowerCase().includes(q));
+  if(delv.length)results.push({source:'Delivered আর্কাইভ',items:delv.map(a=>({name:a.name,ref:a.ref,phone:a.phone||'',applyDate:a.apply_date||a.applyDate,deliveredDate:a.deliveredDate}))});
   resetArchive.forEach(r=>{
     const matched=[...(r.urgentItems||[]),...(r.importantItems||[])].filter(a=>(a.name||'').toLowerCase().includes(q)||(a.ref||'').toLowerCase().includes(q));
     if(matched.length)results.push({source:`রিসেট: ${r.resetDate}`,items:matched});
@@ -1596,20 +1631,22 @@ function renderClientModal(){
       +'</div></div></div>';
   }).join('');
 }
+let editingClientOldName='';
 function editClient(name){
+  editingClientOldName=name;
   const list=document.getElementById('client-name-list');
   list.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'
     +'<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px">✏️ সম্পাদনা</div>'
     +'<input id="edit-cli-name" style="background:#1e293b;border:1px solid #2563eb;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;width:100%;box-sizing:border-box" value="'+name+'">'
     +'<input id="edit-cli-phone" style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;width:100%;box-sizing:border-box" value="'+(clientPhones[name]||'')+'" placeholder="ফোন নম্বর...">'
-    +'<input type="hidden" id="edit-cli-name-hidden" value="'+name+'">'
     +'<div style="display:flex;gap:8px">'
-    +'<button onclick="saveEditClient(document.getElementById("edit-cli-name-hidden").value)" style="flex:1;background:#2563eb;border:none;color:#fff;padding:9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">সংরক্ষণ</button>'
+    +'<button onclick="saveEditClient()" style="flex:1;background:#2563eb;border:none;color:#fff;padding:9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">সংরক্ষণ</button>'
     +'<button onclick="renderClientModal()" style="flex:1;background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:9px;border-radius:8px;font-size:13px;cursor:pointer">বাতিল</button>'
     +'</div></div>';
   setTimeout(function(){var el=document.getElementById('edit-cli-name');if(el){el.focus();el.select();}},80);
 }
-function saveEditClient(oldName){
+function saveEditClient(){
+  var oldName=editingClientOldName;
   var nameEl=document.getElementById('edit-cli-name');
   var phoneEl=document.getElementById('edit-cli-phone');
   if(!nameEl)return;
@@ -1781,6 +1818,7 @@ function cardHTML(app){
   const daysCol=(isCol&&!isDelivered&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
+  const shouldBlink910=(s>=1)&&!isDelivered&&num===9&&!isCol;
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
   // Due code + collected → blink
   const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
@@ -1831,7 +1869,7 @@ function cardHTML(app){
           &nbsp;${daySpan}${colDaySpan?'&nbsp;'+colDaySpan:''}
         </div>
         <div class="bottom-row">
-          <span class="status ${scls}${shouldBlink?' status-blink':''}" onclick="${statusClick}">${trimStatus(app.status)}</span>
+          <span class="status ${scls}${(shouldBlink||shouldBlink910)?' status-blink':''}" onclick="${statusClick}">${trimStatus(app.status)}</span>
           ${printBadge}${phoneHTML}
         </div>
         ${deuHTML?`<div class="bottom-row" style="margin-top:4px">${deuHTML}</div>`:''}
@@ -1863,7 +1901,21 @@ async function swipeEnd(e,ref){
     if(collected[ref]&&codes[ref]&&!delivered[ref]){showToast('⚠️ Due code মুছুন আগে Delivered করুন');return;}
     const s=stars[ref]||0;
     if(s>0&&!delivered[ref]){const ok=await showConfirm('Delivered করবেন?');if(!ok)return;}
-    delivered[ref]=!delivered[ref];if(delivered[ref])showDeu[ref]=false;save();render();
+    const wasDelivered=delivered[ref];
+    delivered[ref]=!delivered[ref];
+    if(delivered[ref])showDeu[ref]=false;
+    // Starred cards: move to delivered archive on deliver; remove on un-deliver
+    if(s>0){
+      if(delivered[ref]){
+        const app=allApps.find(a=>a.ref===ref);
+        if(app&&!deliveredArchive.some(d=>d.ref===ref)){
+          deliveredArchive.push({...app,starLevel:s,deliveredDate:todayStr(),applyDate:app.apply_date});
+        }
+      } else {
+        deliveredArchive=deliveredArchive.filter(d=>d.ref!==ref);
+      }
+    }
+    save();render();
   } else if(dx>80){
     if(!delivered[ref]){showDeu[ref]=!showDeu[ref];if(showDeu[ref])editingDeu[ref]=true;save();render();if(showDeu[ref])setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}
   }
@@ -1886,7 +1938,8 @@ function render(){
   const star2=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2);
   const star1=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1);
   const normal=displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0);
-  const done=displayApps.filter(a=>delivered[a.ref]);
+  // Starred delivered cards go to delivered archive — only show normal (s=0) delivered in main list
+  const done=displayApps.filter(a=>delivered[a.ref]&&(stars[a.ref]||0)===0);
   // Date chip only shown when calendar is closed
   const dateChip=!calOpen?todayDateChipHTML():'';
   let html='';let dateShown=false;

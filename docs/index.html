@@ -1086,7 +1086,7 @@ function openPhonePopup(ref,appPhone){
   const clientPhone=policeTag&&clientPhones[policeTag]?clientPhones[policeTag]:'';
   const app=allApps.find(a=>a.ref===ref);
   const name=app?app.name:ref;
-  const waApp='whatsapp://send?phone='+('88'+appPhone).replace(/[^0-9]/g,'');
+  const waApp='intent://send/'+('88'+appPhone).replace(/[^0-9]/g,'')+'#Intent;scheme=whatsapp;package=com.whatsapp;end';
   if(!clientPhone){
     // No client tag — direct call
     document.getElementById('confirm-msg').innerHTML=`
@@ -1104,7 +1104,7 @@ function openPhonePopup(ref,appPhone){
     document.getElementById('confirm-modal').classList.add('open');
     return;
   }
-  const waClient='whatsapp://send?phone='+('88'+clientPhone).replace(/[^0-9]/g,'');
+  const waClient='intent://send/'+('88'+clientPhone).replace(/[^0-9]/g,'')+'#Intent;scheme=whatsapp;package=com.whatsapp;end';
   document.getElementById('confirm-msg').innerHTML=`
     <div style="font-weight:700;font-size:13px;margin-bottom:8px">📞 ${name}</div>
     <div style="display:flex;flex-direction:column;gap:6px">
@@ -1175,7 +1175,7 @@ function callClientPhone(){
   if(!currentClientName)return;
   const phone=clientPhones[currentClientName];
   if(!phone)return;
-  const waPhone='whatsapp://send?phone='+('88'+phone).replace(/[^0-9]/g,'');
+  const waPhone='intent://send/'+('88'+phone).replace(/[^0-9]/g,'')+'#Intent;scheme=whatsapp;package=com.whatsapp;end';
   document.getElementById('confirm-msg').innerHTML=`
     <div style="font-weight:700;font-size:13px;margin-bottom:10px">📞 ${currentClientName}</div>
     <div style="display:flex;gap:8px">

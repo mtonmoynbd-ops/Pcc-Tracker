@@ -1819,7 +1819,7 @@ function cardHTML(app){
           &nbsp;${daySpan}${colDaySpan?'&nbsp;'+colDaySpan:''}
         </div>
         <div class="bottom-row">
-          <span class="status ${scls}${shouldBlink?' status-blink':''}" onclick="${statusClick}">${app.status}</span>
+          <span class="status ${scls}${shouldBlink?' status-blink':''}" onclick="${statusClick}">${trimStatus(app.status)}</span>
           ${printBadge}${phoneHTML}
         </div>
         ${deuHTML?`<div class="bottom-row" style="margin-top:4px">${deuHTML}</div>`:''}

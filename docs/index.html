@@ -1085,7 +1085,7 @@ const _svgWa=`<svg width="21" height="21" viewBox="0 0 48 48" xmlns="http://www.
 const _svgPerson=`<svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" fill="#a78bfa"/><path fill="#a78bfa" d="M4 20c0-4 3.582-7 8-7s8 3 8 7H4z"/></svg>`;
 const _ibStyle='width:32px;height:32px;border:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;background:none;padding:0';
 function _phoneRow(num,waUrl,numColor){
-  return `<div style="display:flex;align-items:center;gap:2px;padding:7px 0;border-bottom:1px solid #1e3a5f">
+  return `<div style="display:flex;align-items:center;gap:2px;padding:5px 0;border-bottom:1px solid #1e3a5f">
     <span style="flex:1;font-size:13px;font-weight:700;color:${numColor};letter-spacing:0.3px">${num}</span>
     <button onclick="window.location.href='tel:${num}';confirmCancel()" style="${_ibStyle}">${_svgDial}</button>
     <button onclick="window.open('${waUrl}','_blank');confirmCancel()" style="${_ibStyle}">${_svgWa}</button>
@@ -1098,7 +1098,7 @@ function openPhonePopup(ref,appPhone){
   const s=stars[ref]||0;
   const headerIcon=s===2?'<svg width="13" height="13" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ef4444"/></svg>':s===1?'<svg width="14" height="14" viewBox="0 0 24 24"><path fill="#f59e0b" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>':'';
   const waApp='https://wa.me/'+('88'+appPhone).replace(/[^0-9]/g,'');
-  let html=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;padding-bottom:8px;border-bottom:2px solid #1e3a5f">
+  let html=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;padding-bottom:6px;border-bottom:2px solid #1e3a5f">
     ${headerIcon}
     <span style="font-size:13px;font-weight:700;color:#e2e8f0;letter-spacing:0.3px;text-transform:uppercase">${name}</span>
   </div>`;
@@ -1106,7 +1106,7 @@ function openPhonePopup(ref,appPhone){
   if(clientPhone){
     const waClient='https://wa.me/'+('88'+clientPhone).replace(/[^0-9]/g,'');
     html+=_phoneRow(clientPhone,waClient,'#c4b5fd');
-    html+=`<div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:5px 0 1px">
+    html+=`<div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:4px 0 0">
       <span style="font-size:12px;font-weight:600;color:#a78bfa">${policeTag}</span>
       ${_svgPerson}
     </div>`;
@@ -1972,8 +1972,10 @@ function render(){
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
   // Collect blink: urgent/important uncollected cards exist
   const hasUncollected=getDisplayApps().some(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!delivered[a.ref];});
+  const collectCount=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!delivered[a.ref];}).length;
   const collectBtn=document.getElementById('collect-btn');
   if(collectBtn){
+    collectBtn.textContent=collectCount>0?`Collect ${collectCount}`:'Collect';
     if(hasUncollected&&activeFilter!=='collected'){collectBtn.classList.add('collected-blink');collectBtn.classList.remove('collected-active');}
     else if(activeFilter==='collected'){collectBtn.classList.remove('collected-blink');collectBtn.classList.add('collected-active');}
     else{collectBtn.classList.remove('collected-blink','collected-active');}

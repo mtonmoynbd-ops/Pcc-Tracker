@@ -619,6 +619,8 @@
     </div>
   </div>
 </div>
+
+<div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title"><span id="modal-title-text"></span><button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="count-top">
@@ -1384,7 +1386,484 @@ function openDateModal(dateStr,prefix,sourceField,editRef){
     const certFile=a.cert_file||null;
     const certLink=certFile&&sourceField==='print_date'?`<a onclick="openCertInApp('https://mtonmoynbd-ops.github.io/Pcc-Tracker/${certFile}','${a.ref}');event.stopPropagation()" style="display:inline-flex;align-items:center;gap:3px;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;text-decoration:none;margin-left:6px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Certificate</a>`:'';
     return `<div class="date-modal-item"><div class="dm-left"><div class="dm-name">${a.name}</div>
-      <div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;$
+      <div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${st}">${txt}</span>${certLink}</div>
+      </div>${si?`<span class="dm-star">${si}</span>`:''}</div>`;
+  }).join('');
+  document.getElementById('date-modal').classList.add('open');
+}
+function toggleInlinePicker(){
+  if(dateModalSourceField!=='print_date')return;
+  const wrap=document.getElementById('date-picker-inline');const isV=wrap.style.display==='block';
+  wrap.style.display=isV?'none':'block';if(!isV){try{document.getElementById('inline-date-picker').showPicker();}catch(e){}}
+}
+async function confirmInlineDateChange(val){
+  if(!val)return;const newDate=fromInputDate(val);if(!newDate)return;
+  const ok=await showConfirm('তারিখ পরিবর্তন করবেন?',`${dateModalDateStr} → ${newDate}`);
+  if(!ok){document.getElementById('inline-date-picker').value=toInputDate(dateModalDateStr);return;}
+  if(dateModalEditRef){manualPrintDates[dateModalEditRef]=newDate;}
+  else{allApps.forEach(a=>{if(getEffectivePrintDate(a.ref)===dateModalDateStr)manualPrintDates[a.ref]=newDate;});}
+  save();closeDateModal();render();showToast('✅ '+newDate);
+}
+function closeDateModal(){document.getElementById('date-modal').classList.remove('open');document.getElementById('date-picker-inline').style.display='none';dateModalSourceField=null;dateModalDateStr=null;dateModalEditRef=null;}
+
+// ── Timeline ──────────────────────────────────────────────
+function openTimelineModal(ref){
+  const app=allApps.find(a=>a.ref===ref);if(!app)return;
+  const s=stars[ref]||0;const si=s===2?'🔴':s===1?'⭐':'';
+  document.getElementById('timeline-modal-title').textContent=(si?si+' ':'')+app.name;
+  const hist=statusHistory[ref]||[];
+  const clr={'s1':'#60a5fa','s2':'#60a5fa','s3':'#f59e0b','s4':'#f59e0b','s5':'#f59e0b','s6':'#a78bfa','s7':'#a78bfa','s8':'#34d399','s9':'#34d399','s10':'#34d399'};
+  if(!hist.length){document.getElementById('timeline-list').innerHTML='<div style="color:#475569;font-size:12px;text-align:center;padding:12px">কোনো ইতিহাস নেই</div>';document.getElementById('timeline-modal').classList.add('open');return;}
+  // Calculate days spent at each status
+  const histWithDuration=hist.map((h,i)=>{
+    const next=hist[i+1];
+    let days=null;
+    if(h.date){
+      const endDate=next?toInputDate(next.date):null;
+      const startDate=toInputDate(h.date);
+      if(startDate){
+        const s=new Date(startDate),e=endDate?new Date(endDate):new Date();
+        days=Math.floor((e-s)/86400000);
+      }
+    }
+    return{...h,days};
+  });
+  document.getElementById('timeline-list').innerHTML=histWithDuration.map(h=>{
+    const cleaned=trimStatus(h.status);const n2=parseInt((h.status||'').split('/')[0])||0;const sc='s'+Math.min(n2,10);const color=clr[sc]||'#94a3b8';
+    const daysTxt=h.days!==null&&h.days>=0?`<span style="font-size:10px;color:#475569;margin-left:4px">(${h.days}d)</span>`:'';
+    return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${cleaned}</span>${daysTxt}</div><span class="timeline-date">${h.date}</span></div>`;
+  }).join('');
+  document.getElementById('timeline-modal').classList.add('open');
+}
+function closeTimelineModal(){document.getElementById('timeline-modal').classList.remove('open');}
+
+// ── Note Modal ────────────────────────────────────────────
+function openNoteModal(ref){
+  noteModalRef=ref;const app=allApps.find(a=>a.ref===ref);const s=stars[ref]||0;const si=s===2?'🔴':s===1?'⭐':'';
+  document.getElementById('note-modal-title').textContent=(si?si+' ':'')+( app?app.name:ref)+' — নোট';
+  document.getElementById('note-modal-textarea').value=notes[ref]||'';
+  document.getElementById('note-modal').classList.add('open');setTimeout(()=>document.getElementById('note-modal-textarea').focus(),100);
+}
+function closeNoteModal(){document.getElementById('note-modal').classList.remove('open');noteModalRef=null;}
+function addNoteTemplate(txt){const ta=document.getElementById('note-modal-textarea');const cur=ta.value.trim();ta.value=cur?cur+' · '+txt:txt;ta.focus();}
+function saveNoteModal(){if(!noteModalRef)return;notes[noteModalRef]=document.getElementById('note-modal-textarea').value.trim();save();closeNoteModal();render();}
+
+// ── Archive ───────────────────────────────────────────────
+function openArchive(){archYearFilter=null;archMonthFilter=null;renderArchiveFilters();renderArchiveContent();document.getElementById('archive-modal').classList.add('open');}
+function closeArchive(){document.getElementById('archive-modal').classList.remove('open');}
+function setArchTab(tab){
+  archTab=tab;archYearFilter=null;archMonthFilter=null;
+  ['month','delivered','reset','deleted'].forEach(t=>{const el=document.getElementById('arch-tab-'+t);if(el)el.classList.toggle('active',t===tab);});
+  renderArchiveFilters();renderArchiveContent();
+}
+function getArchiveYears(){
+  if(archTab==='month'){const yrs=new Set();allApps.forEach(a=>{const p=(a.apply_date||'').toUpperCase().split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}});return [...yrs].sort((a,b)=>b-a);}
+  else if(archTab==='delivered'){const yrs=new Set();deliveredArchive.forEach(a=>{if(a.deliveredDate){const p=a.deliveredDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
+  else if(archTab==='reset'){const yrs=new Set();resetArchive.forEach(r=>{if(r.resetDate){const p=r.resetDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
+  else{const yrs=new Set();deletedAppsStore.forEach(a=>{if(a.deletedDate){const p=a.deletedDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
+}
+function renderArchiveFilters(){
+  const wrap=document.getElementById('arch-filter-wrap');const years=getArchiveYears();
+  if(years.length<=1){wrap.innerHTML='';return;}
+  let html=`<div class="arch-year-row">`;
+  years.forEach(y=>{html+=`<span class="arch-year-chip ${archYearFilter===y?'active':''}" onclick="setArchYear(${y})">${y}</span>`;});
+  html+=`</div>`;
+  if(archTab==='month'&&archYearFilter){
+    const months=new Set();
+    allApps.forEach(a=>{const p=(a.apply_date||'').toUpperCase().split('-');if(p.length===3){const yr=2000+parseInt(p[2]);const mo=MONTHS_UP.indexOf(p[1]);if(yr===archYearFilter&&mo>=0)months.add(mo);}});
+    if(months.size>1){html+=`<div class="arch-month-row">`;[...months].sort((a,b)=>b-a).forEach(mo=>{html+=`<span class="arch-month-chip ${archMonthFilter===mo?'active':''}" onclick="setArchMonth(${mo})">${MONTHS_SHORT[mo]}</span>`;});html+=`</div>`;}
+  }
+  wrap.innerHTML=html;
+}
+function setArchYear(y){archYearFilter=archYearFilter===y?null:y;archMonthFilter=null;renderArchiveFilters();renderArchiveContent();}
+function setArchMonth(m){archMonthFilter=archMonthFilter===m?null:m;renderArchiveFilters();renderArchiveContent();}
+function copyArchText(itemsStr){
+  try{const items=JSON.parse(itemsStr);navigator.clipboard.writeText(items.map(a=>`${a.name||''}  ${a.ref||''}  ${a.apply_date||a.applyDate||''}`).join('\n')).then(()=>showToast('✓ কপি'));}catch(e){}
+}
+function archPhoneClick(nameEsc,phone){
+  const name=nameEsc.replace(/\\'/g,"'");
+  if(!phone||phone.trim()==='-'||phone.trim()===''){showToast('ফোন নম্বর নেই');return;}
+  showConfirm(`📞 ${name}`,`${phone} নম্বরে কল করবেন?`).then(ok=>{if(ok)window.location.href=`tel:${phone}`;});
+}
+function archItemHTML(a,si){
+  const phone=a.phone||a.phoneNum||'';const nameEsc=(a.name||'').replace(/'/g,"\\'");
+  return `<div class="arch-item">
+    <span class="arch-item-star">${si}</span>
+    <span class="arch-item-name" onclick="archPhoneClick('${nameEsc}','${phone}')">${a.name||''}</span>
+    <span class="arch-item-ref">${a.ref||''}</span>
+    <span class="arch-item-date">${a.apply_date||a.applyDate||''}</span>
+  </div>`;
+}
+function renderArchiveContent(){
+  const el=document.getElementById('arch-content');
+  if(archTab==='delivered'){
+    let filtered=deliveredArchive;
+    if(archYearFilter){filtered=deliveredArchive.filter(a=>{const p=(a.deliveredDate||'').split('-');return p.length===3&&(2000+parseInt(p[2]))===archYearFilter;});}
+    if(!filtered.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো Delivered রেকর্ড নেই</div>';return;}
+    // Group by deliveredDate
+    const byDate={};
+    filtered.forEach(a=>{const k=a.deliveredDate||'অজানা';if(!byDate[k])byDate[k]=[];byDate[k].push(a);});
+    el.innerHTML=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,items])=>{
+      const urgents=items.filter(a=>a.starLevel===2);const importants=items.filter(a=>a.starLevel===1);
+      const copyStr=JSON.stringify(items).replace(/"/g,'&quot;');
+      return `<div class="arch-section">
+        <div class="arch-header"><span class="arch-month-label">✅ ${date}</span>
+          <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
+        <div class="arch-badges">
+          ${urgents.length?`<span class="arch-badge urgent">🔴 ${urgents.length}</span>`:''}
+          ${importants.length?`<span class="arch-badge important">⭐ ${importants.length}</span>`:''}
+          <span class="arch-badge total">Total ${items.length}</span>
+        </div>
+        <div class="arch-list">${urgents.map(a=>archItemHTML(a,'🔴')).join('')}${importants.map(a=>archItemHTML(a,'⭐')).join('')}</div>
+      </div>`;
+    }).join('');
+    return;
+  }
+  if(archTab==='month'){
+    const groups={};
+    allApps.forEach(a=>{
+      if(!a.apply_date)return;const p=a.apply_date.toUpperCase().split('-');if(p.length!==3)return;
+      const mo=MONTHS_UP.indexOf(p[1]);if(mo<0)return;const yr=2000+parseInt(p[2]);
+      if(archYearFilter&&yr!==archYearFilter)return;if(archMonthFilter!==null&&mo!==archMonthFilter)return;
+      const key=`${yr}-${String(mo).padStart(2,'0')}`;
+      if(!groups[key])groups[key]={label:MONTHS_SHORT[mo]+' '+yr,urgent:[],important:[],normal:[]};
+      const s=stars[a.ref]||0;
+      if(s===2)groups[key].urgent.push(a);else if(s===1)groups[key].important.push(a);else groups[key].normal.push(a);
+    });
+    const sorted=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([,v])=>v);
+    if(!sorted.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো ডেটা নেই</div>';return;}
+    el.innerHTML=sorted.map(m=>{
+      const total=m.urgent.length+m.important.length+m.normal.length;
+      const allItems=[...m.urgent,...m.important,...m.normal];
+      const copyStr=JSON.stringify(allItems).replace(/"/g,'&quot;');
+      return `<div class="arch-section">
+        <div class="arch-header"><span class="arch-month-label">${m.label}</span>
+          <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
+        <div class="arch-badges">
+          ${m.urgent.length?`<span class="arch-badge urgent">🔴 ${m.urgent.length}</span>`:''}
+          ${m.important.length?`<span class="arch-badge important">⭐ ${m.important.length}</span>`:''}
+          ${m.normal.length?`<span class="arch-badge normal">📄 ${m.normal.length}</span>`:''}
+          <span class="arch-badge total">Total ${total}</span>
+        </div>
+        <div class="arch-sum-bar">
+          <span>📤 Fwd: ${[...m.urgent,...m.important,...m.normal].filter(a=>forwarded[a.ref]).length}</span>
+          <span>📦 Col: ${[...m.urgent,...m.important,...m.normal].filter(a=>collected[a.ref]).length}</span>
+          <span>✅ Del: ${[...m.urgent,...m.important,...m.normal].filter(a=>delivered[a.ref]).length}</span>
+        </div>
+        <div class="arch-list">${m.urgent.map(a=>archItemHTML(a,'🔴')).join('')}${m.important.map(a=>archItemHTML(a,'⭐')).join('')}${m.normal.map(a=>archItemHTML(a,'·')).join('')}</div>
+      </div>`;
+    }).join('');
+  } else if(archTab==='reset'){
+    let filtered=resetArchive;
+    if(archYearFilter){filtered=resetArchive.filter(r=>{const p=(r.resetDate||'').split('-');return p.length===3&&(2000+parseInt(p[2]))===archYearFilter;});}
+    if(!filtered.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো রিসেট রেকর্ড নেই</div>';return;}
+    el.innerHTML=filtered.map(r=>{
+      const allItems=[...(r.urgentItems||[]),...(r.importantItems||[])];
+      const copyStr=JSON.stringify(allItems.map(a=>({...a,apply_date:a.applyDate}))).replace(/"/g,'&quot;');
+      return `<div class="arch-section">
+        <div class="arch-header"><div><div class="arch-month-label">${r.resetDate}</div>
+          ${r.fromDate?`<div class="arch-date-range">${r.fromDate} → ${r.resetDate}</div>`:''}</div>
+          <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
+        <div class="arch-badges">
+          ${r.urgentCount?`<span class="arch-badge urgent">🔴 ${r.urgentCount}</span>`:''}
+          ${r.importantCount?`<span class="arch-badge important">⭐ ${r.importantCount}</span>`:''}
+          <span class="arch-badge total">Total ${allItems.length}</span>
+        </div>
+        <div class="arch-list">${(r.urgentItems||[]).map(a=>archItemHTML(a,'🔴')).join('')}${(r.importantItems||[]).map(a=>archItemHTML(a,'⭐')).join('')}</div>
+      </div>`;
+    }).join('');
+  } else {
+    let filtered=deletedAppsStore;
+    if(archYearFilter){filtered=deletedAppsStore.filter(a=>{const p=(a.deletedDate||'').split('-');return p.length===3&&(2000+parseInt(p[2]))===archYearFilter;});}
+    if(!filtered.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো মুছে ফেলা ফাইল নেই</div>';return;}
+    const byDate={};filtered.forEach(a=>{const k=a.deletedDate||'অজানা';if(!byDate[k])byDate[k]=[];byDate[k].push(a);});
+    el.innerHTML=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,items])=>{
+      const copyStr=JSON.stringify(items).replace(/"/g,'&quot;');
+      return `<div class="arch-section">
+        <div class="arch-header"><span class="arch-month-label">🗑 ${date}</span>
+          <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
+        <div class="arch-badges"><span class="arch-badge deleted">মুছে ফেলা ${items.length}</span></div>
+        <div class="arch-list">${items.map(a=>archItemHTML(a,'🗑')).join('')}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── Delete ────────────────────────────────────────────────
+async function deleteSelected(){
+  if(!selected.size)return;
+  const ok=await showConfirm(`${selected.size}টি ফাইল মুছবেন?`,'আর্কাইভের "মুছে ফেলা" ট্যাবে চলে যাবে');
+  if(!ok)return;
+  const toDelete=allApps.filter(a=>selected.has(a.ref));const delDate=todayStr();
+  toDelete.forEach(a=>{deletedRefs.add(a.ref);deletedAppsStore.push({...a,deletedDate:delDate});});
+  clearSelection();saveLocal();render();showToast(`🗑 ${toDelete.length}টি মুছে ফেলা হয়েছে`);
+}
+
+// ── Archive search ────────────────────────────────────────
+function searchInArchive(q){
+  if(!q)return[];const results=[];
+  const delv=deliveredArchive.filter(a=>(a.name||'').toLowerCase().includes(q)||(a.ref||'').toLowerCase().includes(q));
+  if(delv.length)results.push({source:'Delivered আর্কাইভ',items:delv.map(a=>({name:a.name,ref:a.ref,phone:a.phone||'',applyDate:a.apply_date||a.applyDate,deliveredDate:a.deliveredDate}))});
+  resetArchive.forEach(r=>{
+    const matched=[...(r.urgentItems||[]),...(r.importantItems||[])].filter(a=>(a.name||'').toLowerCase().includes(q)||(a.ref||'').toLowerCase().includes(q));
+    if(matched.length)results.push({source:`রিসেট: ${r.resetDate}`,items:matched});
+  });
+  const done10=allApps.filter(a=>a.status==='10/10'&&((a.name||'').toLowerCase().includes(q)||(a.ref||'').toLowerCase().includes(q)));
+  if(done10.length)results.push({source:'সম্পন্ন (10/10)',items:done10.map(a=>({name:a.name,ref:a.ref,phone:a.phone||'',applyDate:a.apply_date}))});
+  const del=deletedAppsStore.filter(a=>(a.name||'').toLowerCase().includes(q)||(a.ref||'').toLowerCase().includes(q));
+  if(del.length)results.push({source:'মুছে ফেলা ফাইল',items:del.map(a=>({name:a.name,ref:a.ref,phone:a.phone||'',applyDate:a.apply_date}))});
+  return results;
+}
+
+// ── Police ────────────────────────────────────────────────
+function openPoliceFilterModal(){
+  const list=document.getElementById('police-filter-list');
+  let html='<span class="police-filter-pill police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)">সব</span>';
+  clientNames.forEach(function(n){
+    const phone=clientPhones[n]?'<br><span style="font-size:10px;opacity:0.7">'+clientPhones[n]+'</span>':'';
+    const nSafe=n.replace(/'/g,"\'");
+    html+='<span class="police-filter-pill '+(activePoliceFilter===n?'active':'')+'" onclick="openClientDetailModal(\'' + nSafe + '\')">'+n+phone+'</span>';
+  });
+  if(!clientNames.length)html+='<div style="color:#475569;font-size:12px;margin-top:8px">Add Clients বাটনে নাম যোগ করুন</div>';
+  list.innerHTML=html;document.getElementById('police-filter-modal').classList.add('open');
+}
+function closePoliceFilterModal(){document.getElementById('police-filter-modal').classList.remove('open');}
+function setPoliceFilter(name){activePoliceFilter=name;document.getElementById('police-filter-btn').classList.toggle('active',!!name);closePoliceFilterModal();render();}
+function openClientModal(){renderClientModal();document.getElementById('client-modal').classList.add('open');}
+function closeClientModal(){document.getElementById('client-modal').classList.remove('open');}
+function renderClientModal(){
+  const list=document.getElementById('client-name-list');
+  if(!clientNames.length){list.innerHTML='<div style="font-size:12px;color:#475569;text-align:center;padding:12px">কোনো নাম নেই</div>';return;}
+  var editArea=document.getElementById('client-edit-area');
+  if(editArea)editArea.style.display='none';
+  list.style.display='';
+  list.innerHTML=clientNames.map(function(n){
+    const ph=clientPhones[n]?'<div style="font-size:10px;color:#64748b;margin-top:1px">'+clientPhones[n]+'</div>':'';
+    return '<div class="client-name-row" style="flex-direction:column;align-items:stretch;padding:8px 10px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+      +'<div style="flex:1"><div style="font-size:13px;color:#c4b5fd">'+n+'</div>'+ph+'</div>'
+      +'<div style="display:flex;gap:6px;flex-shrink:0">'
+      +'<button data-edit="'+n+'" onclick="event.stopPropagation();editClient(this.dataset.edit)" style="background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:3px 8px;border-radius:6px;font-size:11px;cursor:pointer">✏️</button>'
+      +'<button class="client-del-btn" data-del="'+n+'" onclick="event.stopPropagation();deleteClientName(this.dataset.del)">×</button>'
+      +'</div></div></div>';
+  }).join('');
+}
+let editingClientOldName='';
+function editClient(name){
+  editingClientOldName=name;
+  const list=document.getElementById('client-name-list');
+  list.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'
+    +'<div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px">✏️ সম্পাদনা</div>'
+    +'<input id="edit-cli-name" style="background:#1e293b;border:1px solid #2563eb;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;width:100%;box-sizing:border-box" value="'+name+'">'
+    +'<input id="edit-cli-phone" style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:13px;outline:none;width:100%;box-sizing:border-box" value="'+(clientPhones[name]||'')+'" placeholder="ফোন নম্বর...">'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="saveEditClient()" style="flex:1;background:#2563eb;border:none;color:#fff;padding:9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">সংরক্ষণ</button>'
+    +'<button onclick="renderClientModal()" style="flex:1;background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:9px;border-radius:8px;font-size:13px;cursor:pointer">বাতিল</button>'
+    +'</div></div>';
+  setTimeout(function(){var el=document.getElementById('edit-cli-name');if(el){el.focus();el.select();}},80);
+}
+function saveEditClient(){
+  var oldName=editingClientOldName;
+  var nameEl=document.getElementById('edit-cli-name');
+  var phoneEl=document.getElementById('edit-cli-phone');
+  if(!nameEl)return;
+  var newName=nameEl.value.trim();
+  var newPhone=phoneEl?phoneEl.value.trim():'';
+  if(!newName){showToast('নাম খালি রাখা যাবে না');return;}
+  var idx=clientNames.indexOf(oldName);
+  if(idx>=0)clientNames[idx]=newName;
+  if(newPhone)clientPhones[newName]=newPhone;
+  else delete clientPhones[newName];
+  if(oldName!==newName){
+    if(clientPhones[oldName]&&!clientPhones[newName])clientPhones[newName]=clientPhones[oldName];
+    delete clientPhones[oldName];
+    if(clientNotes[oldName]){clientNotes[newName]=clientNotes[oldName];delete clientNotes[oldName];}
+    Object.keys(policeTags).forEach(function(ref){if(policeTags[ref]===oldName)policeTags[ref]=newName;});
+    if(activePoliceFilter===oldName)activePoliceFilter=newName;
+  }
+  save();renderClientModal();render();showToast('✅ আপডেট হয়েছে');
+}
+function addClientName(){
+  const inp=document.getElementById('client-add-input');
+  const pinp=document.getElementById('client-add-phone');
+  const name=inp.value.trim();
+  const phone=(pinp?pinp.value.trim():'');
+  if(!name||clientNames.includes(name))return;
+  clientNames.push(name);
+  if(phone)clientPhones[name]=phone;
+  inp.value='';if(pinp)pinp.value='';
+  save();renderClientModal();
+}
+function deleteClientName(name){
+  clientNames=clientNames.filter(function(n){return n!==name;});
+  delete clientPhones[name];
+  delete clientNotes[name];
+  Object.keys(policeTags).forEach(function(ref){if(policeTags[ref]===name)delete policeTags[ref];});
+  if(activePoliceFilter===name){activePoliceFilter=null;document.getElementById('police-filter-btn').classList.remove('active');}
+  save();renderClientModal();render();
+}
+function openPickModal(ref){
+  pickRef=ref;const list=document.getElementById('pick-list');
+  if(!clientNames.length){list.innerHTML='<div class="pick-item" style="color:#475569">Client\'s Name বাটনে নাম যোগ করুন</div>';document.getElementById('pick-modal').classList.add('open');return;}
+  let html=`<div class="pick-item" style="color:#475569;border-color:#1e293b" onclick="assignPoliceTag(null)">— ট্যাগ সরান</div>`;
+  clientNames.forEach(n=>{const active=policeTags[ref]===n;html+=`<div class="pick-item ${active?'active-pick':''}" onclick="assignPoliceTag('${n}')">${active?'✓ ':''}${n}</div>`;});
+  list.innerHTML=html;document.getElementById('pick-modal').classList.add('open');
+}
+function closePickModal(){document.getElementById('pick-modal').classList.remove('open');pickRef=null;}
+function assignPoliceTag(name){if(!pickRef)return;if(name)policeTags[pickRef]=name;else delete policeTags[pickRef];save();closePickModal();render();}
+
+// ── Count Modal ───────────────────────────────────────────
+function openModal(type){
+  modalType=type;
+  document.getElementById('modal-title-text').textContent=type==='urgent'?'🔴 Urgent':'⭐ Important';
+  document.getElementById('modal-count').textContent=counts[type];
+  document.getElementById('modal-add-input').value='';
+  renderModalList();document.getElementById('modal').classList.add('open');
+}
+function renderModalList(){
+  if(!modalType)return;const list=[...history[modalType]].reverse();
+  if(!list.length){document.getElementById('modal-list').innerHTML='<div style="color:#475569;padding:8px 0;font-size:12px">কোনো রেকর্ড নেই</div>';return;}
+  const orig=history[modalType];
+  document.getElementById('modal-list').innerHTML=list.map((e,ri)=>{
+    const i=orig.length-1-ri;
+    return `<div class="modal-list-item">
+      <button class="m-order-btn" onclick="moveEntry(${i},-1)" ${i===0?'style="opacity:0.2;pointer-events:none"':''}>▲</button>
+      <button class="m-order-btn" onclick="moveEntry(${i},1)" ${i===orig.length-1?'style="opacity:0.2;pointer-events:none"':''}>▼</button>
+      <span title="${e}">• ${e}</span><button class="modal-del-btn" onclick="removeModalEntry(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+function moveEntry(idx,dir){if(!modalType)return;const list=history[modalType];const ni=idx+dir;if(ni<0||ni>=list.length)return;[list[idx],list[ni]]=[list[ni],list[idx]];save();renderModalList();}
+function addModalEntry(){if(!modalType)return;const inp=document.getElementById('modal-add-input');const val=inp.value.trim();if(!val)return;if(!history[modalType].includes(val)){history[modalType].push(val);counts[modalType]++;document.getElementById('modal-count').textContent=counts[modalType];document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');save();renderModalList();}inp.value='';}
+function removeModalEntry(idx){if(!modalType)return;history[modalType].splice(idx,1);counts[modalType]=Math.max(0,counts[modalType]-1);document.getElementById('modal-count').textContent=counts[modalType];document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');save();renderModalList();}
+function copyModalList(){if(!modalType)return;const list=history[modalType];if(!list.length){showToast('কোনো রেকর্ড নেই');return;}const text=[...list].reverse().join('\n');if(navigator.share)navigator.share({text});else navigator.clipboard.writeText(text).then(()=>showToast('✓ কপি'));}
+function closeModal(){document.getElementById('modal').classList.remove('open');modalType=null;}
+function adjustCount(delta){if(!modalType)return;counts[modalType]=Math.max(0,counts[modalType]+delta);document.getElementById('modal-count').textContent=counts[modalType];document.getElementById('cnt-'+modalType).textContent=String(counts[modalType]).padStart(2,'0');save();}
+
+async function resetCounts(){
+  if(!resetConfirm){
+    resetConfirm=true;document.getElementById('reset-btn').classList.add('confirm');
+    resetTimer=setTimeout(()=>{resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');},3000);
+  } else {
+    clearTimeout(resetTimer);resetConfirm=false;document.getElementById('reset-btn').classList.remove('confirm');
+    // Starred files from allApps
+    const urgentStarred=allApps.filter(a=>(stars[a.ref]||0)===2).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,phone:a.phone||'',type:'urgent'}));
+    const importantStarred=allApps.filter(a=>(stars[a.ref]||0)===1).map(a=>({ref:a.ref,name:a.name,applyDate:a.apply_date,phone:a.phone||'',type:'important'}));
+    // Manually added history entries not in allApps
+    const starredUrgentRefs=new Set(urgentStarred.map(a=>a.ref));
+    const starredImportantRefs=new Set(importantStarred.map(a=>a.ref));
+    const manualUrgent=(history.urgent||[]).filter(e=>{const ref=(e.match(/([A-Z0-9]{6,})/)||[])[1];return !ref||!starredUrgentRefs.has(ref);}).map(e=>({ref:'',name:e,applyDate:'',phone:'',type:'urgent'}));
+    const manualImportant=(history.important||[]).filter(e=>{const ref=(e.match(/([A-Z0-9]{6,})/)||[])[1];return !ref||!starredImportantRefs.has(ref);}).map(e=>({ref:'',name:e,applyDate:'',phone:'',type:'important'}));
+    const urgentItems=[...urgentStarred,...manualUrgent];
+    const importantItems=[...importantStarred,...manualImportant];
+    // Read actual displayed counts from DOM (source of truth)
+    const displayUrgent=parseInt(document.getElementById('cnt-urgent').textContent)||0;
+    const displayImportant=parseInt(document.getElementById('cnt-important').textContent)||0;
+    const total=displayUrgent+displayImportant;
+    const ok=await showConfirm('কাউন্ট রিসেট করবেন?',`Urgent ${displayUrgent} + Important ${displayImportant} = ${total} file আর্কাইভে (রিসেট ট্যাব) চলে যাবে।`);
+    if(!ok)return;
+    if(urgentItems.length||importantItems.length){
+      const allItems=[...urgentItems,...importantItems];const dates=allItems.map(a=>a.applyDate).filter(Boolean);let fromDate='';
+      if(dates.length){const parsed=dates.map(d=>toInputDate(d)).filter(Boolean).sort();if(parsed.length)fromDate=fromInputDate(parsed[0]);}
+      resetArchive.unshift({id:Date.now(),resetDate:todayStr(),fromDate,urgentItems,importantItems,urgentCount:displayUrgent,importantCount:displayImportant});
+      localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
+    }
+    // Reset stars for starred files
+    urgentStarred.forEach(a=>{stars[a.ref]=0;});
+    importantStarred.forEach(a=>{stars[a.ref]=0;});
+    counts={urgent:0,important:0};history={urgent:[],important:[]};save();render();showToast('✅ রিসেট সম্পন্ন');
+  }
+}
+
+// ── Multi-select ──────────────────────────────────────────
+function toggleSelect(ref){if(selected.has(ref))selected.delete(ref);else selected.add(ref);updateSelectBar();const w=document.getElementById('wrap-'+ref);if(w)w.classList.toggle('selected',selected.has(ref));}
+function updateSelectBar(){const bar=document.getElementById('select-bar');if(selected.size>0){selectMode=true;bar.classList.add('visible');document.getElementById('sel-count').textContent=selected.size;}else{selectMode=false;bar.classList.remove('visible');}}
+function clearSelection(){selected.forEach(r=>{const w=document.getElementById('wrap-'+r);if(w)w.classList.remove('selected');});selected.clear();selectMode=false;document.getElementById('select-bar').classList.remove('visible');}
+function copySelected(){
+  const lines=[];
+  allApps.forEach(a=>{if(selected.has(a.ref)){lines.push(`${a.name} ${a.ref}`);const n=parseInt((a.status||'').split('/')[0])||0;if(n===2)blinkStopped[a.ref]=true;const s=stars[a.ref]||0;if(s>0&&!forwarded[a.ref])forwarded[a.ref]=true;}});
+  save();const text=lines.join('\n');
+  if(navigator.share)navigator.share({text});else navigator.clipboard.writeText(text).then(()=>showToast('✓ '+selected.size+' কপি')).catch(()=>showToast('✓ কপি'));
+  clearSelection();render();
+}
+
+// ── Filter ────────────────────────────────────────────────
+function toggleFilter(f,btn){
+  if(activeFilter===f){activeFilter='all';document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));}
+  else{activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  render();
+}
+function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');render();}
+function matchesFilter(app){
+  const num=parseInt((app.status||'').split('/')[0])||0;const isDraft=(app.status||'').toLowerCase().includes('draft');
+  if(activePoliceFilter&&policeTags[app.ref]!==activePoliceFilter)return false;
+  if(activeFilter==='all')return true;if(activeFilter==='draft')return isDraft;
+  if(activeFilter==='collected'){const n=parseInt((app.status||'').split('/')[0])||0;return n===9&&(stars[app.ref]||0)>0&&!delivered[app.ref];}
+  if(activeFilter==='1-5')return !isDraft&&num>=1&&num<=5;if(activeFilter==='6-8')return !isDraft&&num>=6&&num<=8;
+  return true;
+}
+function daysSince(ds,ref){
+  if(collected[ref]&&collectedDay[ref]!==undefined)return collectedDay[ref];
+  try{
+    const p=ds.toUpperCase().split('-');if(p.length!==3)return null;
+    const d=parseInt(p[0]),m=MONTHS_UP.indexOf(p[1]),y=2000+parseInt(p[2]);
+    if(isNaN(d)||m<0||isNaN(y))return null;
+    const aDate=new Date(y,m,d),today=new Date();today.setHours(0,0,0,0);
+    const diff=Math.floor((today-aDate)/86400000);return diff>0?diff:null;
+  }catch{return null;}
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2200);}
+function toggleStar(ref){
+  const prev=stars[ref]||0;stars[ref]=(prev+1)%3;const next=stars[ref];
+  const app=allApps.find(a=>a.ref===ref);const entry=app?`${app.name} ${ref}`:ref;
+  if(prev===0&&next===1){counts.important++;if(!history.important.includes(entry))history.important.push(entry);}
+  else if(prev===1&&next===2){counts.important=Math.max(0,counts.important-1);history.important=history.important.filter(e=>e!==entry);counts.urgent++;if(!history.urgent.includes(entry))history.urgent.push(entry);}
+  else if(prev===2&&next===0){counts.urgent=Math.max(0,counts.urgent-1);history.urgent=history.urgent.filter(e=>e!==entry);}
+  save();render();
+}
+function startEditDeu(ref){editingDeu[ref]=true;render();setTimeout(()=>{const i=document.getElementById('deu-input-'+ref);if(i)i.focus();},50);}
+function updateCode(ref,val){codes[ref]=val;editingDeu[ref]=false;save();render();}
+function toggleExpandNormal(ref){if(expandedNormal.has(ref))expandedNormal.delete(ref);else expandedNormal.add(ref);saveLocal();render();}
+
+// ── Card HTML ─────────────────────────────────────────────
+function cardHTML(app){
+  const s=stars[app.ref]||0;const isDelivered=delivered[app.ref]||false;
+  const si=s===2?'🔴':s===1?'⭐':'☆';
+  const cls=isDelivered?'delivered':s===2?'star2':s===1?'star1':'';
+  const num=parseInt((app.status||'').split('/')[0])||0;const scls='s'+Math.min(num,10);
+  const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded;
+  const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
+  const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
+  const stage=isDelivered?3:isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':stage===2?'📦':'✅';const stageCls=stage===0?'':stage===1?'fwd':stage===2?'col':'del';
+  const statusNum=parseInt((app.status||'').split('/')[0])||0;
+  const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
+  const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
+  const daysCol=(isCol&&!isDelivered&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
+  const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
+  const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
+  const shouldBlink910=(s>=1)&&!isDelivered&&num===9&&!isCol;
+  const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
+  // Due code + collected → blink
+  const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
+  let dayClass='day-normal';
+  if(days){if(s===2&&days>=5)dayClass='day-warn-urgent';else if(s===1&&days>=12)dayClass='day-warn-important';}
+  const statusNum2=parseInt((app.status||'').split('/')[0])||0;
+  const alertBlink=(s===1&&statusNum2>=2&&stage===0)?'alert-blink':'';
+  const stageBtn=s>0?`<button class="stage-btn ${stageCls} ${alertBlink}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'';
+  let deuHTML='';
+  if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
+  const showPrint=showDetails&&printDate&&!isDelivered;
+  const printBadge=showPrint?`<span class="print-badge" onclick="openDateModal('${printDate}','📅','print_date','${app.ref}');event.stopPropagation()">${printSVG} ${printDate}</span>`:'';
+  const noteSVG='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+  const notePreview=(!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()">${noteSVG}${noteVal}</div>`:'';
+  const nameClick=`openNoteModal('${app.ref}');event.stopPropagation()`;
+  const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
+  const daySpan=days?`<span class="${dayClass}" onclick="openDayPopup('${app.ref}',${days},${s});event.stopPropagation()" style="cursor:pointer">Day:${String(days).padStart(2,'0')}</span>`:'';
+  const colDaySpan=daysCol!==null?`<span class="day-collected">+${String(daysCol).padStart(2,'0')}d</span>`:'';
+  const phoneTag=policeTags[app.ref]||'';
+  const clientPhone=phoneTag&&clientPhones[phoneTag]?clientPhones[phoneTag]:'';
+  const hasClientPhone=!!(clientPhone);
+  const phoneBlinkClass=(isCol&&!blinkStopped[app.ref])?'phone-blink':'';
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link ${phoneBlinkClass}" onclick="blinkStopped['${app.ref}']=true;save();render();openPhonePopup('${app.ref}','${app.phone}');event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count

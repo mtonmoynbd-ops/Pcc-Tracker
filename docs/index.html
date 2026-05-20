@@ -600,6 +600,10 @@
     </div>
     <div style="overflow-y:auto;flex:1;background:#fff;display:flex;align-items:flex-start;justify-content:center">
       <img id="cert-img" src="" style="width:100%;display:block" alt="Certificate">
+      <div id="cert-no-img" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:10px;color:#475569;font-size:13px;text-align:center;width:100%">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div>PDF ফাইল এপে দেখানো যাচ্ছে না।<br>নিচের বাটনে ক্লিক করুন।</div>
+      </div>
     </div>
     <div style="display:flex;gap:8px;padding:10px 12px;border-top:1px solid #1e3a5f;flex-shrink:0">
       <a id="cert-open-btn" href="" target="_blank" onclick="window.open(this.href,'_blank');return false" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;border-radius:8px;padding:9px;font-size:12px;font-weight:600;text-decoration:none">
@@ -914,26 +918,24 @@ function confirmOk(){document.getElementById('confirm-modal').classList.remove('
 let _currentCertUrl='';
 function openCertInApp(url,ref){
   _currentCertUrl=url;
-  const img=document.getElementById('cert-img');
-  img.src=url+'?t='+Date.now(); // cache bust
   document.getElementById('cert-open-btn').href=url;
+  const isPdf=url.toLowerCase().endsWith('.pdf');
+  const img=document.getElementById('cert-img');
+  const noImg=document.getElementById('cert-no-img');
+  if(isPdf){
+    img.style.display='none';
+    if(noImg)noImg.style.display='flex';
+  } else {
+    img.style.display='block';
+    if(noImg)noImg.style.display='none';
+    img.src=url+'?t='+Date.now();
+  }
   document.getElementById('cert-modal').classList.add('open');
 }
 function downloadCertPdf(){
   if(!_currentCertUrl)return;
-  showToast('⏳ ডাউনলোড হচ্ছে...');
-  fetch(_currentCertUrl)
-    .then(r=>{if(!r.ok)throw new Error('failed');return r.blob();})
-    .then(blob=>{
-      const ext=_currentCertUrl.endsWith('.png')?'.png':'.pdf';
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(blob);
-      a.download='PCC_Certificate'+ext;
-      document.body.appendChild(a);a.click();
-      setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(a.href);},1000);
-      showToast('✅ ডাউনলোড সম্পন্ন');
-    })
-    .catch(()=>{window.open(_currentCertUrl,'_blank');});
+  // Most reliable: open in Chrome — user can long-press to save PNG or Chrome downloads PDF
+  window.open(_currentCertUrl,'_blank');
 }
 function closeCertModal(){
   document.getElementById('cert-modal').classList.remove('open');

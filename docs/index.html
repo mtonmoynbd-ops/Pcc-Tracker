@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!-- saved from url=(0052)file:///C:/Users/ADMIN/Downloads/pcc_tracker_10.html -->
 <html lang="bn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -599,14 +600,14 @@
     </div>
     <iframe id="cert-iframe" src="" style="width:100%;flex:1;min-height:420px;border:none;background:#fff"></iframe>
     <div style="display:flex;gap:8px;padding:10px 12px;border-top:1px solid #1e3a5f;flex-shrink:0">
-      <a id="cert-open-btn" href="" target="_blank" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;border-radius:8px;padding:9px;font-size:12px;font-weight:600;text-decoration:none">
+      <a id="cert-open-btn" href="" target="_blank" onclick="window.open(this.href,'_blank');return false" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;border-radius:8px;padding:9px;font-size:12px;font-weight:600;text-decoration:none">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         ব্রাউজারে খুলুন
       </a>
-      <a id="cert-download-btn" href="" download style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#14532d;border:1px solid #22c55e;color:#4ade80;border-radius:8px;padding:9px;font-size:12px;font-weight:600;text-decoration:none">
+      <button onclick="downloadCertPdf()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#14532d;border:1px solid #22c55e;color:#4ade80;border-radius:8px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #22c55e">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         ডাউনলোড
-      </a>
+      </button>
     </div>
   </div>
 </div>
@@ -908,17 +909,37 @@ function showConfirm(mainText,subText=''){
   });
 }
 function confirmOk(){document.getElementById('confirm-modal').classList.remove('open');if(confirmResolve)confirmResolve(true);confirmResolve=null;}
+let _currentCertUrl='';
 function openCertInApp(url,ref){
+  _currentCertUrl=url;
   const viewerUrl='https://docs.google.com/viewer?url='+encodeURIComponent(url)+'&embedded=true';
   document.getElementById('cert-iframe').src=viewerUrl;
   document.getElementById('cert-open-btn').href=url;
-  document.getElementById('cert-download-btn').href=url;
-  document.getElementById('cert-download-btn').download='PCC_'+ref+'.pdf';
   document.getElementById('cert-modal').classList.add('open');
+}
+function downloadCertPdf(){
+  if(!_currentCertUrl)return;
+  // Try direct download via fetch + blob (works in Chrome Android)
+  showToast('⏳ ডাউনলোড হচ্ছে...');
+  fetch(_currentCertUrl)
+    .then(r=>{if(!r.ok)throw new Error('fetch failed');return r.blob();})
+    .then(blob=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='PCC_Certificate.pdf';
+      document.body.appendChild(a);a.click();
+      setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(a.href);},1000);
+      showToast('✅ ডাউনলোড সম্পন্ন');
+    })
+    .catch(()=>{
+      // Fallback: open in browser (Chrome will offer download)
+      window.open(_currentCertUrl,'_blank');
+    });
 }
 function closeCertModal(){
   document.getElementById('cert-modal').classList.remove('open');
   document.getElementById('cert-iframe').src='';
+  _currentCertUrl='';
 }
 function confirmCancel(){document.getElementById('confirm-modal').classList.remove('open');if(confirmResolve)confirmResolve(false);confirmResolve=null;}
 
@@ -1798,7 +1819,7 @@ function matchesFilter(app){
   const num=parseInt((app.status||'').split('/')[0])||0;const isDraft=(app.status||'').toLowerCase().includes('draft');
   if(activePoliceFilter&&policeTags[app.ref]!==activePoliceFilter)return false;
   if(activeFilter==='all')return true;if(activeFilter==='draft')return isDraft;
-  if(activeFilter==='collected'){const n=parseInt((app.status||'').split('/')[0])||0;return n===9&&(stars[app.ref]||0)>0&&!delivered[app.ref];}
+  if(activeFilter==='collected'){const n=parseInt((app.status||'').split('/')[0])||0;return n===9&&(stars[app.ref]||0)>0&&!collected[app.ref]&&!delivered[app.ref];}
   if(activeFilter==='1-5')return !isDraft&&num>=1&&num<=5;if(activeFilter==='6-8')return !isDraft&&num>=6&&num<=8;
   return true;
 }
@@ -2009,7 +2030,7 @@ function render(){
   const draftBtn=document.getElementById('draft-btn');
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
   // Collect blink: urgent/important uncollected cards exist
-  const hasUncollected=getDisplayApps().some(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!delivered[a.ref];});
+  const hasUncollected=getDisplayApps().some(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
   const collectCount=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!delivered[a.ref];}).length;
   const collectBtn=document.getElementById('collect-btn');
   if(collectBtn){

@@ -132,7 +132,23 @@ def parse_rows(rows):
     return apps
 
 
-async def download_cert(page, app):
+def cleanup_certs(applications):
+    """Remove cert PDFs for apps that are now 10/10 (delivered) or no longer in list"""
+    if not os.path.exists(CERT_DIR):
+        return
+    active_refs = {a["ref"] for a in applications}
+    delivered_refs = {a["ref"] for a in applications if a["status"] == "10/10"}
+    for fname in os.listdir(CERT_DIR):
+        if not fname.endswith(".pdf"):
+            continue
+        ref = fname.replace(".pdf", "")
+        # Remove if delivered (10/10) or no longer in list
+        if ref in delivered_refs or ref not in active_refs:
+            try:
+                os.remove(os.path.join(CERT_DIR, fname))
+                print(f"🗑️ Cert removed: {ref}")
+            except Exception as e:
+                print(f"Cert remove failed [{ref}]: {e}")
     """
     Navigate to the certificate URL using the active session,
     save as PDF → docs/certs/{ref}.pdf
@@ -294,6 +310,9 @@ async def main():
                 status_num = int(app["status"].split('/')[0]) if '/' in app["status"] else 0
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
+
+            # ── Remove certs for delivered/gone apps ─────────────────
+            cleanup_certs(applications)
 
             save_data(applications)
 

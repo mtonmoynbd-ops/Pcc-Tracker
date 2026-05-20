@@ -133,7 +133,7 @@ def parse_rows(rows):
 
 
 def cleanup_certs(applications):
-    """Remove cert PDFs for apps that are now 10/10 (delivered) or no longer in list"""
+    """Remove cert PDFs for apps that are now 10/10 or no longer in list"""
     if not os.path.exists(CERT_DIR):
         return
     active_refs = {a["ref"] for a in applications}
@@ -142,13 +142,15 @@ def cleanup_certs(applications):
         if not fname.endswith(".pdf"):
             continue
         ref = fname.replace(".pdf", "")
-        # Remove if delivered (10/10) or no longer in list
         if ref in delivered_refs or ref not in active_refs:
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
                 print(f"🗑️ Cert removed: {ref}")
             except Exception as e:
                 print(f"Cert remove failed [{ref}]: {e}")
+
+
+async def download_cert(page, app):
     """
     Navigate to the certificate URL using the active session,
     save as PDF → docs/certs/{ref}.pdf
@@ -161,9 +163,8 @@ def cleanup_certs(applications):
 
     os.makedirs(CERT_DIR, exist_ok=True)
     pdf_path    = f"{CERT_DIR}/{ref}.pdf"
-    github_path = f"certs/{ref}.pdf"   # relative path served by GitHub Pages
+    github_path = f"certs/{ref}.pdf"
 
-    # Skip if already downloaded in a previous run
     if os.path.exists(pdf_path):
         print(f"Cert already exists: {ref}")
         return github_path
@@ -172,12 +173,10 @@ def cleanup_certs(applications):
         await page.goto(cert_url, timeout=20000, wait_until="networkidle")
         await page.wait_for_timeout(2000)
 
-        # If we got redirected to login, session expired — skip
         if "login" in page.url.lower():
             print(f"Session expired for cert {ref}")
             return None
 
-        # Save the certificate page as PDF
         await page.pdf(
             path=pdf_path,
             format="A4",

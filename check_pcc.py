@@ -108,7 +108,7 @@ def parse_rows(rows):
             cert_tag = cols[1].select_one("a")
             raw_href = cert_tag["href"].strip() if cert_tag else None
             if raw_href:
-            cert_url = (raw_href if raw_href.startswith("http") else PCC_BASE + raw_href).strip()
+                cert_url = (raw_href if raw_href.startswith("http") else PCC_BASE + raw_href).strip()
             else:
                 cert_url = None
 

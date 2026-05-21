@@ -99,7 +99,6 @@ def save_userdata(print_dates, status_history):
 def parse_rows(rows):
     """Parse table rows into application dicts — also extracts cert link and app form link"""
     apps = []
-    debug_printed = False
     for row in rows:
         cols = row.select("td")
         if len(cols) >= 9:
@@ -108,9 +107,6 @@ def parse_rows(rows):
             # ── Application form link (col index 0 — ref is a link) ──
             ref_tag = cols[0].select_one("a")
             raw_ref_href = ref_tag["href"].strip() if ref_tag else None
-            if raw_ref_href and not debug_printed:
-                print(f"REF_LINK_DEBUG: {raw_ref_href}")
-                debug_printed = True
             if raw_ref_href:
                 form_url = (raw_ref_href if raw_ref_href.startswith("http") else PCC_BASE + "/" + raw_ref_href.lstrip("/")).strip()
             else:
@@ -133,14 +129,16 @@ def parse_rows(rows):
 
             if ref and len(ref) > 2:
                 apps.append({
-                    "ref":        ref,
-                    "name":       name,
-                    "apply_date": apply_date,
-                    "phone":      phone,
-                    "status":     status,
-                    "cert_url":   cert_url,
-                    "cert_file":  None,
-                    "form_url":   form_url,   # application form URL
+                    "ref":          ref,
+                    "name":         name,
+                    "apply_date":   apply_date,
+                    "phone":        phone,
+                    "status":       status,
+                    "cert_url":     cert_url,
+                    "cert_file":    None,
+                    "form_url":     form_url,
+                    "chalan_file":  None,
+                    "passport_file":None,
                 })
     return apps
 
@@ -159,21 +157,22 @@ def migrate_pdf_to_png():
 
 
 def cleanup_certs(applications):
-    """Remove cert PNGs for apps that are now 10/10 or no longer in list"""
+    """Remove cert/doc PNGs for apps that are 10/10 or no longer in list"""
     if not os.path.exists(CERT_DIR):
         return
-    active_refs = {a["ref"] for a in applications}
-    delivered_refs = {a["ref"] for a in applications if a["status"] == "10/10"}
+    active_refs   = {a["ref"] for a in applications}
+    delivered_refs= {a["ref"] for a in applications if a["status"] == "10/10"}
     for fname in os.listdir(CERT_DIR):
         if not fname.endswith(".png") and not fname.endswith(".pdf"):
             continue
-        ref = fname.rsplit(".", 1)[0]
+        # ref is everything before first underscore or dot
+        ref = fname.split("_")[0].split(".")[0]
         if ref in delivered_refs or ref not in active_refs:
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
-                print(f"🗑️ Cert removed: {ref}")
+                print(f"🗑️ Cert/doc removed: {fname}")
             except Exception as e:
-                print(f"Cert remove failed [{ref}]: {e}")
+                print(f"Remove failed [{fname}]: {e}")
 
 
 async def download_cert(page, app):
@@ -212,7 +211,7 @@ async def download_cert(page, app):
 
 
 async def scrape_form_docs(page, app):
-    """Visit application form page, extract Chalan and Passport View/Download links"""
+    """Visit application form page, extract Chalan and Passport direct URLs"""
     form_url = app.get("form_url")
     if not form_url:
         return None, None
@@ -221,40 +220,30 @@ async def scrape_form_docs(page, app):
     try:
         await page.goto(full_url, timeout=20000, wait_until="networkidle")
         await page.wait_for_timeout(1500)
-
         if "login" in page.url.lower():
             return None, None
 
         content = await page.content()
         soup = BeautifulSoup(content, "html.parser")
 
-        # DEBUG — print Attached Documents section HTML
-        attached = soup.find(string=lambda t: t and "Attached Documents" in t)
-        if attached:
-            section = attached.find_parent()
-            if section:
-                print("ATTACHED_HTML:", str(section.parent)[:3000])
-
         chalan_url = None
         passport_url = None
 
-        # Find all links in the page
-        for a in soup.select("a"):
-            href = a.get("href", "").strip()
-            text = a.text.strip().lower()
-            parent_text = (a.parent.text if a.parent else "").lower()
-            if not href:
+        for card in soup.select("div.doc-card"):
+            label = card.select_one("p")
+            link  = card.select_one("a[href]")
+            if not label or not link:
                 continue
-            full_href = href if href.startswith("http") else PCC_BASE + "/" + href.lstrip("/")
-            if "chalan" in parent_text or "chalan" in text or "challan" in parent_text:
-                if "view" in text or "download" in text or "view" in parent_text:
-                    chalan_url = full_href
-            if "passport" in parent_text or "passport" in text:
-                if "view" in text or "download" in text or "view" in parent_text:
-                    passport_url = full_href
+            label_text = label.text.strip().lower()
+            href = link["href"].strip()
+            if not href or href == "#":
+                continue
+            if "chalan" in label_text or "challan" in label_text:
+                chalan_url = href
+            elif "passport" in label_text:
+                passport_url = href
 
-        print(f"  chalan_url: {chalan_url}")
-        print(f"  passport_url: {passport_url}")
+        print(f"  [{app['ref']}] chalan={chalan_url} passport={passport_url}")
         return chalan_url, passport_url
 
     except Exception as e:
@@ -310,7 +299,29 @@ async def scrape_form_docs(page, app):
         return None
 
 
-async def scrape_all_pages(page):
+async def download_doc(page, url, ref, doc_type):
+    """Screenshot a document URL → docs/certs/{ref}_{doc_type}.png"""
+    if not url:
+        return None
+    os.makedirs(CERT_DIR, exist_ok=True)
+    png_path    = f"{CERT_DIR}/{ref}_{doc_type}.png"
+    github_path = f"certs/{ref}_{doc_type}.png"
+    if os.path.exists(png_path):
+        print(f"Doc already exists: {ref}_{doc_type}")
+        return github_path
+    try:
+        await page.goto(url, timeout=20000, wait_until="networkidle")
+        await page.wait_for_timeout(1500)
+        if "login" in page.url.lower():
+            return None
+        await page.set_viewport_size({"width": 900, "height": 1200})
+        await page.wait_for_timeout(300)
+        await page.screenshot(path=png_path, full_page=True)
+        print(f"✅ Doc screenshot: {ref}_{doc_type} → {png_path}")
+        return github_path
+    except Exception as e:
+        print(f"⚠️ Doc screenshot failed [{ref}_{doc_type}]: {e}")
+        return None
     """Scrape all pagination pages — handles multi-page PCC lists"""
     all_apps = []
     page_num = 0
@@ -430,10 +441,21 @@ async def main():
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
 
-            # ── DEBUG: test form scrape on first app ──────────────────
-            if applications:
-                print(f"Testing form scrape on: {applications[0]['ref']}")
-                await scrape_form_docs(page, applications[0])
+            # ── Scrape & download form docs (chalan, passport) ────────
+            for app in applications:
+                if not app.get("form_url"):
+                    continue
+                # Only scrape if we don't already have both docs
+                ref = app["ref"]
+                chalan_exists  = os.path.exists(f"{CERT_DIR}/{ref}_chalan.png")
+                passport_exists= os.path.exists(f"{CERT_DIR}/{ref}_passport.png")
+                if chalan_exists and passport_exists:
+                    app["chalan_file"]  = f"certs/{ref}_chalan.png"
+                    app["passport_file"]= f"certs/{ref}_passport.png"
+                    continue
+                chalan_url, passport_url = await scrape_form_docs(page, app)
+                app["chalan_file"]  = await download_doc(page, chalan_url,  ref, "chalan")
+                app["passport_file"]= await download_doc(page, passport_url, ref, "passport")
 
             # ── Remove certs for delivered/gone apps ─────────────────
             cleanup_certs(applications)

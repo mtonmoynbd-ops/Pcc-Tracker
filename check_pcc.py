@@ -209,6 +209,9 @@ async def download_cert(page, app):
     except Exception as e:
         print(f"⚠️ Cert screenshot failed [{ref}]: {e}")
         return None
+
+
+async def scrape_form_docs(page, app):
     """Visit application form page, extract Chalan and Passport View/Download links"""
     form_url = app.get("form_url")
     if not form_url:

@@ -176,7 +176,55 @@ def cleanup_certs(applications):
                 print(f"Cert remove failed [{ref}]: {e}")
 
 
-async def download_cert(page, app):
+async def scrape_form_docs(page, app):
+    """Visit application form page, extract Chalan and Passport View/Download links"""
+    form_url = app.get("form_url")
+    if not form_url:
+        return None, None
+
+    full_url = (form_url if form_url.startswith("http") else PCC_BASE + form_url).strip()
+    try:
+        await page.goto(full_url, timeout=20000, wait_until="networkidle")
+        await page.wait_for_timeout(1500)
+
+        if "login" in page.url.lower():
+            return None, None
+
+        content = await page.content()
+        soup = BeautifulSoup(content, "html.parser")
+
+        # DEBUG — print Attached Documents section HTML
+        attached = soup.find(string=lambda t: t and "Attached Documents" in t)
+        if attached:
+            section = attached.find_parent()
+            if section:
+                print("ATTACHED_HTML:", str(section.parent)[:3000])
+
+        chalan_url = None
+        passport_url = None
+
+        # Find all links in the page
+        for a in soup.select("a"):
+            href = a.get("href", "").strip()
+            text = a.text.strip().lower()
+            parent_text = (a.parent.text if a.parent else "").lower()
+            if not href:
+                continue
+            full_href = href if href.startswith("http") else PCC_BASE + "/" + href.lstrip("/")
+            if "chalan" in parent_text or "chalan" in text or "challan" in parent_text:
+                if "view" in text or "download" in text or "view" in parent_text:
+                    chalan_url = full_href
+            if "passport" in parent_text or "passport" in text:
+                if "view" in text or "download" in text or "view" in parent_text:
+                    passport_url = full_href
+
+        print(f"  chalan_url: {chalan_url}")
+        print(f"  passport_url: {passport_url}")
+        return chalan_url, passport_url
+
+    except Exception as e:
+        print(f"Form scrape failed [{app['ref']}]: {e}")
+        return None, None
     """
     Navigate to the certificate URL using the active session,
     screenshot the certificate area → docs/certs/{ref}.png
@@ -346,6 +394,14 @@ async def main():
                 status_num = int(app["status"].split('/')[0]) if '/' in app["status"] else 0
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
+
+            # ── DEBUG: test form scrape on first starred app ──────────
+            test_app = next((a for a in applications if (stars_test := int(a["status"].split('/')[0]) if '/' in a["status"] else 0) >= 1), None)
+            if not test_app:
+                test_app = applications[0] if applications else None
+            if test_app:
+                print(f"Testing form scrape on: {test_app['ref']}")
+                await scrape_form_docs(page, test_app)
 
             # ── Remove certs for delivered/gone apps ─────────────────
             cleanup_certs(applications)

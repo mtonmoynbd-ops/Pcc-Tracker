@@ -416,9 +416,14 @@ async def main():
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
 
-            # ── Download form docs (form, chalan, passport) for ALL apps ─
+            # ── Download form docs (form, chalan, passport) ──────────
+            # Only for: Pending for Payment + status 1/10 to 5/10
             for app in applications:
                 if not app.get("form_url"):
+                    continue
+                status_num = int(app["status"].split('/')[0]) if '/' in app["status"] else 0
+                is_pending = "pending" in app["status"].lower() and "payment" in app["status"].lower()
+                if not is_pending and (status_num < 1 or status_num > 5):
                     continue
                 ref = app["ref"]
                 if (os.path.exists(f"{CERT_DIR}/{ref}_form.png") and

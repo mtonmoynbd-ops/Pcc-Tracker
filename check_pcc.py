@@ -97,20 +97,12 @@ def save_userdata(print_dates, status_history):
 
 
 def parse_rows(rows):
-    """Parse table rows into application dicts — also extracts cert link and app form link"""
+    """Parse table rows into application dicts — also extracts cert link"""
     apps = []
     for row in rows:
         cols = row.select("td")
         if len(cols) >= 9:
             ref = cols[0].text.strip()
-
-            # ── Application form link (col index 0 — ref is a link) ──
-            ref_tag = cols[0].select_one("a")
-            raw_ref_href = ref_tag["href"].strip() if ref_tag else None
-            if raw_ref_href:
-                form_url = (raw_ref_href if raw_ref_href.startswith("http") else PCC_BASE + "/" + raw_ref_href.lstrip("/")).strip()
-            else:
-                form_url = None
 
             # ── Certificate link (col index 1) ──────────────────────
             cert_tag = cols[1].select_one("a")
@@ -129,126 +121,49 @@ def parse_rows(rows):
 
             if ref and len(ref) > 2:
                 apps.append({
-                    "ref":          ref,
-                    "name":         name,
-                    "apply_date":   apply_date,
-                    "phone":        phone,
-                    "status":       status,
-                    "cert_url":     cert_url,
-                    "cert_file":    None,
-                    "form_url":     form_url,
-                    "chalan_file":  None,
-                    "passport_file":None,
+                    "ref":        ref,
+                    "name":       name,
+                    "apply_date": apply_date,
+                    "phone":      phone,
+                    "status":     status,
+                    "cert_url":   cert_url,   # raw site URL (session-bound)
+                    "cert_file":  None,        # will be filled after download
                 })
     return apps
 
 
 def migrate_pdf_to_png():
-    """Delete only old .pdf cert files — never delete PNGs"""
+    """Delete all old .pdf cert files so next run regenerates as .png"""
     if not os.path.exists(CERT_DIR):
         return
     for fname in os.listdir(CERT_DIR):
         if fname.endswith(".pdf"):
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
-                print(f"🗑️ Removed old PDF: {fname}")
+                print(f"🗑️ Migrated: removed old PDF {fname}")
             except Exception as e:
                 print(f"Remove failed [{fname}]: {e}")
 
 
 def cleanup_certs(applications):
-    """Remove cert/doc PNGs for apps that are 10/10 or no longer in list"""
+    """Remove cert PNGs for apps that are now 10/10 or no longer in list"""
     if not os.path.exists(CERT_DIR):
         return
-    active_refs   = {a["ref"] for a in applications}
-    delivered_refs= {a["ref"] for a in applications if a["status"] == "10/10"}
+    active_refs = {a["ref"] for a in applications}
+    delivered_refs = {a["ref"] for a in applications if a["status"] == "10/10"}
     for fname in os.listdir(CERT_DIR):
         if not fname.endswith(".png") and not fname.endswith(".pdf"):
             continue
-        # ref is everything before first underscore or dot
-        ref = fname.split("_")[0].split(".")[0]
+        ref = fname.rsplit(".", 1)[0]
         if ref in delivered_refs or ref not in active_refs:
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
-                print(f"🗑️ Cert/doc removed: {fname}")
+                print(f"🗑️ Cert removed: {ref}")
             except Exception as e:
-                print(f"Remove failed [{fname}]: {e}")
+                print(f"Cert remove failed [{ref}]: {e}")
 
 
 async def download_cert(page, app):
-    """Screenshot #printID element → docs/certs/{ref}.png"""
-    ref      = app["ref"]
-    cert_url = app.get("cert_url")
-    if not cert_url:
-        return None
-
-    os.makedirs(CERT_DIR, exist_ok=True)
-    png_path    = f"{CERT_DIR}/{ref}.png"
-    github_path = f"certs/{ref}.png"
-
-    if os.path.exists(png_path):
-        print(f"Cert already exists: {ref}")
-        return github_path
-
-    try:
-        await page.goto(cert_url, timeout=20000, wait_until="networkidle")
-        await page.wait_for_timeout(2000)
-        if "login" in page.url.lower():
-            print(f"Session expired for cert {ref}")
-            return None
-        await page.set_viewport_size({"width": 900, "height": 1200})
-        await page.wait_for_timeout(500)
-        cert_el = await page.query_selector("#printID")
-        if cert_el:
-            await cert_el.screenshot(path=png_path, scale="device")
-        else:
-            await page.screenshot(path=png_path, full_page=True)
-        print(f"✅ Cert screenshot: {ref} → {png_path}")
-        return github_path
-    except Exception as e:
-        print(f"⚠️ Cert screenshot failed [{ref}]: {e}")
-        return None
-
-
-async def scrape_form_docs(page, app):
-    """Visit application form page, extract Chalan and Passport direct URLs"""
-    form_url = app.get("form_url")
-    if not form_url:
-        return None, None
-
-    full_url = (form_url if form_url.startswith("http") else PCC_BASE + form_url).strip()
-    try:
-        await page.goto(full_url, timeout=20000, wait_until="networkidle")
-        await page.wait_for_timeout(1500)
-        if "login" in page.url.lower():
-            return None, None
-
-        content = await page.content()
-        soup = BeautifulSoup(content, "html.parser")
-
-        chalan_url = None
-        passport_url = None
-
-        for card in soup.select("div.doc-card"):
-            label = card.select_one("p")
-            link  = card.select_one("a[href]")
-            if not label or not link:
-                continue
-            label_text = label.text.strip().lower()
-            href = link["href"].strip()
-            if not href or href == "#":
-                continue
-            if "chalan" in label_text or "challan" in label_text:
-                chalan_url = href
-            elif "passport" in label_text:
-                passport_url = href
-
-        print(f"  [{app['ref']}] chalan={chalan_url} passport={passport_url}")
-        return chalan_url, passport_url
-
-    except Exception as e:
-        print(f"Form scrape failed [{app['ref']}]: {e}")
-        return None, None
     """
     Navigate to the certificate URL using the active session,
     screenshot the certificate area → docs/certs/{ref}.png
@@ -284,12 +199,30 @@ async def scrape_form_docs(page, app):
         await page.set_viewport_size({"width": 900, "height": 1200})
         await page.wait_for_timeout(500)
 
-        # #printID is the exact certificate content div (confirmed from page source)
-        cert_el = await page.query_selector("#printID")
-        if cert_el:
-            await cert_el.screenshot(path=png_path, scale="device")
-        else:
-            await page.screenshot(path=png_path, full_page=True)
+        # Hide everything except the certificate content
+        await page.evaluate("""() => {
+            const hideSelectors = [
+                'nav', 'header', 'footer',
+                '.t-Header', '.t-Footer',
+                '.t-NavigationBar', '.t-NavBar',
+                '.t-Body-nav', '.t-Body-header',
+                '.t-BreadcrumbRegion',
+                '#t_Header', '#t_Footer',
+                '.t-Alert'
+            ];
+            hideSelectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    el.style.display = 'none';
+                });
+            });
+            // Also remove margin/padding from body
+            document.body.style.margin = '0';
+            document.body.style.padding = '0';
+        }""")
+        await page.wait_for_timeout(300)
+
+        # Full page screenshot — most reliable, no selector guessing
+        await page.screenshot(path=png_path, full_page=True)
 
         print(f"✅ Cert screenshot: {ref} → {png_path}")
         return github_path
@@ -299,29 +232,7 @@ async def scrape_form_docs(page, app):
         return None
 
 
-async def download_doc(page, url, ref, doc_type):
-    """Screenshot a document URL → docs/certs/{ref}_{doc_type}.png"""
-    if not url:
-        return None
-    os.makedirs(CERT_DIR, exist_ok=True)
-    png_path    = f"{CERT_DIR}/{ref}_{doc_type}.png"
-    github_path = f"certs/{ref}_{doc_type}.png"
-    if os.path.exists(png_path):
-        print(f"Doc already exists: {ref}_{doc_type}")
-        return github_path
-    try:
-        await page.goto(url, timeout=20000, wait_until="networkidle")
-        await page.wait_for_timeout(1500)
-        if "login" in page.url.lower():
-            return None
-        await page.set_viewport_size({"width": 900, "height": 1200})
-        await page.wait_for_timeout(300)
-        await page.screenshot(path=png_path, full_page=True)
-        print(f"✅ Doc screenshot: {ref}_{doc_type} → {png_path}")
-        return github_path
-    except Exception as e:
-        print(f"⚠️ Doc screenshot failed [{ref}_{doc_type}]: {e}")
-        return None
+async def scrape_all_pages(page):
     """Scrape all pagination pages — handles multi-page PCC lists"""
     all_apps = []
     page_num = 0
@@ -440,21 +351,6 @@ async def main():
                 status_num = int(app["status"].split('/')[0]) if '/' in app["status"] else 0
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
-
-            # ── Scrape & download form docs (chalan, passport) for ALL apps ─
-            for app in applications:
-                if not app.get("form_url"):
-                    continue
-                ref = app["ref"]
-                chalan_exists  = os.path.exists(f"{CERT_DIR}/{ref}_chalan.png")
-                passport_exists= os.path.exists(f"{CERT_DIR}/{ref}_passport.png")
-                if chalan_exists and passport_exists:
-                    app["chalan_file"]  = f"certs/{ref}_chalan.png"
-                    app["passport_file"]= f"certs/{ref}_passport.png"
-                    continue
-                chalan_url, passport_url = await scrape_form_docs(page, app)
-                app["chalan_file"]  = await download_doc(page, chalan_url,  ref, "chalan")
-                app["passport_file"]= await download_doc(page, passport_url, ref, "passport")
 
             # ── Remove certs for delivered/gone apps ─────────────────
             cleanup_certs(applications)

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!-- saved from url=(0052)file:///C:/Users/ADMIN/Downloads/pcc_tracker_10.html -->
 <html lang="bn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -1459,14 +1460,14 @@ function openNoteModal(ref){
   noteModalRef=ref;const app=allApps.find(a=>a.ref===ref);const s=stars[ref]||0;const si=s===2?'🔴':s===1?'⭐':'';
   document.getElementById('note-modal-title').textContent=(si?si+' ':'')+( app?app.name:ref)+' — নোট';
   document.getElementById('note-modal-textarea').value=notes[ref]||'';
-  // Doc buttons
+  // Doc buttons — show for all files
   const docsDiv=document.getElementById('note-modal-docs');
   if(docsDiv&&app){
     const BASE='https://mtonmoynbd-ops.github.io/Pcc-Tracker/';
     const btns=[];
-    if(app.cert_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.cert_file}','${ref}')" style="flex:1;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">📄 সার্টিফিকেট</button>`);
-    if(app.chalan_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.chalan_file}','${ref}')" style="flex:1;background:#1a2a1a;border:1px solid #22c55e;color:#4ade80;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🏦 চালান</button>`);
-    if(app.passport_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.passport_file}','${ref}')" style="flex:1;background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🛂 পাসপোর্ট</button>`);
+    if(app.form_url)btns.push(`<button onclick="window.open('${app.form_url}','_blank')" style="flex:1;min-width:80px;background:#1e2a3a;border:1px solid #334155;color:#94a3b8;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">📋 আবেদন</button>`);
+    if(app.chalan_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.chalan_file}','${ref}')" style="flex:1;min-width:80px;background:#1a2a1a;border:1px solid #22c55e;color:#4ade80;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🏦 চালান</button>`);
+    if(app.passport_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.passport_file}','${ref}')" style="flex:1;min-width:80px;background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🛂 পাসপোর্ট</button>`);
     docsDiv.style.display=btns.length?'flex':'none';
     docsDiv.innerHTML=btns.join('');
   }

@@ -133,14 +133,14 @@ def parse_rows(rows):
 
 
 def migrate_pdf_to_png():
-    """Delete all old .pdf cert files so next run regenerates as .png"""
+    """Delete all old cert files so next run regenerates with correct #printID selector"""
     if not os.path.exists(CERT_DIR):
         return
     for fname in os.listdir(CERT_DIR):
-        if fname.endswith(".pdf"):
+        if fname.endswith(".pdf") or fname.endswith(".png"):
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
-                print(f"🗑️ Migrated: removed old PDF {fname}")
+                print(f"🗑️ Removed old cert: {fname}")
             except Exception as e:
                 print(f"Remove failed [{fname}]: {e}")
 
@@ -178,10 +178,9 @@ async def download_cert(page, app):
     png_path    = f"{CERT_DIR}/{ref}.png"
     github_path = f"certs/{ref}.png"
 
-    # TEMP: force re-download for debug
-    # if os.path.exists(png_path):
-    #     print(f"Cert already exists: {ref}")
-    #     return github_path
+    if os.path.exists(png_path):
+        print(f"Cert already exists: {ref}")
+        return github_path
 
     # Delete old PDF if exists (migrating to PNG)
     old_pdf = f"{CERT_DIR}/{ref}.pdf"
@@ -200,36 +199,12 @@ async def download_cert(page, app):
         await page.set_viewport_size({"width": 900, "height": 1200})
         await page.wait_for_timeout(500)
 
-        # DEBUG
-        content = await page.content()
-        print("CERT_HTML_START")
-        print(content[:5000])
-        print("CERT_HTML_END")
-
-        # Hide everything except the certificate content
-        await page.evaluate("""() => {
-            const hideSelectors = [
-                'nav', 'header', 'footer',
-                '.t-Header', '.t-Footer',
-                '.t-NavigationBar', '.t-NavBar',
-                '.t-Body-nav', '.t-Body-header',
-                '.t-BreadcrumbRegion',
-                '#t_Header', '#t_Footer',
-                '.t-Alert'
-            ];
-            hideSelectors.forEach(sel => {
-                document.querySelectorAll(sel).forEach(el => {
-                    el.style.display = 'none';
-                });
-            });
-            // Also remove margin/padding from body
-            document.body.style.margin = '0';
-            document.body.style.padding = '0';
-        }""")
-        await page.wait_for_timeout(300)
-
-        # Full page screenshot — most reliable, no selector guessing
-        await page.screenshot(path=png_path, full_page=True)
+        # #printID is the exact certificate content div (confirmed from page source)
+        cert_el = await page.query_selector("#printID")
+        if cert_el:
+            await cert_el.screenshot(path=png_path, scale="device")
+        else:
+            await page.screenshot(path=png_path, full_page=True)
 
         print(f"✅ Cert screenshot: {ref} → {png_path}")
         return github_path

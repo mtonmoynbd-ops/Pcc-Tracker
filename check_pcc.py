@@ -196,16 +196,42 @@ async def download_cert(page, app):
             print(f"Session expired for cert {ref}")
             return None
 
-        # Set viewport wide enough for certificate
+        # Wide viewport, hide nav/header/footer for clean cert
         await page.set_viewport_size({"width": 900, "height": 1200})
         await page.wait_for_timeout(500)
 
-        # Try to screenshot only the certificate content area (red-bordered table)
-        cert_el = await page.query_selector("table.t-Report-report, .t-Region-body table, table")
+        # Hide nav bar, header, footer — keep only cert content
+        await page.evaluate("""() => {
+            const hide = ['nav', 'header', '.t-Header', '.t-NavigationBar',
+                          '.t-Footer', 'footer', '.t-Body-nav', '.t-Body-header'];
+            hide.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => el.style.display = 'none');
+            });
+        }""")
+
+        # Try selectors from most specific to least
+        selectors = [
+            ".t-Region--scrollBody",
+            ".t-Region-body",
+            "#report_NISAD",          # APEX region IDs vary, try generic
+            ".t-Body-content",
+            "main",
+            ".t-Body",
+        ]
+        cert_el = None
+        for sel in selectors:
+            cert_el = await page.query_selector(sel)
+            if cert_el:
+                box = await cert_el.bounding_box()
+                if box and box["height"] > 200:  # Must be tall enough to be the cert
+                    print(f"Using selector: {sel}")
+                    break
+                cert_el = None
+
         if cert_el:
             await cert_el.screenshot(path=png_path, scale="device")
         else:
-            # Fallback: full page screenshot
+            # Fallback: full page
             await page.screenshot(path=png_path, full_page=True)
 
         print(f"✅ Cert screenshot: {ref} → {png_path}")

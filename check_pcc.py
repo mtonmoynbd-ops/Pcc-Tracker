@@ -176,7 +176,39 @@ def cleanup_certs(applications):
                 print(f"Cert remove failed [{ref}]: {e}")
 
 
-async def scrape_form_docs(page, app):
+async def download_cert(page, app):
+    """Screenshot #printID element → docs/certs/{ref}.png"""
+    ref      = app["ref"]
+    cert_url = app.get("cert_url")
+    if not cert_url:
+        return None
+
+    os.makedirs(CERT_DIR, exist_ok=True)
+    png_path    = f"{CERT_DIR}/{ref}.png"
+    github_path = f"certs/{ref}.png"
+
+    if os.path.exists(png_path):
+        print(f"Cert already exists: {ref}")
+        return github_path
+
+    try:
+        await page.goto(cert_url, timeout=20000, wait_until="networkidle")
+        await page.wait_for_timeout(2000)
+        if "login" in page.url.lower():
+            print(f"Session expired for cert {ref}")
+            return None
+        await page.set_viewport_size({"width": 900, "height": 1200})
+        await page.wait_for_timeout(500)
+        cert_el = await page.query_selector("#printID")
+        if cert_el:
+            await cert_el.screenshot(path=png_path, scale="device")
+        else:
+            await page.screenshot(path=png_path, full_page=True)
+        print(f"✅ Cert screenshot: {ref} → {png_path}")
+        return github_path
+    except Exception as e:
+        print(f"⚠️ Cert screenshot failed [{ref}]: {e}")
+        return None
     """Visit application form page, extract Chalan and Passport View/Download links"""
     form_url = app.get("form_url")
     if not form_url:
@@ -395,13 +427,10 @@ async def main():
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
 
-            # ── DEBUG: test form scrape on first starred app ──────────
-            test_app = next((a for a in applications if (stars_test := int(a["status"].split('/')[0]) if '/' in a["status"] else 0) >= 1), None)
-            if not test_app:
-                test_app = applications[0] if applications else None
-            if test_app:
-                print(f"Testing form scrape on: {test_app['ref']}")
-                await scrape_form_docs(page, test_app)
+            # ── DEBUG: test form scrape on first app ──────────────────
+            if applications:
+                print(f"Testing form scrape on: {applications[0]['ref']}")
+                await scrape_form_docs(page, applications[0])
 
             # ── Remove certs for delivered/gone apps ─────────────────
             cleanup_certs(applications)

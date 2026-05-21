@@ -416,12 +416,30 @@ async def main():
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
 
-            # ── Download form docs (form, chalan, passport) ──────────
+            # ── Download form docs only for starred (important/urgent) apps ─
+            from_userdata = load_userdata()
+            starred_refs = set()
+            # Read stars from userdata if available (synced from app)
+            ud_stars = from_userdata.get("pcc_stars", {})
+            for ref, val in ud_stars.items():
+                if val and val > 0:
+                    starred_refs.add(ref)
+
             for app in applications:
                 if not app.get("form_url"):
                     continue
                 ref = app["ref"]
-                # If all three already exist, just fill the paths
+                # Only download for starred apps
+                if ref not in starred_refs:
+                    # Still fill paths if files already exist from before
+                    if os.path.exists(f"{CERT_DIR}/{ref}_form.png"):
+                        app["form_file"] = f"certs/{ref}_form.png"
+                    if os.path.exists(f"{CERT_DIR}/{ref}_chalan.png"):
+                        app["chalan_file"] = f"certs/{ref}_chalan.png"
+                    if os.path.exists(f"{CERT_DIR}/{ref}_passport.png"):
+                        app["passport_file"] = f"certs/{ref}_passport.png"
+                    continue
+                # All three already exist
                 if (os.path.exists(f"{CERT_DIR}/{ref}_form.png") and
                     os.path.exists(f"{CERT_DIR}/{ref}_chalan.png") and
                     os.path.exists(f"{CERT_DIR}/{ref}_passport.png")):

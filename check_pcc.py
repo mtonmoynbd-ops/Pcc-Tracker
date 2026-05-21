@@ -97,14 +97,22 @@ def save_userdata(print_dates, status_history):
 
 
 def parse_rows(rows):
-    """Parse table rows into application dicts — also extracts cert link"""
+    """Parse table rows — extracts cert link and form link"""
     apps = []
     for row in rows:
         cols = row.select("td")
         if len(cols) >= 9:
             ref = cols[0].text.strip()
 
-            # ── Certificate link (col index 1) ──────────────────────
+            # ── Form link (col 0 — ref is a link) ───────────────────
+            ref_tag = cols[0].select_one("a")
+            raw_form = ref_tag["href"].strip() if ref_tag else None
+            if raw_form:
+                form_url = (raw_form if raw_form.startswith("http") else PCC_BASE + "/" + raw_form.lstrip("/")).strip()
+            else:
+                form_url = None
+
+            # ── Certificate link (col 1) ─────────────────────────────
             cert_tag = cols[1].select_one("a")
             raw_href = cert_tag["href"].strip() if cert_tag else None
             if raw_href:
@@ -112,28 +120,31 @@ def parse_rows(rows):
             else:
                 cert_url = None
 
-            apply_date = cols[3].text.strip()
-            phone      = cols[4].text.strip()
-            name       = cols[5].text.strip()
+            apply_date  = cols[3].text.strip()
+            phone       = cols[4].text.strip()
+            name        = cols[5].text.strip()
             full_status = cols[8].text.strip()
             m = re.match(r'(\d+/\d+)', full_status)
             status = m.group(1) if m else full_status
 
             if ref and len(ref) > 2:
                 apps.append({
-                    "ref":        ref,
-                    "name":       name,
-                    "apply_date": apply_date,
-                    "phone":      phone,
-                    "status":     status,
-                    "cert_url":   cert_url,   # raw site URL (session-bound)
-                    "cert_file":  None,        # will be filled after download
+                    "ref":          ref,
+                    "name":         name,
+                    "apply_date":   apply_date,
+                    "phone":        phone,
+                    "status":       status,
+                    "cert_url":     cert_url,
+                    "cert_file":    None,
+                    "form_url":     form_url,
+                    "chalan_file":  None,
+                    "passport_file": None,
                 })
     return apps
 
 
 def migrate_pdf_to_png():
-    """Delete all old .pdf cert files so next run regenerates as .png"""
+    """Delete only old .pdf cert files"""
     if not os.path.exists(CERT_DIR):
         return
     for fname in os.listdir(CERT_DIR):
@@ -146,29 +157,26 @@ def migrate_pdf_to_png():
 
 
 def cleanup_certs(applications):
-    """Remove cert PNGs for apps that are now 10/10 or no longer in list"""
+    """Remove cert/doc PNGs for apps that are 10/10 or no longer in list"""
     if not os.path.exists(CERT_DIR):
         return
-    active_refs = {a["ref"] for a in applications}
+    active_refs    = {a["ref"] for a in applications}
     delivered_refs = {a["ref"] for a in applications if a["status"] == "10/10"}
     for fname in os.listdir(CERT_DIR):
         if not fname.endswith(".png") and not fname.endswith(".pdf"):
             continue
-        ref = fname.rsplit(".", 1)[0]
+        # ref = everything before first underscore or dot
+        ref = fname.split("_")[0].split(".")[0]
         if ref in delivered_refs or ref not in active_refs:
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
-                print(f"🗑️ Cert removed: {ref}")
+                print(f"🗑️ Removed: {fname}")
             except Exception as e:
-                print(f"Cert remove failed [{ref}]: {e}")
+                print(f"Remove failed [{fname}]: {e}")
 
 
 async def download_cert(page, app):
-    """
-    Navigate to the certificate URL using the active session,
-    screenshot the certificate area → docs/certs/{ref}.png
-    Returns the relative path on success, None on failure.
-    """
+    """Screenshot #printID → docs/certs/{ref}.png"""
     ref      = app["ref"]
     cert_url = app.get("cert_url")
     if not cert_url:
@@ -182,122 +190,179 @@ async def download_cert(page, app):
         print(f"Cert already exists: {ref}")
         return github_path
 
-    # Delete old PDF if exists (migrating to PNG)
     old_pdf = f"{CERT_DIR}/{ref}.pdf"
     if os.path.exists(old_pdf):
         os.remove(old_pdf)
-        print(f"Removed old PDF: {ref}")
 
     try:
         await page.goto(cert_url, timeout=20000, wait_until="networkidle")
         await page.wait_for_timeout(2000)
-
         if "login" in page.url.lower():
-            print(f"Session expired for cert {ref}")
             return None
-
         await page.set_viewport_size({"width": 900, "height": 1200})
         await page.wait_for_timeout(500)
-
-        # Hide everything except the certificate content
-        await page.evaluate("""() => {
-            const hideSelectors = [
-                'nav', 'header', 'footer',
-                '.t-Header', '.t-Footer',
-                '.t-NavigationBar', '.t-NavBar',
-                '.t-Body-nav', '.t-Body-header',
-                '.t-BreadcrumbRegion',
-                '#t_Header', '#t_Footer',
-                '.t-Alert'
-            ];
-            hideSelectors.forEach(sel => {
-                document.querySelectorAll(sel).forEach(el => {
-                    el.style.display = 'none';
-                });
-            });
-            // Also remove margin/padding from body
-            document.body.style.margin = '0';
-            document.body.style.padding = '0';
-        }""")
-        await page.wait_for_timeout(300)
-
-        # Full page screenshot — most reliable, no selector guessing
-        await page.screenshot(path=png_path, full_page=True)
-
+        cert_el = await page.query_selector("#printID")
+        if cert_el:
+            await cert_el.screenshot(path=png_path, scale="device")
+        else:
+            await page.screenshot(path=png_path, full_page=True)
         print(f"✅ Cert screenshot: {ref} → {png_path}")
         return github_path
-
     except Exception as e:
-        print(f"⚠️ Cert screenshot failed [{ref}]: {e}")
+        print(f"⚠️ Cert failed [{ref}]: {e}")
         return None
 
 
+async def download_form_docs(page, app):
+    """
+    Visit application form page → screenshot full page as form.png
+    Then find Chalan and Passport links → screenshot each.
+    Returns (form_file, chalan_file, passport_file)
+    """
+    ref      = app["ref"]
+    form_url = app.get("form_url")
+    if not form_url:
+        return None, None, None
+
+    os.makedirs(CERT_DIR, exist_ok=True)
+    form_path     = f"{CERT_DIR}/{ref}_form.png"
+    chalan_path   = f"{CERT_DIR}/{ref}_chalan.png"
+    passport_path = f"{CERT_DIR}/{ref}_passport.png"
+
+    form_github     = f"certs/{ref}_form.png"
+    chalan_github   = f"certs/{ref}_chalan.png"
+    passport_github = f"certs/{ref}_passport.png"
+
+    # Skip if all already exist
+    all_exist = os.path.exists(form_path) and os.path.exists(chalan_path) and os.path.exists(passport_path)
+    if all_exist:
+        print(f"Form docs already exist: {ref}")
+        return form_github, chalan_github, passport_github
+
+    try:
+        await page.goto(form_url, timeout=20000, wait_until="networkidle")
+        await page.wait_for_timeout(2000)
+        if "login" in page.url.lower():
+            return None, None, None
+
+        await page.set_viewport_size({"width": 900, "height": 1400})
+        await page.wait_for_timeout(500)
+
+        # ── Screenshot form page ──────────────────────────────────
+        if not os.path.exists(form_path):
+            await page.evaluate("""() => {
+                ['nav','header','footer','.t-Header','.t-Footer',
+                 '.t-NavigationBar','.t-Body-nav','#t_Header','#t_Footer']
+                .forEach(s => document.querySelectorAll(s)
+                .forEach(el => el.style.display='none'));
+            }""")
+            await page.wait_for_timeout(200)
+            await page.screenshot(path=form_path, full_page=True)
+            print(f"✅ Form screenshot: {ref}")
+
+        # ── Parse doc links from page ─────────────────────────────
+        content = await page.content()
+        soup    = BeautifulSoup(content, "html.parser")
+
+        chalan_url   = None
+        passport_url = None
+        for card in soup.select("div.doc-card"):
+            label = card.select_one("p")
+            link  = card.select_one("a[href]")
+            if not label or not link:
+                continue
+            label_text = label.text.strip().lower()
+            href = link["href"].strip()
+            if not href or href == "#":
+                continue
+            if "chalan" in label_text or "challan" in label_text:
+                chalan_url = href
+            elif "passport" in label_text:
+                passport_url = href
+
+        # ── Screenshot chalan ─────────────────────────────────────
+        if chalan_url and not os.path.exists(chalan_path):
+            try:
+                await page.goto(chalan_url, timeout=15000, wait_until="networkidle")
+                await page.wait_for_timeout(1000)
+                await page.set_viewport_size({"width": 900, "height": 1200})
+                await page.screenshot(path=chalan_path, full_page=True)
+                print(f"✅ Chalan screenshot: {ref}")
+            except Exception as e:
+                print(f"⚠️ Chalan failed [{ref}]: {e}")
+                chalan_github = None
+
+        # ── Screenshot passport ───────────────────────────────────
+        if passport_url and not os.path.exists(passport_path):
+            try:
+                await page.goto(passport_url, timeout=15000, wait_until="networkidle")
+                await page.wait_for_timeout(1000)
+                await page.set_viewport_size({"width": 900, "height": 1200})
+                await page.screenshot(path=passport_path, full_page=True)
+                print(f"✅ Passport screenshot: {ref}")
+            except Exception as e:
+                print(f"⚠️ Passport failed [{ref}]: {e}")
+                passport_github = None
+
+        return (
+            form_github     if os.path.exists(form_path)     else None,
+            chalan_github   if os.path.exists(chalan_path)   else None,
+            passport_github if os.path.exists(passport_path) else None,
+        )
+
+    except Exception as e:
+        print(f"⚠️ Form docs failed [{ref}]: {e}")
+        return None, None, None
+
+
 async def scrape_all_pages(page):
-    """Scrape all pagination pages — handles multi-page PCC lists"""
+    """Scrape all pagination pages"""
     all_apps = []
     page_num = 0
-
     while page_num < 20:
         page_num += 1
         await page.wait_for_timeout(1500)
-
         content = await page.content()
         soup    = BeautifulSoup(content, "html.parser")
         rows    = soup.select("table tr")[1:]
-
         if not rows:
             print(f"Page {page_num}: no rows found, stopping")
             break
-
         page_apps = parse_rows(rows)
         all_apps.extend(page_apps)
         print(f"Page {page_num}: {len(page_apps)} applications")
-
         has_next = await page.evaluate("""() => {
-            const candidates = [
-                ...document.querySelectorAll(
-                    'button[title="Next"], a[title="Next"], ' +
-                    'button[aria-label="Next"], a[aria-label="Next"], ' +
-                    '.t-Report-paginationLink--next, ' +
-                    'a.t-Button--pagination, button.t-Button--pagination'
-                )
-            ];
+            const candidates = [...document.querySelectorAll(
+                'button[title="Next"], a[title="Next"], button[aria-label="Next"], a[aria-label="Next"], .t-Report-paginationLink--next, a.t-Button--pagination, button.t-Button--pagination'
+            )];
             for (const el of candidates) {
-                const txt   = el.textContent.trim();
-                const title = (el.getAttribute('title') || '').toLowerCase();
-                const aria  = (el.getAttribute('aria-label') || '').toLowerCase();
-                if (
-                    title.includes('next') || aria.includes('next') ||
-                    txt === '>' || txt === 'Next' || txt === '›'
-                ) {
-                    if (!el.disabled && !el.classList.contains('disabled') && el.offsetParent !== null) {
-                        el.click();
-                        return true;
+                const txt = el.textContent.trim();
+                const title = (el.getAttribute('title')||'').toLowerCase();
+                const aria  = (el.getAttribute('aria-label')||'').toLowerCase();
+                if (title.includes('next')||aria.includes('next')||txt==='>'||txt==='Next'||txt==='›') {
+                    if (!el.disabled && !el.classList.contains('disabled') && el.offsetParent!==null) {
+                        el.click(); return true;
                     }
                 }
             }
             const all = [...document.querySelectorAll('button, a, span[role="button"]')];
             for (const el of all) {
-                if (el.textContent.trim() === '>' && !el.disabled && el.offsetParent !== null) {
-                    el.click();
-                    return true;
+                if (el.textContent.trim()==='>' && !el.disabled && el.offsetParent!==null) {
+                    el.click(); return true;
                 }
             }
             return false;
         }""")
-
         if not has_next:
             print(f"No next page after page {page_num}")
             break
-
         await page.wait_for_load_state("networkidle")
         print(f"Navigated to page {page_num + 1}")
-
     return all_apps
 
 
 async def main():
-    migrate_pdf_to_png()  # Remove old PDFs → will regenerate as PNG
+    migrate_pdf_to_png()
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         context = await browser.new_context(
@@ -338,7 +403,6 @@ async def main():
 
             # ── Scrape ───────────────────────────────────────────────
             applications = await scrape_all_pages(page)
-
             if not applications:
                 send_telegram("⚠️ আবেদন পাওয়া যায়নি।")
                 await browser.close()
@@ -352,23 +416,41 @@ async def main():
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
 
-            # ── Remove certs for delivered/gone apps ─────────────────
-            cleanup_certs(applications)
+            # ── Download form docs (form, chalan, passport) ──────────
+            for app in applications:
+                if not app.get("form_url"):
+                    continue
+                ref = app["ref"]
+                # If all three already exist, just fill the paths
+                if (os.path.exists(f"{CERT_DIR}/{ref}_form.png") and
+                    os.path.exists(f"{CERT_DIR}/{ref}_chalan.png") and
+                    os.path.exists(f"{CERT_DIR}/{ref}_passport.png")):
+                    app["form_file"]     = f"certs/{ref}_form.png"
+                    app["chalan_file"]   = f"certs/{ref}_chalan.png"
+                    app["passport_file"] = f"certs/{ref}_passport.png"
+                    print(f"Form docs already exist: {ref}")
+                    continue
+                f, c, ps = await download_form_docs(page, app)
+                app["form_file"]     = f
+                app["chalan_file"]   = c
+                app["passport_file"] = ps
 
+            # ── Cleanup ──────────────────────────────────────────────
+            cleanup_certs(applications)
             save_data(applications)
 
             # ── Change detection ─────────────────────────────────────
-            old_state      = load_state()
-            old_statuses   = old_state.get("statuses", {})
-            old_print_dates= old_state.get("print_dates", {})
-            old_history    = old_state.get("status_history", {})
+            old_state       = load_state()
+            old_statuses    = old_state.get("statuses", {})
+            old_print_dates = old_state.get("print_dates", {})
+            old_history     = old_state.get("status_history", {})
 
-            new_statuses   = {}
-            new_print_dates= dict(old_print_dates)
-            new_history    = dict(old_history)
-            changes        = []
-            new_files      = []
-            today_str      = datetime.now(BD_TZ).strftime("%d-%b-%Y")
+            new_statuses    = {}
+            new_print_dates = dict(old_print_dates)
+            new_history     = dict(old_history)
+            changes         = []
+            new_files       = []
+            today_str       = datetime.now(BD_TZ).strftime("%d-%b-%Y")
 
             for app in applications:
                 ref    = app["ref"]
@@ -378,7 +460,6 @@ async def main():
                 num = int(status.split('/')[0]) if '/' in status else 0
                 if num == 5 and ref not in new_print_dates:
                     new_print_dates[ref] = today_str
-                    print(f"Print date recorded: {ref} → {today_str}")
 
                 if ref not in new_history:
                     new_history[ref] = []
@@ -408,7 +489,6 @@ async def main():
                 save_rss(changes)
                 for c in changes:
                     cert_note = ""
-                    # If newly reached 9/10 and cert downloaded, add note
                     if c["new"].startswith("9/") and c["old"] != c["new"]:
                         matched = next((a for a in applications if a["ref"] == c["ref"]), None)
                         if matched and matched.get("cert_file"):
@@ -425,7 +505,8 @@ async def main():
             save_state({"statuses": new_statuses, "print_dates": new_print_dates, "status_history": new_history})
             save_userdata(new_print_dates, new_history)
             cert_count = sum(1 for a in applications if a.get("cert_file"))
-            print(f"Done. {len(applications)} apps, {len(changes)} changes, {len(new_files)} new, {cert_count} certs.")
+            doc_count  = sum(1 for a in applications if a.get("form_file"))
+            print(f"Done. {len(applications)} apps, {len(changes)} changes, {len(new_files)} new, {cert_count} certs, {doc_count} forms.")
 
         except Exception as e:
             send_telegram(f"⚠️ সমস্যা:\n{str(e)[:200]}")

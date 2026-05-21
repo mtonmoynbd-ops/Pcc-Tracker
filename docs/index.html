@@ -604,13 +604,9 @@
         <div>PDF ফাইল এপে দেখানো যাচ্ছে না।<br>নিচের বাটনে ক্লিক করুন।</div>
       </div>
     </div>
-    <div style="display:flex;gap:8px;padding:10px 12px;border-top:1px solid #1e3a5f;flex-shrink:0">
-      <a id="cert-open-btn" href="" target="_blank" onclick="window.open(this.href,'_blank');return false" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;border-radius:8px;padding:9px;font-size:12px;font-weight:600;text-decoration:none">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        ব্রাউজারে খুলুন
-      </a>
-      <button onclick="downloadCertPdf()" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#14532d;border:1px solid #22c55e;color:#4ade80;border-radius:8px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #22c55e">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <div style="padding:10px 12px;border-top:1px solid #1e3a5f;flex-shrink:0">
+      <button onclick="downloadCertPdf()" style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:#14532d;border:1px solid #22c55e;color:#4ade80;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         ডাউনলোড
       </button>
     </div>
@@ -1816,7 +1812,7 @@ function toggleFilter(f,btn){
 }
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');render();}
 function matchesFilter(app){
-  const num=parseInt((app.status||'').split('/')[0])||0;const isDraft=(app.status||'').toLowerCase().includes('draft');
+  const num=parseInt((app.status||'').split('/')[0])||0;const isDraft=num<1;
   if(activePoliceFilter&&policeTags[app.ref]!==activePoliceFilter)return false;
   if(activeFilter==='all')return true;if(activeFilter==='draft')return isDraft;
   if(activeFilter==='ready')return !!(collected[app.ref]&&!delivered[app.ref]);

@@ -144,14 +144,14 @@ def parse_rows(rows):
 
 
 def migrate_pdf_to_png():
-    """Delete all old cert files so next run regenerates with correct #printID selector"""
+    """Delete only old .pdf cert files — never delete PNGs"""
     if not os.path.exists(CERT_DIR):
         return
     for fname in os.listdir(CERT_DIR):
-        if fname.endswith(".pdf") or fname.endswith(".png"):
+        if fname.endswith(".pdf"):
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
-                print(f"🗑️ Removed old cert: {fname}")
+                print(f"🗑️ Removed old PDF: {fname}")
             except Exception as e:
                 print(f"Remove failed [{fname}]: {e}")
 
@@ -441,11 +441,10 @@ async def main():
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
 
-            # ── Scrape & download form docs (chalan, passport) ────────
+            # ── Scrape & download form docs (chalan, passport) for ALL apps ─
             for app in applications:
                 if not app.get("form_url"):
                     continue
-                # Only scrape if we don't already have both docs
                 ref = app["ref"]
                 chalan_exists  = os.path.exists(f"{CERT_DIR}/{ref}_chalan.png")
                 passport_exists= os.path.exists(f"{CERT_DIR}/{ref}_passport.png")

@@ -143,7 +143,10 @@ def migrate_pdf_to_png():
                 print(f"🗑️ Migrated: removed old PDF {fname}")
             except Exception as e:
                 print(f"Remove failed [{fname}]: {e}")
-    """Remove cert PDFs for apps that are now 10/10 or no longer in list"""
+
+
+def cleanup_certs(applications):
+    """Remove cert PNGs for apps that are now 10/10 or no longer in list"""
     if not os.path.exists(CERT_DIR):
         return
     active_refs = {a["ref"] for a in applications}

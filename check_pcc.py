@@ -97,12 +97,24 @@ def save_userdata(print_dates, status_history):
 
 
 def parse_rows(rows):
-    """Parse table rows into application dicts — also extracts cert link"""
+    """Parse table rows into application dicts — also extracts cert link and app form link"""
     apps = []
+    debug_printed = False
     for row in rows:
         cols = row.select("td")
         if len(cols) >= 9:
             ref = cols[0].text.strip()
+
+            # ── Application form link (col index 0 — ref is a link) ──
+            ref_tag = cols[0].select_one("a")
+            raw_ref_href = ref_tag["href"].strip() if ref_tag else None
+            if raw_ref_href and not debug_printed:
+                print(f"REF_LINK_DEBUG: {raw_ref_href}")
+                debug_printed = True
+            if raw_ref_href:
+                form_url = (raw_ref_href if raw_ref_href.startswith("http") else PCC_BASE + "/" + raw_ref_href.lstrip("/")).strip()
+            else:
+                form_url = None
 
             # ── Certificate link (col index 1) ──────────────────────
             cert_tag = cols[1].select_one("a")
@@ -126,8 +138,9 @@ def parse_rows(rows):
                     "apply_date": apply_date,
                     "phone":      phone,
                     "status":     status,
-                    "cert_url":   cert_url,   # raw site URL (session-bound)
-                    "cert_file":  None,        # will be filled after download
+                    "cert_url":   cert_url,
+                    "cert_file":  None,
+                    "form_url":   form_url,   # application form URL
                 })
     return apps
 

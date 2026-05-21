@@ -178,9 +178,10 @@ async def download_cert(page, app):
     png_path    = f"{CERT_DIR}/{ref}.png"
     github_path = f"certs/{ref}.png"
 
-    if os.path.exists(png_path):
-        print(f"Cert already exists: {ref}")
-        return github_path
+    # TEMP: force re-download for debug
+    # if os.path.exists(png_path):
+    #     print(f"Cert already exists: {ref}")
+    #     return github_path
 
     # Delete old PDF if exists (migrating to PNG)
     old_pdf = f"{CERT_DIR}/{ref}.pdf"

@@ -913,7 +913,6 @@ function confirmOk(){document.getElementById('confirm-modal').classList.remove('
 let _currentCertUrl='';
 function openCertInApp(url,ref){
   _currentCertUrl=url;
-  document.getElementById('cert-open-btn').href=url;
   const isPdf=url.toLowerCase().endsWith('.pdf');
   const img=document.getElementById('cert-img');
   const noImg=document.getElementById('cert-no-img');

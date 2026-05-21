@@ -199,6 +199,12 @@ async def download_cert(page, app):
         await page.set_viewport_size({"width": 900, "height": 1200})
         await page.wait_for_timeout(500)
 
+        # DEBUG
+        content = await page.content()
+        print("CERT_HTML_START")
+        print(content[:5000])
+        print("CERT_HTML_END")
+
         # Hide everything except the certificate content
         await page.evaluate("""() => {
             const hideSelectors = [

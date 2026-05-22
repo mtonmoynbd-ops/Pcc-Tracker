@@ -519,6 +519,11 @@
 </head>
 <body>
 <script>(function(){var t=localStorage.getItem('pcc_theme');if(t==='light'||t==='amoled')document.body.className=t;}())</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/Pcc-Tracker/sw.js').catch(function(e){console.log('SW:',e);});
+}
+</script>
 
 <svg style="display:none">
   <symbol id="ico-archive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

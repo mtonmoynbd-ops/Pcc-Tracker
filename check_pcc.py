@@ -210,19 +210,11 @@ async def download_cert(page, app):
         await page.set_viewport_size({"width": 900, "height": 1200})
         await page.wait_for_timeout(500)
 
-        # Hide everything except #printID
-        await page.evaluate("""() => {
-            const print_el = document.getElementById('printID');
-            if (print_el) {
-                document.body.innerHTML = '';
-                document.body.style.margin = '0';
-                document.body.style.padding = '10px';
-                document.body.style.background = '#fff';
-                document.body.appendChild(print_el);
-            }
-        }""")
-        await page.wait_for_timeout(300)
-        await page.screenshot(path=png_path, full_page=True)
+        cert_el = await page.query_selector("#printID")
+        if cert_el:
+            await cert_el.screenshot(path=png_path)
+        else:
+            await page.screenshot(path=png_path, full_page=True)
         print(f"✅ Cert screenshot: {ref} → {png_path}")
         return github_path
     except Exception as e:

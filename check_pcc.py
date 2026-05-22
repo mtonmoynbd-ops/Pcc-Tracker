@@ -423,19 +423,6 @@ async def main():
                     continue
                 docs = await scrape_form_docs(page, app)
                 app.update(docs)
-                ref = app["ref"]
-                if (os.path.exists(f"{CERT_DIR}/{ref}_form.png") and
-                    os.path.exists(f"{CERT_DIR}/{ref}_chalan.png") and
-                    os.path.exists(f"{CERT_DIR}/{ref}_passport.png")):
-                    app["form_file"]     = f"certs/{ref}_form.png"
-                    app["chalan_file"]   = f"certs/{ref}_chalan.png"
-                    app["passport_file"] = f"certs/{ref}_passport.png"
-                    print(f"Form docs already exist: {ref}")
-                    continue
-                f, c, ps = await download_form_docs(page, app)
-                app["form_file"]     = f
-                app["chalan_file"]   = c
-                app["passport_file"] = ps
 
             # ── Cleanup ──────────────────────────────────────────────
             cleanup_certs(applications)

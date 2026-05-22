@@ -137,8 +137,10 @@ def parse_rows(rows):
                     "cert_url":     cert_url,
                     "cert_file":    None,
                     "form_url":     form_url,
+                    "form_file":    None,
                     "chalan_file":  None,
-                    "passport_file": None,
+                    "passport_file":None,
+                    "nid_file":     None,
                 })
     return apps
 
@@ -222,42 +224,27 @@ async def download_cert(page, app):
         return None
 
 
-async def download_form_docs(page, app):
-    """
-    Visit application form page → screenshot full page as form.png
-    Then find Chalan and Passport links → screenshot each.
-    Returns (form_file, chalan_file, passport_file)
-    """
+async def scrape_form_docs(page, app):
+    """Visit application form page → screenshot form + all attachments"""
     ref      = app["ref"]
     form_url = app.get("form_url")
     if not form_url:
-        return None, None, None
+        return {}
 
     os.makedirs(CERT_DIR, exist_ok=True)
-    form_path     = f"{CERT_DIR}/{ref}_form.png"
-    chalan_path   = f"{CERT_DIR}/{ref}_chalan.png"
-    passport_path = f"{CERT_DIR}/{ref}_passport.png"
-
-    form_github     = f"certs/{ref}_form.png"
-    chalan_github   = f"certs/{ref}_chalan.png"
-    passport_github = f"certs/{ref}_passport.png"
-
-    # Skip if all already exist
-    all_exist = os.path.exists(form_path) and os.path.exists(chalan_path) and os.path.exists(passport_path)
-    if all_exist:
-        print(f"Form docs already exist: {ref}")
-        return form_github, chalan_github, passport_github
+    results = {}
 
     try:
         await page.goto(form_url, timeout=20000, wait_until="networkidle")
         await page.wait_for_timeout(2000)
         if "login" in page.url.lower():
-            return None, None, None
+            return {}
 
         await page.set_viewport_size({"width": 900, "height": 1400})
         await page.wait_for_timeout(500)
 
         # ── Screenshot form page ──────────────────────────────────
+        form_path = f"{CERT_DIR}/{ref}_form.png"
         if not os.path.exists(form_path):
             await page.evaluate("""() => {
                 ['nav','header','footer','.t-Header','.t-Footer',
@@ -267,61 +254,56 @@ async def download_form_docs(page, app):
             }""")
             await page.wait_for_timeout(200)
             await page.screenshot(path=form_path, full_page=True)
-            print(f"✅ Form screenshot: {ref}")
+            print(f"✅ Form: {ref}")
+        results["form_file"] = f"certs/{ref}_form.png"
 
-        # ── Parse doc links from page ─────────────────────────────
+        # ── Parse all doc-card attachments ────────────────────────
         content = await page.content()
         soup    = BeautifulSoup(content, "html.parser")
 
-        chalan_url   = None
-        passport_url = None
         for card in soup.select("div.doc-card"):
             label = card.select_one("p")
             link  = card.select_one("a[href]")
             if not label or not link:
                 continue
-            label_text = label.text.strip().lower()
+            label_text = label.text.strip()
             href = link["href"].strip()
             if not href or href == "#":
                 continue
-            if "chalan" in label_text or "challan" in label_text:
-                chalan_url = href
-            elif "passport" in label_text:
-                passport_url = href
 
-        # ── Screenshot chalan ─────────────────────────────────────
-        if chalan_url and not os.path.exists(chalan_path):
+            # Generate safe file key and filename from label
+            label_lower = label_text.lower()
+            if "chalan" in label_lower or "challan" in label_lower:
+                key = "chalan_file"; slug = "chalan"
+            elif "passport" in label_lower:
+                key = "passport_file"; slug = "passport"
+            elif "national" in label_lower or "nid" in label_lower:
+                key = "nid_file"; slug = "nid"
+            else:
+                # Generic: sanitize label to slug
+                slug = re.sub(r'[^a-z0-9]', '_', label_lower).strip('_')[:20]
+                key  = slug + "_file"
+
+            png_path = f"{CERT_DIR}/{ref}_{slug}.png"
+            if os.path.exists(png_path):
+                results[key] = f"certs/{ref}_{slug}.png"
+                continue
+
             try:
-                await page.goto(chalan_url, timeout=15000, wait_until="networkidle")
+                await page.goto(href, timeout=15000, wait_until="networkidle")
                 await page.wait_for_timeout(1000)
                 await page.set_viewport_size({"width": 900, "height": 1200})
-                await page.screenshot(path=chalan_path, full_page=True)
-                print(f"✅ Chalan screenshot: {ref}")
+                await page.screenshot(path=png_path, full_page=True)
+                print(f"✅ {label_text}: {ref}")
+                results[key] = f"certs/{ref}_{slug}.png"
             except Exception as e:
-                print(f"⚠️ Chalan failed [{ref}]: {e}")
-                chalan_github = None
+                print(f"⚠️ {label_text} failed [{ref}]: {e}")
 
-        # ── Screenshot passport ───────────────────────────────────
-        if passport_url and not os.path.exists(passport_path):
-            try:
-                await page.goto(passport_url, timeout=15000, wait_until="networkidle")
-                await page.wait_for_timeout(1000)
-                await page.set_viewport_size({"width": 900, "height": 1200})
-                await page.screenshot(path=passport_path, full_page=True)
-                print(f"✅ Passport screenshot: {ref}")
-            except Exception as e:
-                print(f"⚠️ Passport failed [{ref}]: {e}")
-                passport_github = None
-
-        return (
-            form_github     if os.path.exists(form_path)     else None,
-            chalan_github   if os.path.exists(chalan_path)   else None,
-            passport_github if os.path.exists(passport_path) else None,
-        )
+        return results
 
     except Exception as e:
         print(f"⚠️ Form docs failed [{ref}]: {e}")
-        return None, None, None
+        return {}
 
 
 async def scrape_all_pages(page):
@@ -431,18 +413,16 @@ async def main():
                 if not app.get("form_url"):
                     continue
                 ref = app["ref"]
-                if (os.path.exists(f"{CERT_DIR}/{ref}_form.png") and
-                    os.path.exists(f"{CERT_DIR}/{ref}_chalan.png") and
-                    os.path.exists(f"{CERT_DIR}/{ref}_passport.png")):
-                    app["form_file"]     = f"certs/{ref}_form.png"
-                    app["chalan_file"]   = f"certs/{ref}_chalan.png"
-                    app["passport_file"] = f"certs/{ref}_passport.png"
-                    print(f"Form docs already exist: {ref}")
+                # Check if form already exists (proxy for all docs done)
+                if os.path.exists(f"{CERT_DIR}/{ref}_form.png"):
+                    # Fill in any existing files
+                    for fname in os.listdir(CERT_DIR):
+                        if fname.startswith(ref+"_") and fname.endswith(".png"):
+                            slug = fname[len(ref)+1:-4]  # e.g. "chalan", "nid"
+                            app[slug+"_file"] = f"certs/{fname}"
                     continue
-                f, c, ps = await download_form_docs(page, app)
-                app["form_file"]     = f
-                app["chalan_file"]   = c
-                app["passport_file"] = ps
+                docs = await scrape_form_docs(page, app)
+                app.update(docs)
                 ref = app["ref"]
                 if (os.path.exists(f"{CERT_DIR}/{ref}_form.png") and
                     os.path.exists(f"{CERT_DIR}/{ref}_chalan.png") and

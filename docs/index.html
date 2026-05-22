@@ -2056,15 +2056,23 @@ function render(){
 
 async function load(){
   try{
-    const r=await fetch('data.json?t='+Date.now());
+    // Try network first, SW will handle cache fallback when offline
+    const r=await fetch('data.json',{cache:'no-store'});
     const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
     allApps=d.applications;
-    try{const ur=await fetch('userdata.json?t='+Date.now());if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
+    try{const ur=await fetch('userdata.json',{cache:'no-store'});if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
     render();
   }catch(e){
     if(allApps.length>0){render();}
-    else{document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
+    else{
+      // Try cache explicitly when network fails
+      try{
+        const cr=await caches.match('https://mtonmoynbd-ops.github.io/Pcc-Tracker/data.json');
+        if(cr){const d=await cr.json();allApps=d.applications;document.getElementById('updated').textContent='📵 অফলাইন: '+d.updated;render();}
+        else{document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
+      }catch(ce){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
+    }
   }
 }
 load();

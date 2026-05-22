@@ -328,7 +328,7 @@ async def scrape_all_pages(page):
     """Scrape all pagination pages"""
     all_apps = []
     page_num = 0
-    while page_num < 20:
+    while page_num < 3:  # Only first 3 pages (~45 most recent files)
         page_num += 1
         await page.wait_for_timeout(1500)
         content = await page.content()
@@ -338,6 +338,7 @@ async def scrape_all_pages(page):
             print(f"Page {page_num}: no rows found, stopping")
             break
         page_apps = parse_rows(rows)
+        # Filter out already-delivered files from processing (still count them)
         all_apps.extend(page_apps)
         print(f"Page {page_num}: {len(page_apps)} applications")
         has_next = await page.evaluate("""() => {

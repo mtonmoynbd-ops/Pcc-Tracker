@@ -700,12 +700,15 @@ if('serviceWorker' in navigator){
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
       <div style="font-size:9px;color:#475569;width:100%;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">টেমপ্লেট</div>
-      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;মামলা ম্যাচ করছে&#39;)">মামলা ম্যাচ করছে</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ডকুমেন্ট অসম্পূর্ণ&#39;)">ডকুমেন্ট অসম্পূর্ণ</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েট ফর কনফার্মেশন&#39;)">ওয়েট ফর কনফার্মেশন</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;মামলা সনাক্ত হয়েছে&#39;)">মামলা সনাক্ত হয়েছে</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;নিষ্পত্তির অপেক্ষায়&#39;)">নিষ্পত্তির অপেক্ষায়</button>
-      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ঠিকানার ডকুমেন্ট&#39;)">ঠিকানার ডকুমেন্ট</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর কনফার্মেশন&#39;)">ওয়েটফর কনফার্মেশন</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর জন্মনিবন্ধন&#39;)">ওয়েটফর জন্মনিবন্ধন</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর এরাইভাল&#39;)">ওয়েটফর এরাইভাল</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর বাবা মার আইডি&#39;)">ওয়েটফর বাবা মার আইডি</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর বিদ্যুৎ বিল&#39;)">ওয়েটফর বিদ্যুৎ বিল</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর নিষ্পত্তি&#39;)">ওয়েটফর নিষ্পত্তি</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;বিল পেইড&#39;)">বিল পেইড</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;পেমেন্ট পরিশোধ করেনি&#39;)">পেমেন্ট পরিশোধ করেনি</button>
+      <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;জানানো হইছে&#39;)">জানানো হইছে</button>
     </div>
     <textarea class="note-modal-textarea" id="note-modal-textarea" placeholder="নোট লিখুন..."></textarea>
     <div style="display:flex">
@@ -917,8 +920,11 @@ function showConfirm(mainText,subText=''){
 }
 function confirmOk(){document.getElementById('confirm-modal').classList.remove('open');if(confirmResolve)confirmResolve(true);confirmResolve=null;}
 let _currentCertUrl='';
-function openCertInApp(url,ref){
+let _currentCertTitle='সার্টিফিকেট';
+function openCertInApp(url,ref,title){
   _currentCertUrl=url;
+  _currentCertTitle=title||'সার্টিফিকেট';
+  document.querySelector('#cert-modal span').textContent='📄 '+_currentCertTitle;
   const isPdf=url.toLowerCase().endsWith('.pdf');
   const img=document.getElementById('cert-img');
   const noImg=document.getElementById('cert-no-img');
@@ -1469,9 +1475,9 @@ function openNoteModal(ref){
   if(docsDiv&&app){
     const BASE='https://mtonmoynbd-ops.github.io/Pcc-Tracker/';
     const btns=[];
-    if(app.form_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.form_file}','${ref}')" style="flex:1;min-width:80px;background:#1e2a3a;border:1px solid #334155;color:#94a3b8;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">📋 আবেদন</button>`);
-    if(app.chalan_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.chalan_file}','${ref}')" style="flex:1;min-width:80px;background:#1a2a1a;border:1px solid #22c55e;color:#4ade80;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🏦 চালান</button>`);
-    if(app.passport_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.passport_file}','${ref}')" style="flex:1;min-width:80px;background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🛂 পাসপোর্ট</button>`);
+    if(app.form_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.form_file}','${ref}','আবেদন ফর্ম')" style="flex:1;min-width:80px;background:#1e2a3a;border:1px solid #334155;color:#94a3b8;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">📋 আবেদন</button>`);
+    if(app.chalan_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.chalan_file}','${ref}','চালান কপি')" style="flex:1;min-width:80px;background:#1a2a1a;border:1px solid #22c55e;color:#4ade80;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🏦 চালান</button>`);
+    if(app.passport_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.passport_file}','${ref}','পাসপোর্ট কপি')" style="flex:1;min-width:80px;background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🛂 পাসপোর্ট</button>`);
     docsDiv.style.display=btns.length?'flex':'none';
     docsDiv.innerHTML=btns.join('');
   }

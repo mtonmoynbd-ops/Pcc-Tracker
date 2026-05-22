@@ -511,6 +511,8 @@
   .phone-link{font-size:12px;color:#38bdf8;text-decoration:none;margin-left:auto;flex-shrink:0}
   .cert-btn{display:inline-flex;align-items:center;gap:5px;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;text-decoration:none;}
   .cert-btn:active{background:#2563eb;color:#fff;}
+  body.light .cert-btn{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8;}
+  body.light #note-modal-docs button{filter:brightness(1.8) saturate(0.8);}
   .expand-toggle{width:36%;margin:7px auto 0;height:1px;border-radius:2px;background:rgba(250,204,21,0.12);cursor:pointer;display:block;border:none;transition:background 0.2s,height 0.15s}
   .expand-toggle.open{background:rgba(250,204,21,0.6);height:2px}
   .loading{text-align:center;padding:40px;color:#475569}
@@ -564,9 +566,10 @@ if('serviceWorker' in navigator){
   <button class="filter-btn" id="draft-btn" onclick="toggleFilter(&#39;draft&#39;,this)">Draft</button>
   <button class="filter-btn" id="f15-btn" onclick="toggleFilter(&#39;1-5&#39;,this)">1-5</button>
   <button class="filter-btn" id="f68-btn" onclick="toggleFilter(&#39;6-8&#39;,this)">6-8</button>
-  <button class="filter-btn" id="collect-btn" onclick="toggleFilter(&#39;collected&#39;,this)">Collect</button>
+  <button class="filter-btn" id="waiting-btn" onclick="toggleFilter(&#39;waiting&#39;,this)" style="font-size:14px">⏳</button>
+  <button class="filter-btn" id="collect-btn" onclick="toggleFilter(&#39;collected&#39;,this)" style="font-size:14px">📥</button>
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
-    <span style="font-size:13px">🏷️</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
   </button>
   <button class="icon-filter-btn archive-btn" onclick="openArchive()">
     <svg width="16" height="16"><use href="#ico-archive" stroke="#60a5fa"></use></svg>
@@ -584,7 +587,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
-<button class="client-name-bottom-btn" onclick="openClientModal()">🏷️ Add Clients</button>
+<button class="client-name-bottom-btn" onclick="openClientModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Add Clients</button>
 <div id="toast"></div>
 
 <div class="select-bar" id="select-bar">
@@ -603,7 +606,11 @@ if('serviceWorker' in navigator){
       <button onclick="closeCertModal()" style="background:none;border:none;color:#64748b;font-size:16px;cursor:pointer;padding:4px">✕</button>
     </div>
     <div style="overflow-y:auto;flex:1;background:#fff;display:flex;align-items:flex-start;justify-content:center">
-      <img id="cert-img" src="" style="width:100%;display:block" alt="Certificate">
+      <img id="cert-img" src="" style="width:100%;display:block" alt="Certificate" onerror="this.style.display='none';document.getElementById('cert-offline-msg').style.display='flex'">
+      <div id="cert-offline-msg" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:10px;color:#475569;font-size:13px;text-align:center;width:100%;background:#fff">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 0114.72-1.49M10.71 5.05A16 16 0 0122.56 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+        ডকুমেন্টস দেখতে ইন্টারনেট সংযোগ করুন
+      </div>
       <div id="cert-no-img" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:10px;color:#475569;font-size:13px;text-align:center;width:100%">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <div>PDF ফাইল এপে দেখানো যাচ্ছে না।<br>নিচের বাটনে ক্লিক করুন।</div>
@@ -735,14 +742,14 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="police-filter-modal">
   <div class="modal-box">
-    <div class="modal-title">🏷️ Client Filter<button class="modal-close" onclick="closePoliceFilterModal()">✕</button></div>
+    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client Filter<button class="modal-close" onclick="closePoliceFilterModal()">✕</button></div>
     <div class="police-filter-list" id="police-filter-list"></div>
   </div>
 </div>
 
 <div class="modal" id="client-modal">
   <div class="modal-box">
-    <div class="modal-title">🏷️ Add Clients<button class="modal-close" onclick="closeClientModal()">✕</button></div>
+    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Add Clients<button class="modal-close" onclick="closeClientModal()">✕</button></div>
     <div class="client-add-row">
       <input class="client-add-input" id="client-add-input" type="text" placeholder="ক্লায়েন্ট নাম..." onkeydown="if(event.key===&#39;Enter&#39;)document.getElementById(&#39;client-add-phone&#39;).focus()">
       <input class="client-add-input" id="client-add-phone" type="tel" placeholder="ফোন নম্বর..." style="margin-top:6px" onkeydown="if(event.key===&#39;Enter&#39;)addClientName()">
@@ -780,7 +787,7 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="pick-modal">
   <div class="modal-box">
-    <div class="modal-title">🏷️ Client সিলেক্ট করুন<button class="modal-close" onclick="closePickModal()">✕</button></div>
+    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client সিলেক্ট করুন<button class="modal-close" onclick="closePickModal()">✕</button></div>
     <div id="pick-list"></div>
   </div>
 </div>
@@ -945,7 +952,10 @@ function downloadCertPdf(){
 }
 function closeCertModal(){
   document.getElementById('cert-modal').classList.remove('open');
-  document.getElementById('cert-img').src='';
+  const img=document.getElementById('cert-img');
+  img.src='';img.style.display='block';
+  const offMsg=document.getElementById('cert-offline-msg');
+  if(offMsg)offMsg.style.display='none';
   _currentCertUrl='';
 }
 function confirmCancel(){document.getElementById('confirm-modal').classList.remove('open');if(confirmResolve)confirmResolve(false);confirmResolve=null;}
@@ -1182,7 +1192,7 @@ function openPhonePopup(ref,appPhone){
 let currentClientName='';
 function openClientDetailModal(name){
   currentClientName=name;
-  document.getElementById('client-detail-title').textContent='🏷️ '+name;
+  document.getElementById('client-detail-title').textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> '+name;
   const phone=clientPhones[name]||'';
   const phoneEl=document.getElementById('client-detail-phone');
   phoneEl.textContent=phone?'📞 '+phone:'ফোন নম্বর নেই';
@@ -1474,10 +1484,23 @@ function openNoteModal(ref){
   const docsDiv=document.getElementById('note-modal-docs');
   if(docsDiv&&app){
     const BASE='https://mtonmoynbd-ops.github.io/Pcc-Tracker/';
+    const docDefs=[
+      {key:'form_file',   label:'📋 আবেদন',  title:'আবেদন ফর্ম',  style:'background:#1e2a3a;border:1px solid #334155;color:#94a3b8'},
+      {key:'chalan_file', label:'🏦 চালান',   title:'চালান কপি',   style:'background:#1a2a1a;border:1px solid #22c55e;color:#4ade80'},
+      {key:'passport_file',label:'🛂 পাসপোর্ট',title:'পাসপোর্ট কপি',style:'background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd'},
+      {key:'nid_file',    label:'🪪 NID',     title:'NID কপি',     style:'background:#1a1a2a;border:1px solid #6366f1;color:#a5b4fc'},
+    ];
     const btns=[];
-    if(app.form_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.form_file}','${ref}','আবেদন ফর্ম')" style="flex:1;min-width:80px;background:#1e2a3a;border:1px solid #334155;color:#94a3b8;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">📋 আবেদন</button>`);
-    if(app.chalan_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.chalan_file}','${ref}','চালান কপি')" style="flex:1;min-width:80px;background:#1a2a1a;border:1px solid #22c55e;color:#4ade80;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🏦 চালান</button>`);
-    if(app.passport_file)btns.push(`<button onclick="openCertInApp('${BASE}${app.passport_file}','${ref}','পাসপোর্ট কপি')" style="flex:1;min-width:80px;background:#1e1a3a;border:1px solid #7c3aed;color:#c4b5fd;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">🛂 পাসপোর্ট</button>`);
+    docDefs.forEach(function(d){
+      if(app[d.key])btns.push(`<button onclick="openCertInApp('${BASE}${app[d.key]}','${ref}','${d.title}')" style="flex:1;min-width:70px;${d.style};border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">${d.label}</button>`);
+    });
+    // Any extra dynamic keys (other attachments)
+    Object.keys(app).forEach(function(k){
+      if(k.endsWith('_file')&&app[k]&&!['cert_file','form_file','chalan_file','passport_file','nid_file'].includes(k)){
+        const lbl=k.replace('_file','').replace(/_/g,' ');
+        btns.push(`<button onclick="openCertInApp('${BASE}${app[k]}','${ref}','${lbl}')" style="flex:1;min-width:70px;background:#1e2a3a;border:1px solid #475569;color:#94a3b8;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer">📎 ${lbl}</button>`);
+      }
+    });
     docsDiv.style.display=btns.length?'flex':'none';
     docsDiv.innerHTML=btns.join('');
   }
@@ -1829,7 +1852,7 @@ function copySelected(){
 // ── Filter ────────────────────────────────────────────────
 function toggleFilter(f,btn){
   if(activeFilter===f){activeFilter='all';document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));}
-  else{activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  else{activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
   render();
 }
 function setFilter(f,btn){activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');render();}
@@ -1838,6 +1861,7 @@ function matchesFilter(app){
   if(activePoliceFilter&&policeTags[app.ref]!==activePoliceFilter)return false;
   if(activeFilter==='all')return true;if(activeFilter==='draft')return isDraft;
   if(activeFilter==='ready')return !!(collected[app.ref]&&!delivered[app.ref]);
+  if(activeFilter==='waiting'){const n=parseInt((app.status||'').split('/')[0])||0;return n===2&&(stars[app.ref]||0)===1&&!forwarded[app.ref]&&!delivered[app.ref];}
   if(activeFilter==='collected'){const n=parseInt((app.status||'').split('/')[0])||0;return n===9&&(stars[app.ref]||0)>0&&!collected[app.ref]&&!delivered[app.ref];}
   if(activeFilter==='1-5')return !isDraft&&num>=1&&num<=5;if(activeFilter==='6-8')return !isDraft&&num>=6&&num<=8;
   return true;
@@ -1907,7 +1931,7 @@ function cardHTML(app){
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link ${phoneBlinkClass}" onclick="blinkStopped['${app.ref}']=true;save();render();openPhonePopup('${app.ref}','${app.phone}');event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count
-  const policeTagHTML=policeTag?`<span class="police-inline-tag" onclick="openPickModal('${app.ref}');event.stopPropagation()">🏷️ ${policeTag}</span>`:'';
+  const policeTagHTML=policeTag?`<span class="police-inline-tag" onclick="openPickModal('${app.ref}');event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> ${policeTag}</span>`:'';
   const refHTML=`<span class="ref-link" onclick="openPickModal('${app.ref}');event.stopPropagation()">${refSVG} ${app.ref}</span>`;
 
   const certFile=app.cert_file||null;
@@ -2050,10 +2074,17 @@ function render(){
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
   // Collect blink: urgent/important uncollected cards exist
   const hasUncollected=getDisplayApps().some(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
+  const waitingCount=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];}).length;
+  const waitingBtn=document.getElementById('waiting-btn');
+  if(waitingBtn){
+    waitingBtn.textContent=waitingCount>0?'⏳ '+waitingCount:'⏳';
+    if(waitingCount>0&&activeFilter!=='waiting'){waitingBtn.style.animation='blink-col 1.2s ease-in-out infinite';waitingBtn.style.borderColor='#f59e0b';waitingBtn.style.color='#f59e0b';}
+    else{waitingBtn.style.animation='';waitingBtn.style.borderColor='';waitingBtn.style.color='';}
+  }
   const collectCount=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];}).length;
   const collectBtn=document.getElementById('collect-btn');
   if(collectBtn){
-    collectBtn.textContent=collectCount>0?`Collect ${collectCount}`:'Collect';
+    collectBtn.textContent=collectCount>0?'📥 '+collectCount:'📥';
     if(hasUncollected&&activeFilter!=='collected'){collectBtn.classList.add('collected-blink');collectBtn.classList.remove('collected-active');}
     else if(activeFilter==='collected'){collectBtn.classList.remove('collected-blink');collectBtn.classList.add('collected-active');}
     else{collectBtn.classList.remove('collected-blink','collected-active');}

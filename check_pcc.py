@@ -413,13 +413,18 @@ async def main():
                 if not app.get("form_url"):
                     continue
                 ref = app["ref"]
-                # Check if form already exists (proxy for all docs done)
-                if os.path.exists(f"{CERT_DIR}/{ref}_form.png"):
-                    # Fill in any existing files
+                form_exists = os.path.exists(f"{CERT_DIR}/{ref}_form.png")
+                nid_exists  = os.path.exists(f"{CERT_DIR}/{ref}_nid.png")
+                if form_exists:
+                    # Fill in all existing files from disk
                     for fname in os.listdir(CERT_DIR):
                         if fname.startswith(ref+"_") and fname.endswith(".png"):
-                            slug = fname[len(ref)+1:-4]  # e.g. "chalan", "nid"
+                            slug = fname[len(ref)+1:-4]
                             app[slug+"_file"] = f"certs/{fname}"
+                    # If NID missing, re-scrape to get remaining attachments
+                    if not nid_exists:
+                        docs = await scrape_form_docs(page, app)
+                        app.update(docs)
                     continue
                 docs = await scrape_form_docs(page, app)
                 app.update(docs)

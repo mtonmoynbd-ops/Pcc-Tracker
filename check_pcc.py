@@ -144,14 +144,22 @@ def parse_rows(rows):
 
 
 def migrate_pdf_to_png():
-    """Delete only old .pdf cert files"""
+    """Delete old PDFs and cert PNGs (no suffix) to force re-screenshot without footer"""
     if not os.path.exists(CERT_DIR):
         return
     for fname in os.listdir(CERT_DIR):
+        # Delete PDFs always
         if fname.endswith(".pdf"):
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
-                print(f"🗑️ Migrated: removed old PDF {fname}")
+                print(f"🗑️ Removed old PDF: {fname}")
+            except Exception as e:
+                print(f"Remove failed [{fname}]: {e}")
+        # Delete cert PNGs (no underscore = cert, not form/chalan/passport)
+        elif fname.endswith(".png") and "_" not in fname:
+            try:
+                os.remove(os.path.join(CERT_DIR, fname))
+                print(f"🗑️ Removed old cert PNG: {fname}")
             except Exception as e:
                 print(f"Remove failed [{fname}]: {e}")
 
@@ -201,11 +209,20 @@ async def download_cert(page, app):
             return None
         await page.set_viewport_size({"width": 900, "height": 1200})
         await page.wait_for_timeout(500)
-        cert_el = await page.query_selector("#printID")
-        if cert_el:
-            await cert_el.screenshot(path=png_path, scale="device")
-        else:
-            await page.screenshot(path=png_path, full_page=True)
+
+        # Hide everything except #printID
+        await page.evaluate("""() => {
+            const print_el = document.getElementById('printID');
+            if (print_el) {
+                document.body.innerHTML = '';
+                document.body.style.margin = '0';
+                document.body.style.padding = '10px';
+                document.body.style.background = '#fff';
+                document.body.appendChild(print_el);
+            }
+        }""")
+        await page.wait_for_timeout(300)
+        await page.screenshot(path=png_path, full_page=True)
         print(f"✅ Cert screenshot: {ref} → {png_path}")
         return github_path
     except Exception as e:

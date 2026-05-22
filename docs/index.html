@@ -465,7 +465,7 @@
   /* Ref clickable — no underline on date */
   .ref-link { cursor: pointer; color: #94a3b8; font-size: 12px; }
   .ref-link:hover { color: #c4b5fd; }
-  .police-inline-tag { color: #c4b5fd; font-size: 10px; padding: 1px 6px; border: 1px solid #4c1d95; border-radius: 3px; background: #1e1a3a; cursor: pointer; flex-shrink: 0; }
+  .police-inline-tag { color: #c4b5fd; font-size: 10px; padding: 1px 6px; border: 1px solid #4c1d95; border-radius: 3px; background: #1e1a3a; cursor: pointer; flex-shrink: 0; display:inline-flex; align-items:center; gap:3px; vertical-align:middle; }
   .day-normal { color: #60a5fa; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
   .day-warn-urgent { color: #ef4444; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
   .day-warn-important { color: #f97316; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
@@ -1323,7 +1323,7 @@ function renderCal(){
   if(isCurrentMonth){
     titleWrap.innerHTML=`<span class="cal-title-lbl">Today</span><span class="cal-title-text">${getTodayDisplay()}</span><span class="live-dot" style="width:5px;height:5px"></span>`;
   } else {
-    titleWrap.innerHTML=`<span class="cal-title-text" style="color:#f1f5f9">${MONTHS_BN[m]} ${y}</span>`;
+    titleWrap.innerHTML=`<span class="cal-title-text">${MONTHS_BN[m]} ${y}</span>`;
   }
   const fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
   const today=new Date();today.setHours(0,0,0,0);

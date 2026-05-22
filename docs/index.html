@@ -572,7 +572,7 @@ if('serviceWorker' in navigator){
   <button class="filter-btn" id="waiting-btn" onclick="toggleFilter(&#39;waiting&#39;,this)" style="font-size:14px">⏳</button>
   <button class="filter-btn" id="collect-btn" onclick="toggleFilter(&#39;collected&#39;,this)" style="font-size:14px">📥</button>
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
   </button>
   <button class="icon-filter-btn archive-btn" onclick="openArchive()">
     <svg width="16" height="16"><use href="#ico-archive" stroke="#60a5fa"></use></svg>
@@ -590,7 +590,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <div id="list"><div class="loading">⏳ লোড হচ্ছে...</div></div>
-<button class="client-name-bottom-btn" onclick="openClientModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Add Clients</button>
+<button class="client-name-bottom-btn" onclick="openClientModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Add Clients</button>
 <div id="toast"></div>
 
 <div class="select-bar" id="select-bar">
@@ -713,15 +713,15 @@ if('serviceWorker' in navigator){
     <div style="margin-bottom:8px">
       <div style="font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">টেমপ্লেট</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর কনফার্মেশন&#39;)">✋ কনফার্মেশন</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর জন্মনিবন্ধন&#39;)">📄 জন্মনিবন্ধন</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর এরাইভাল&#39;)">✈️ এরাইভাল</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর বাবা মার আইডি&#39;)">🪪 বাবা মার আইডি</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর বিদ্যুৎ বিল&#39;)">⚡ বিদ্যুৎ বিল</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;ওয়েটফর নিষ্পত্তি&#39;)">⚖️ নিষ্পত্তি</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;বিল পেইড&#39;)">✅ বিল পেইড</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;পেমেন্ট পরিশোধ করেনি&#39;)">❌ পেমেন্ট নেই</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;জানানো হইছে&#39;)">📢 জানানো হইছে</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✋ ওয়েটফর কনফার্মেশন&#39;)">✋ কনফার্মেশন</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;📄 ওয়েটফর জন্মনিবন্ধন&#39;)">📄 জন্মনিবন্ধন</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✈️ ওয়েটফর এরাইভাল&#39;)">✈️ এরাইভাল</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;🪪 ওয়েটফর বাবা মার আইডি&#39;)">🪪 বাবা মার আইডি</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;⚡ ওয়েটফর বিদ্যুৎ বিল&#39;)">⚡ বিদ্যুৎ বিল</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;⚖️ ওয়েটফর নিষ্পত্তি&#39;)">⚖️ নিষ্পত্তি</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✅ বিল পেইড&#39;)">✅ বিল পেইড</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;❌ পেমেন্ট পরিশোধ করেনি&#39;)">❌ পেমেন্ট নেই</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;📢 জানানো হইছে&#39;)">📢 জানানো হইছে</button>
       </div>
     </div>
     <textarea class="note-modal-textarea" id="note-modal-textarea" placeholder="নোট লিখুন..."></textarea>
@@ -749,14 +749,14 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="police-filter-modal">
   <div class="modal-box">
-    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Client Filter<button class="modal-close" onclick="closePoliceFilterModal()">✕</button></div>
+    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client Filter<button class="modal-close" onclick="closePoliceFilterModal()">✕</button></div>
     <div class="police-filter-list" id="police-filter-list"></div>
   </div>
 </div>
 
 <div class="modal" id="client-modal">
   <div class="modal-box">
-    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Add Clients<button class="modal-close" onclick="closeClientModal()">✕</button></div>
+    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Add Clients<button class="modal-close" onclick="closeClientModal()">✕</button></div>
     <div class="client-add-row">
       <input class="client-add-input" id="client-add-input" type="text" placeholder="ক্লায়েন্ট নাম..." onkeydown="if(event.key===&#39;Enter&#39;)document.getElementById(&#39;client-add-phone&#39;).focus()">
       <input class="client-add-input" id="client-add-phone" type="tel" placeholder="ফোন নম্বর..." style="margin-top:6px" onkeydown="if(event.key===&#39;Enter&#39;)addClientName()">
@@ -794,7 +794,7 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="pick-modal">
   <div class="modal-box">
-    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Client সিলেক্ট করুন<button class="modal-close" onclick="closePickModal()">✕</button></div>
+    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client সিলেক্ট করুন<button class="modal-close" onclick="closePickModal()">✕</button></div>
     <div id="pick-list"></div>
   </div>
 </div>
@@ -1183,9 +1183,9 @@ function openPhonePopup(ref,appPhone){
   html+=_phoneRow(appPhone,waApp,'#60a5fa');
   if(clientPhone){
     const waClient='https://wa.me/'+('88'+clientPhone).replace(/[^0-9]/g,'');
-    html+=_phoneRow(clientPhone,waClient,'#c4b5fd');
+    html+=_phoneRow(clientPhone,waClient,'#34d399');
     html+=`<div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:4px 0 0">
-      <span style="font-size:12px;font-weight:600;color:#a78bfa">${policeTag}</span>
+      <span style="font-size:12px;font-weight:600;color:#34d399">${policeTag}</span>
       ${_svgPerson}
     </div>`;
   }
@@ -1199,7 +1199,7 @@ function openPhonePopup(ref,appPhone){
 let currentClientName='';
 function openClientDetailModal(name){
   currentClientName=name;
-  document.getElementById('client-detail-title').textContent='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> '+name;
+  document.getElementById('client-detail-title').innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> '+name;
   const phone=clientPhones[name]||'';
   const phoneEl=document.getElementById('client-detail-phone');
   phoneEl.textContent=phone?'📞 '+phone:'ফোন নম্বর নেই';
@@ -1938,7 +1938,7 @@ function cardHTML(app){
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link ${phoneBlinkClass}" onclick="blinkStopped['${app.ref}']=true;save();render();openPhonePopup('${app.ref}','${app.phone}');event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count
-  const policeTagHTML=policeTag?`<span class="police-inline-tag" onclick="openPickModal('${app.ref}');event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> ${policeTag}</span>`:'';
+  const policeTagHTML=policeTag?`<span class="police-inline-tag" onclick="openPickModal('${app.ref}');event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> ${policeTag}</span>`:'';
   const refHTML=`<span class="ref-link" onclick="openPickModal('${app.ref}');event.stopPropagation()">${refSVG} ${app.ref}</span>`;
 
   const certFile=app.cert_file||null;
@@ -2085,6 +2085,7 @@ function render(){
   const waitingBtn=document.getElementById('waiting-btn');
   if(waitingBtn){
     waitingBtn.textContent=waitingCount>0?'⏳ '+waitingCount:'⏳';
+    waitingBtn.style.display=waitingCount>0||activeFilter==='waiting'?'':'none';
     if(waitingCount>0&&activeFilter!=='waiting'){waitingBtn.style.animation='blink-col 1.2s ease-in-out infinite';waitingBtn.style.borderColor='#f59e0b';waitingBtn.style.color='#f59e0b';}
     else{waitingBtn.style.animation='';waitingBtn.style.borderColor='';waitingBtn.style.color='';}
   }
@@ -2092,6 +2093,7 @@ function render(){
   const collectBtn=document.getElementById('collect-btn');
   if(collectBtn){
     collectBtn.textContent=collectCount>0?'📥 '+collectCount:'📥';
+    collectBtn.style.display=collectCount>0||activeFilter==='collected'?'':'none';
     if(hasUncollected&&activeFilter!=='collected'){collectBtn.classList.add('collected-blink');collectBtn.classList.remove('collected-active');}
     else if(activeFilter==='collected'){collectBtn.classList.remove('collected-blink');collectBtn.classList.add('collected-active');}
     else{collectBtn.classList.remove('collected-blink','collected-active');}

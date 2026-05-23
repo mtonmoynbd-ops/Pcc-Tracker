@@ -508,4 +508,24 @@ async def main():
         await browser.close()
 
 
-asyncio.run(main())
+async def run_with_retry(max_attempts=3):
+    for attempt in range(1, max_attempts + 1):
+        try:
+            await main()
+            return
+        except Exception as e:
+            print(f"Attempt {attempt} failed: {e}")
+            if attempt < max_attempts:
+                print(f"Retrying in 30 seconds...")
+                await asyncio.sleep(30)
+            else:
+                print("All attempts failed.")
+                try:
+                    requests.post(
+                        f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+                        json={"chat_id": CHAT_ID, "text": f"⚠️ সব retry ব্যর্থ:\n{str(e)[:200]}", "parse_mode": "HTML"}
+                    )
+                except:
+                    pass
+
+asyncio.run(run_with_retry())

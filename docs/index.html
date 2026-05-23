@@ -123,6 +123,7 @@
   body.light .police-filter-pill { background: #f5f3ff; border-color: #c4b5fd; color: #6d28d9; }
   body.light .police-filter-pill.active { background: #ede9fe; color: #4c1d95; }
   body.light .police-filter-all { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+  .client-note-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; }
   body.light .client-note-btn { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
   body.light .client-name-row { background: #f8fafc; }
   body.light .client-name-row span { color: #6d28d9; }
@@ -364,7 +365,7 @@
   .note-modal-textarea { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: #e2e8f0; font-size: 13px; outline: none; resize: none; margin-bottom: 10px; min-height: 80px; }
   .note-modal-save { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .note-modal-clear { background: none; border: 1px solid #334155; color: #64748b; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; margin-left: 8px; }
-  .note-tpl-btn { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #60a5fa; cursor: pointer; white-space: nowrap; }
+  .note-tpl-btn { padding: 4px 6px; border-radius: 8px; font-size: 10px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #60a5fa; cursor: pointer; white-space: normal; text-align:center; width:100%; box-sizing:border-box; }
   .note-tpl-btn:active { background: #1e3a5f; }
   #confirm-modal { z-index: 200; }
   .confirm-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 14px; padding: 20px; width: 100%; max-width: 340px; }
@@ -579,7 +580,7 @@ if('serviceWorker' in navigator){
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
   </button>
   <button class="icon-filter-btn archive-btn" onclick="openArchive()">
-    <svg width="16" height="16"><use href="#ico-archive" stroke="#60a5fa"></use></svg>
+    <svg width="16" height="16" stroke="#60a5fa" fill="none"><use href="#ico-archive"></use></svg>
   </button>
 </div>
 
@@ -781,13 +782,13 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="client-detail-modal">
   <div class="modal-box">
-    <div class="modal-title"><span id="client-detail-title"></span><button class="modal-close" onclick="closeClientDetailModal()">✕</button></div>
+    <div class="modal-title"><span id="client-detail-title" style="display:inline-flex;align-items:center;gap:6px"></span><button class="modal-close" onclick="closeClientDetailModal()">✕</button></div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px">
       <div style="flex:1">
         <a id="client-detail-phone" href="file:///C:/Users/ADMIN/Downloads/pcc_tracker_10.html#" onclick="callClientPhone();return false" style="font-size:14px;font-weight:700;color:#60a5fa;text-decoration:none;display:block;margin-bottom:4px"></a>
         <div style="font-size:11px;color:#94a3b8;font-style:italic" id="client-detail-note-preview"></div>
       </div>
-      <button onclick="openClientNoteEdit()" class="client-note-btn" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0">✏️ নোট</button>
+      <button onclick="openClientNoteEdit()" class="client-note-btn">✏️ নোট</button>
     </div>
     <div style="border-top:1px solid #1e3a5f;margin-top:4px;padding-top:10px">
       <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">ট্যাগ করা ফাইল</div>
@@ -1691,7 +1692,7 @@ function searchInArchive(q){
 // ── Police ────────────────────────────────────────────────
 function openPoliceFilterModal(){
   const list=document.getElementById('police-filter-list');
-  let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  let html='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px">';
   html+='<span class="police-filter-pill police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)" style="grid-column:1/-1;text-align:center">সব ফাইল</span>';
   clientNames.forEach(function(n){
     const nSafe=n.replace(/'/g,"\\'");

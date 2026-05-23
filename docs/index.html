@@ -279,9 +279,11 @@
   .section-title { font-size: 11px; flex-shrink: 0; font-weight: 700; color: #475569; }
   .section-title.urgent-title { color: #ef4444; }
   .section-title.important-title { color: #f59e0b; }
-  .section-count { font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .section-title.normal-title { color: #64748b; }
+  .section-count { font-size: 11px; font-weight: 700; flex-shrink: 0; color: #64748b; }
   .section-count.urgent-count { color: #ef4444; }
   .section-count.important-count { color: #f59e0b; }
+  .section-count.normal-count { color: #64748b; }
   /* Date chip — same size as cal heading, live dot RIGHT */
   .section-date-chip { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; flex: 1; justify-content: center; padding: 2px 0; }
   .ready-chip { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid #22c55e; color: #22c55e; cursor: pointer; flex-shrink: 0; margin-left: 4px; }
@@ -495,8 +497,8 @@
   body.glass { background: linear-gradient(135deg,#0f1729 0%,#1a0a2e 50%,#0a1a2e 100%) fixed; }
   body.glass .app-bar { background:rgba(15,31,61,0.55);backdrop-filter:blur(16px);border-bottom:1px solid rgba(96,165,250,0.15); }
   body.glass .card { background:rgba(15,31,61,0.4);backdrop-filter:blur(12px);border-color:rgba(96,165,250,0.18); }
-  body.glass .card.star2 { border-color:rgba(239,68,68,0.8)!important;border-width:2px!important;background:rgba(40,10,10,0.45)!important; }
-  body.glass .card.star1 { border-color:rgba(245,158,11,0.75)!important;background:rgba(40,25,5,0.45)!important; }
+  body.glass .card.star2 { border-color:rgba(239,68,68,0.85)!important;border-width:2px!important;background:transparent!important; }
+  body.glass .card.star1 { border-color:rgba(245,158,11,0.8)!important;background:transparent!important; }
   body.glass .card.collected-card { background:rgba(5,30,20,0.55)!important;border-color:rgba(34,197,94,0.5)!important; }
   body.glass .filter-btn { background:rgba(30,41,59,0.45);backdrop-filter:blur(8px);border-color:rgba(100,116,139,0.35); }
   body.glass .filter-btn.active { background:rgba(37,99,235,0.4);border-color:rgba(96,165,250,0.55); }
@@ -589,8 +591,8 @@ if('serviceWorker' in navigator){
   <button class="filter-btn" id="draft-btn" onclick="toggleFilter(&#39;draft&#39;,this)">Draft</button>
   <button class="filter-btn" id="f15-btn" onclick="toggleFilter(&#39;1-5&#39;,this)">1-5</button>
   <button class="filter-btn" id="f68-btn" onclick="toggleFilter(&#39;6-8&#39;,this)">6-8</button>
-  <button class="filter-btn" id="waiting-btn" onclick="toggleFilter(&#39;waiting&#39;,this)" style="font-size:14px">⏳</button>
-  <button class="filter-btn" id="collect-btn" onclick="toggleFilter(&#39;collected&#39;,this)" style="font-size:14px">📥</button>
+  <button class="filter-btn" id="waiting-btn" onclick="toggleFilter(&#39;waiting&#39;,this)">⏳</button>
+  <button class="filter-btn" id="collect-btn" onclick="toggleFilter(&#39;collected&#39;,this)">📥</button>
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
   </button>
@@ -735,11 +737,11 @@ if('serviceWorker' in navigator){
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✋ ওয়েটফর কনফার্মেশন&#39;)">✋ কনফার্মেশন</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;📄 ওয়েটফর জন্মনিবন্ধন&#39;)">📄 জন্মনিবন্ধন</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✈️ ওয়েটফর এরাইভাল&#39;)">✈️ এরাইভাল</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;🛬 ওয়েটফর এরাইভাল&#39;)">✈️ এরাইভাল</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;🪪 ওয়েটফর বাবা মার আইডি&#39;)">🪪 বাবা মার আইডি</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;⚡ ওয়েটফর বিদ্যুৎ বিল&#39;)">⚡ বিদ্যুৎ বিল</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;⚖️ ওয়েটফর নিষ্পত্তি&#39;)">⚖️ নিষ্পত্তি</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✅ বিল পেইড&#39;)">✅ বিল পেইড</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;💰 বিল পেইড&#39;)">💰 বিল পেইড</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;❌ পেমেন্ট পরিশোধ করেনি&#39;)">❌ পেমেন্ট নেই</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;📢 জানানো হইছে&#39;)">📢 জানানো হইছে</button>
       </div>
@@ -1189,6 +1191,7 @@ function _phoneRow(num,waUrl,numColor){
     <button onclick="window.location.href='tel:${num}';confirmCancel()" style="${_ibStyle}">${_svgDial}</button>
     <button onclick="window.open('${waUrl}','_blank');confirmCancel()" style="${_ibStyle}">${_svgWa}</button>
   </div>`;}
+const _svgFolder='<svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>';
 function openPhonePopup(ref,appPhone){
   const policeTag=policeTags[ref]||'';
   const clientPhone=policeTag&&clientPhones[policeTag]?clientPhones[policeTag]:'';
@@ -1199,15 +1202,15 @@ function openPhonePopup(ref,appPhone){
   const waApp='https://wa.me/'+('88'+appPhone).replace(/[^0-9]/g,'');
   let html=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;padding-bottom:6px;border-bottom:2px solid #1e3a5f">
     ${headerIcon}
-    <span style="font-size:13px;font-weight:700;color:#e2e8f0;letter-spacing:0.3px;text-transform:uppercase">${name}</span>
+    <span style="font-size:13px;font-weight:700;color:var(--text-main,#e2e8f0);letter-spacing:0.3px;text-transform:uppercase">${name}</span>
   </div>`;
-  html+=_phoneRow(appPhone,waApp,'#60a5fa');
+  html+=_phoneRow(appPhone,waApp,'var(--text-main,#e2e8f0)');
   if(clientPhone){
     const waClient='https://wa.me/'+('88'+clientPhone).replace(/[^0-9]/g,'');
-    html+=_phoneRow(clientPhone,waClient,'#34d399');
-    html+=`<div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:4px 0 0">
-      <span style="font-size:12px;font-weight:600;color:#34d399">${policeTag}</span>
-      ${_svgPerson}
+    html+=_phoneRow(clientPhone,waClient,'#f59e0b');
+    html+=`<div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;padding:4px 0 0">
+      <span style="font-size:13px;font-weight:700;color:#f59e0b">${policeTag}</span>
+      ${_svgFolder}
     </div>`;
   }
   document.getElementById('confirm-msg').innerHTML=html;
@@ -1987,8 +1990,7 @@ function cardHTML(app){
         <div class="info">
           ${refHTML} &nbsp;|&nbsp;
           <span onclick="openDateModal('${app.apply_date}','📅','apply_date','');event.stopPropagation()" style="cursor:pointer;display:inline-flex;align-items:center;gap:2px">${calSVG} ${app.apply_date}</span>
-          ${policeTagHTML?`&nbsp;${policeTagHTML}`:''}
-          &nbsp;${daySpan}${colDaySpan?'&nbsp;'+colDaySpan:''}
+          &nbsp;${daySpan}${colDaySpan?'&nbsp;'+colDaySpan:''}${policeTagHTML?'&nbsp;'+policeTagHTML:''}
         </div>
         <div class="bottom-row">
           <span class="status ${scls}${(shouldBlink||shouldBlink910)?' status-blink':''}" onclick="${statusClick}">${trimStatus(app.status)}</span>
@@ -2077,7 +2079,7 @@ function render(){
   }
   if(star2.length){html+=secRow('🔴 Urgent',star2.length,'urgent-title','urgent-count');star2.forEach(a=>html+=cardHTML(a));}
   if(star1.length){html+=secRow('⭐ Important',star1.length,'important-title','important-count');star1.forEach(a=>html+=cardHTML(a));}
-  if(normal.length){html+=secRow('Normal',normal.length,'','');normal.forEach(a=>html+=cardHTML(a));}
+  if(normal.length){html+=secRow('Normal',normal.length,'normal-title','normal-count');normal.forEach(a=>html+=cardHTML(a));}
   if(done.length){html+=`<div class="section-row"><div class="section-title">✓ Delivered</div></div>`;done.forEach(a=>html+=cardHTML(a));}
   // Archive search
   if(q){

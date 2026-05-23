@@ -49,7 +49,10 @@
   body.light .filter-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
   body.light .icon-filter-btn { background: #dbeafe; border-color: #93c5fd; }
   body.light .icon-filter-btn.police { background: #f5f3ff; border-color: #c4b5fd; }
+  body.light .reset-btn { background: #e2e8f0; border-color: #94a3b8; color: #64748b; opacity: 0.7; }
+  body.light .reset-btn.confirm { background: #fee2e2; border-color: #ef4444; color: #ef4444; opacity: 1; }
   body.light .icon-filter-btn.archive-btn { background: #f1f5f9; border-color: #cbd5e1; }
+  body.light .icon-filter-btn.archive-btn svg { stroke: #475569; }
   /* Section row */
   body.light .section-title { color: #64748b; }
   body.light .section-title.urgent-title { color: #dc2626; }
@@ -264,6 +267,7 @@
   body.amoled .icon-filter-btn.police { border-color: #a78bfa; background: #1a0a3a; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
   .icon-filter-btn.archive-btn { border-color: #60a5fa; background: #1e3a5f; }
+  .icon-filter-btn.archive-btn svg { stroke: #60a5fa; }
 
   /* Live dot */
   @keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
@@ -334,7 +338,7 @@
   /* Modals */
   .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
   .modal.open { display: flex; }
-  .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 18px; width: 100%; max-width: 360px; max-height: 82vh; overflow-y: auto; }
+  .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 18px; width: calc(100vw - 32px); max-width: 360px; max-height: 82vh; overflow-y: auto; box-sizing: border-box; }
   .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .modal-close { background: none; border: none; color: #64748b; font-size: 20px; cursor: pointer; flex-shrink: 0; }
   .count-top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
@@ -783,7 +787,7 @@ if('serviceWorker' in navigator){
         <a id="client-detail-phone" href="file:///C:/Users/ADMIN/Downloads/pcc_tracker_10.html#" onclick="callClientPhone();return false" style="font-size:14px;font-weight:700;color:#60a5fa;text-decoration:none;display:block;margin-bottom:4px"></a>
         <div style="font-size:11px;color:#94a3b8;font-style:italic" id="client-detail-note-preview"></div>
       </div>
-      <button onclick="openClientNoteEdit()" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0">✏️ নোট</button>
+      <button onclick="openClientNoteEdit()" class="client-note-btn" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0">✏️ নোট</button>
     </div>
     <div style="border-top:1px solid #1e3a5f;margin-top:4px;padding-top:10px">
       <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">ট্যাগ করা ফাইল</div>
@@ -1429,7 +1433,7 @@ function openDateModal(dateStr,prefix,sourceField,editRef){
     const st=isDone?'color:#34d399':sourceField==='print_date'?'color:#64748b':'';
     const s=stars[a.ref]||0;const si=getStarIcon(s);
     const certFile=a.cert_file||null;
-    const certLink=certFile&&sourceField==='print_date'?`<a onclick="openCertInApp('https://mtonmoynbd-ops.github.io/Pcc-Tracker/${certFile}','${a.ref}');event.stopPropagation()" style="display:inline-flex;align-items:center;gap:3px;background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;text-decoration:none;margin-left:6px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Certificate</a>`:'';
+    const certLink=certFile&&sourceField==='print_date'?`<a onclick="openCertInApp('https://mtonmoynbd-ops.github.io/Pcc-Tracker/${certFile}','${a.ref}');event.stopPropagation()" class="cert-btn" style="margin-left:6px;padding:2px 7px;font-size:10px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Certificate</a>`:'';
     return `<div class="date-modal-item"><div class="dm-left"><div class="dm-name">${a.name}</div>
       <div class="dm-info">📄 ${a.ref} &nbsp;|&nbsp; <span class="status ${sc}" style="font-size:11px;padding:2px 8px;${st}">${txt}</span>${certLink}</div>
       </div>${si?`<span class="dm-star">${si}</span>`:''}</div>`;
@@ -1687,13 +1691,16 @@ function searchInArchive(q){
 // ── Police ────────────────────────────────────────────────
 function openPoliceFilterModal(){
   const list=document.getElementById('police-filter-list');
-  let html='<span class="police-filter-pill police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)">সব</span>';
+  let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  html+='<span class="police-filter-pill police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)" style="grid-column:1/-1;text-align:center">সব ফাইল</span>';
   clientNames.forEach(function(n){
-    const phone=clientPhones[n]?'<br><span style="font-size:10px;opacity:0.7">'+clientPhones[n]+'</span>':'';
-    const nSafe=n.replace(/'/g,"\'");
-    html+='<span class="police-filter-pill '+(activePoliceFilter===n?'active':'')+'" onclick="openClientDetailModal(\'' + nSafe + '\')">'+n+phone+'</span>';
+    const nSafe=n.replace(/'/g,"\\'");
+    const activeCount=getDisplayApps().filter(a=>policeTags[a.ref]===n&&!delivered[a.ref]).length;
+    const countBadge=activeCount?'<span style="background:#7c3aed;color:#fff;border-radius:10px;padding:0 5px;font-size:9px;margin-left:4px">'+activeCount+'</span>':'';
+    html+='<span class="police-filter-pill '+(activePoliceFilter===n?'active':'')+'" onclick="setPoliceFilter(\''+nSafe+'\')" style="display:flex;align-items:center;justify-content:space-between;gap:4px"><span>'+n+'</span>'+countBadge+'</span>';
   });
-  if(!clientNames.length)html+='<div style="color:#475569;font-size:12px;margin-top:8px">Add Clients বাটনে নাম যোগ করুন</div>';
+  html+='</div>';
+  if(!clientNames.length)html='<div style="color:#475569;font-size:12px;margin-top:8px">Add Clients বাটনে নাম যোগ করুন</div>';
   list.innerHTML=html;document.getElementById('police-filter-modal').classList.add('open');
 }
 function closePoliceFilterModal(){document.getElementById('police-filter-modal').classList.remove('open');}
@@ -1938,7 +1945,7 @@ function cardHTML(app){
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link ${phoneBlinkClass}" onclick="blinkStopped['${app.ref}']=true;save();render();openPhonePopup('${app.ref}','${app.phone}');event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count
-  const policeTagHTML=policeTag?`<span class="police-inline-tag" onclick="openPickModal('${app.ref}');event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> ${policeTag}</span>`:'';
+  const policeTagHTML=policeTag?`<span class="police-inline-tag" onclick="openClientDetailModal('${policeTag.replace(/'/g,"\\'")}');event.stopPropagation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> ${policeTag}</span>`:'';
   const refHTML=`<span class="ref-link" onclick="openPickModal('${app.ref}');event.stopPropagation()">${refSVG} ${app.ref}</span>`;
 
   const certFile=app.cert_file||null;
@@ -2052,7 +2059,7 @@ function render(){
   }
   if(star2.length){html+=secRow('🔴 Urgent',star2.length,'urgent-title','urgent-count');star2.forEach(a=>html+=cardHTML(a));}
   if(star1.length){html+=secRow('⭐ Important',star1.length,'important-title','important-count');star1.forEach(a=>html+=cardHTML(a));}
-  if(normal.length){html+=secRow('Normal',null,'','');normal.forEach(a=>html+=cardHTML(a));}
+  if(normal.length){html+=secRow('Normal',normal.length,'','');normal.forEach(a=>html+=cardHTML(a));}
   if(done.length){html+=`<div class="section-row"><div class="section-title">✓ Delivered</div></div>`;done.forEach(a=>html+=cardHTML(a));}
   // Archive search
   if(q){

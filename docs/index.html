@@ -1962,6 +1962,7 @@ function filterPressStart(e,type){
   },600);
 }
 function filterPressEnd(type){if(_filterPressTimer){clearTimeout(_filterPressTimer);_filterPressTimer=null;}}
+function toggleFilter(f,btn){
   if(activeFilter===f){activeFilter='all';document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));}
   else{activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
   render();

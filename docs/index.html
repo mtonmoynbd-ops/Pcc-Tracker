@@ -266,7 +266,7 @@
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
   @keyframes blink-draft { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .filter-btn.draft-blink { animation: blink-draft 1.2s ease-in-out infinite; border-color: #f59e0b; color: #f59e0b; }
-  .icon-filter-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #2563eb; background: #1e3a5f; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .icon-filter-btn { height: 30px; border-radius: 20px; border: 1px solid #2563eb; background: #0f1f3d; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 4px 10px; gap: 4px; }
   .icon-filter-btn.police { border-color: #a78bfa; background: #2d1f5e; margin-left: auto; }
   body.amoled .icon-filter-btn.police { border-color: #a78bfa; background: #1a0a3a; }
   .icon-filter-btn.police.active { background: #2d1f5e; border-color: #8b5cf6; }
@@ -499,7 +499,7 @@
   /* ── Glass Theme ──────────────────────────────────── */
   body.glass { background: #0d1117; }
   body.glass .app-bar { background:rgba(15,31,61,0.55);backdrop-filter:blur(16px);border-bottom:1px solid rgba(96,165,250,0.15); }
-  body.glass .card { background:rgba(255,255,255,0.04);backdrop-filter:blur(16px);border-color:rgba(255,255,255,0.1);box-shadow:0 8px 32px rgba(0,0,0,0.3),0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.08);transform:translateZ(0); }
+  body.glass .card { background:rgba(15,30,60,0.65);backdrop-filter:blur(16px);border-color:rgba(96,165,250,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.3),0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.06);transform:translateZ(0); }
   body.glass .card.star2 { border-color:rgba(239,68,68,0.85)!important;border-width:2px!important;background:rgba(239,68,68,0.07)!important;box-shadow:0 8px 32px rgba(239,68,68,0.18),inset 0 1px 0 rgba(255,255,255,0.06)!important; }
   body.glass .card.star1 { border-color:rgba(245,158,11,0.8)!important;background:rgba(245,158,11,0.06)!important;box-shadow:0 8px 32px rgba(245,158,11,0.14),inset 0 1px 0 rgba(255,255,255,0.06)!important; }
   body.glass .card.collected-card { background:rgba(34,197,94,0.06)!important;border-color:rgba(34,197,94,0.5)!important; }
@@ -529,6 +529,25 @@
   body.glass-light .info, body.glass-light .section-title { color:#475569; }
   body.glass-light .theme-opt { background:rgba(255,255,255,0.55);border-color:rgba(0,0,0,0.15);color:#374151; }
   body.glass-light .theme-opt.active { background:rgba(37,99,235,0.15);border-color:#2563eb;color:#1d4ed8; }
+  body.glass-light .section-title { color: #374151; }
+  body.glass-light .section-count { color: #374151; }
+  body.glass-light .status { border-color: rgba(0,0,0,0.15); }
+  body.glass-light .filter-btn { color: #374151; }
+  body.glass-light .filter-btn.active { color: #1d4ed8; background:rgba(219,234,254,0.7); }
+  body.glass-light .police-inline-tag { border-color:rgba(217,119,6,0.4);color:#92400e;background:rgba(255,251,235,0.7); }
+  body.glass-light .note-tpl-btn { background:rgba(255,255,255,0.6);border-color:rgba(0,0,0,0.15);color:#374151; }
+  body.glass-light .confirm-cancel { background:rgba(241,245,249,0.8);border-color:#cbd5e1;color:#475569; }
+  body.glass-light .note-modal-textarea { background:rgba(255,255,255,0.7);border-color:rgba(0,0,0,0.12);color:#1e293b; }
+  body.glass-light .note-modal-save { background:#2563eb;color:#fff; }
+  body.glass-light .note-modal-clear { background:rgba(241,245,249,0.8);border-color:#cbd5e1;color:#64748b; }
+  body.glass-light .modal-add-input { background:rgba(255,255,255,0.7);border-color:rgba(0,0,0,0.12);color:#1e293b; }
+  body.glass-light .modal-list-item { background:rgba(255,255,255,0.6);border-color:rgba(0,0,0,0.08);color:#1e293b; }
+  body.glass-light .ready-chip { background:rgba(34,197,94,0.15);color:#15803d;border-color:rgba(34,197,94,0.4); }
+  body.glass-light .arch-tab { background:rgba(255,255,255,0.5);color:#374151;border-color:rgba(0,0,0,0.1); }
+  body.glass-light .arch-tab.active { background:rgba(37,99,235,0.15);color:#1d4ed8;border-color:#2563eb; }
+  body.glass-light #list { background:transparent; }
+  body.glass-light .police-filter-pill { background:rgba(237,233,254,0.7);border-color:#c4b5fd;color:#5b21b6; }
+  body.glass-light .police-filter-pill.active { background:rgba(109,40,217,0.15);color:#4c1d95; }
   /* Collected filter blink */
   @keyframes blink-col { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .filter-btn.collected-blink { animation: blink-col 1.2s ease-in-out infinite; border-color:#22c55e; color:#22c55e; }
@@ -611,8 +630,8 @@ if('serviceWorker' in navigator){
   <button class="filter-btn" id="draft-btn" onclick="toggleFilter(&#39;draft&#39;,this)">Draft</button>
   <button class="filter-btn" id="f15-btn" onclick="toggleFilter(&#39;1-5&#39;,this)">1-5</button>
   <button class="filter-btn" id="f68-btn" onclick="toggleFilter(&#39;6-8&#39;,this)">6-8</button>
-  <button class="filter-btn" id="waiting-btn" onclick="toggleFilter(&#39;waiting&#39;,this)">⏳</button>
-  <button class="filter-btn" id="collect-btn" onclick="toggleFilter(&#39;collected&#39;,this)">📥</button>
+  <button class="filter-btn" id="waiting-btn" onclick="toggleFilter(&#39;waiting&#39;,this)" oncontextmenu="return false" ontouchstart="filterPressStart(event,'waiting')" ontouchend="filterPressEnd('waiting')" ontouchcancel="filterPressEnd('waiting')">⏳</button>
+  <button class="filter-btn" id="collect-btn" onclick="toggleFilter(&#39;collected&#39;,this)" oncontextmenu="return false" ontouchstart="filterPressStart(event,'collected')" ontouchend="filterPressEnd('collected')" ontouchcancel="filterPressEnd('collected')">📥</button>
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
   </button>
@@ -648,7 +667,7 @@ if('serviceWorker' in navigator){
   <div style="background:#0f1f3d;border:1px solid #1e3a5f;border-radius:14px;padding:0;width:100%;max-width:380px;overflow:hidden;display:flex;flex-direction:column;max-height:88vh">
     <div style="padding:4px 10px;border-bottom:1px solid #1e3a5f;flex-shrink:0;display:flex;align-items:center;justify-content:space-between">
       <span style="font-size:12px;font-weight:700;color:#94a3b8">📄 সার্টিফিকেট</span>
-      <button onclick="closeCertModal()" style="background:none;border:none;color:#64748b;font-size:16px;cursor:pointer;padding:4px">✕</button>
+      <button onclick="closeCertModal()" style="background:none;border:none;color:#64748b;cursor:pointer;padding:4px;display:flex;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
     </div>
     <div style="overflow-y:auto;flex:1;background:#fff;display:flex;align-items:flex-start;justify-content:center">
       <img id="cert-img" src="" style="width:100%;display:block" alt="Certificate"
@@ -683,7 +702,7 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="modal">
   <div class="modal-box">
-    <div class="modal-title"><span id="modal-title-text"></span><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-title"><span id="modal-title-text"></span><button class="modal-close" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button></div>
     <div class="count-top">
       <button class="adj-btn" onclick="adjustCount(-1)">−</button>
       <div class="adj-num" id="modal-count">0</div>
@@ -701,7 +720,7 @@ if('serviceWorker' in navigator){
     <div class="modal-title" style="flex-direction:column;align-items:stretch;gap:0">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div class="date-modal-date-line" id="date-modal-date-line" onclick="toggleInlinePicker()"><span id="date-modal-date-text"></span></div>
-        <button class="modal-close" onclick="closeDateModal()">✕</button>
+        <button class="modal-close" onclick="closeDateModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
       </div>
       <div class="date-picker-inline" id="date-picker-inline">
         <input type="date" id="inline-date-picker" onchange="confirmInlineDateChange(this.value)">
@@ -750,7 +769,7 @@ if('serviceWorker' in navigator){
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         <span id="note-modal-title"></span>
       </div>
-      <button class="modal-close" onclick="closeNoteModal()">✕</button>
+      <button class="modal-close" onclick="closeNoteModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
     </div>
     <div style="margin-bottom:8px">
       <div style="font-size:9px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">টেমপ্লেট</div>
@@ -777,7 +796,7 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="archive-modal">
   <div class="modal-box" style="max-width:400px">
-    <div class="modal-title"><span>📦 আর্কাইভ</span><button class="modal-close" onclick="closeArchive()">✕</button></div>
+    <div class="modal-title"><span>📦 আর্কাইভ</span><button class="modal-close" onclick="closeArchive()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button></div>
     <div class="arch-tabs">
       <button class="arch-tab active" id="arch-tab-month" onclick="setArchTab(&#39;month&#39;)">মাস</button>
       <button class="arch-tab" id="arch-tab-reset" onclick="setArchTab(&#39;reset&#39;)">রিসেট</button>
@@ -791,14 +810,14 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="police-filter-modal">
   <div class="modal-box">
-    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client Filter<button class="modal-close" onclick="closePoliceFilterModal()">✕</button></div>
+    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client Filter<button class="modal-close" onclick="closePoliceFilterModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button></div>
     <div class="police-filter-list" id="police-filter-list"></div>
   </div>
 </div>
 
 <div class="modal" id="client-modal">
   <div class="modal-box">
-    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Add Clients<button class="modal-close" onclick="closeClientModal()">✕</button></div>
+    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Add Clients<button class="modal-close" onclick="closeClientModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button></div>
     <div class="client-add-row">
       <input class="client-add-input" id="client-add-input" type="text" placeholder="ক্লায়েন্ট নাম..." onkeydown="if(event.key===&#39;Enter&#39;)document.getElementById(&#39;client-add-phone&#39;).focus()">
       <input class="client-add-input" id="client-add-phone" type="tel" placeholder="ফোন নম্বর..." style="margin-top:6px" onkeydown="if(event.key===&#39;Enter&#39;)addClientName()">
@@ -819,7 +838,7 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="client-detail-modal">
   <div class="modal-box">
-    <div class="modal-title"><span id="client-detail-title" style="display:inline-flex;align-items:center;gap:6px"></span><button class="modal-close" onclick="closeClientDetailModal()">✕</button></div>
+    <div class="modal-title"><span id="client-detail-title" style="display:inline-flex;align-items:center;gap:6px"></span><button class="modal-close" onclick="closeClientDetailModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button></div>
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px">
       <div style="flex:1">
         <a id="client-detail-phone" href="file:///C:/Users/ADMIN/Downloads/pcc_tracker_10.html#" onclick="callClientPhone();return false" style="font-size:14px;font-weight:700;color:#60a5fa;text-decoration:none;display:block;margin-bottom:4px"></a>
@@ -836,7 +855,7 @@ if('serviceWorker' in navigator){
 
 <div class="modal" id="pick-modal">
   <div class="modal-box">
-    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client সিলেক্ট করুন<button class="modal-close" onclick="closePickModal()">✕</button></div>
+    <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client সিলেক্ট করুন<button class="modal-close" onclick="closePickModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button></div>
     <div id="pick-list"></div>
   </div>
 </div>
@@ -1248,7 +1267,7 @@ function openPhonePopup(ref,appPhone){
   }
   document.getElementById('confirm-msg').innerHTML=html;
   document.getElementById('confirm-modal').querySelector('.confirm-btns').innerHTML=
-    '<button class="confirm-cancel" onclick="confirmCancel()" style="width:100%">বাতিল</button>';
+    '<button class="confirm-cancel" onclick="confirmCancel()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> হোম</button>';
   document.getElementById('confirm-modal').classList.add('open');
 }
 
@@ -1300,7 +1319,7 @@ function callClientPhone(){
   html+=_phoneRow(phone,waPhone,'#c4b5fd');
   document.getElementById('confirm-msg').innerHTML=html;
   document.getElementById('confirm-modal').querySelector('.confirm-btns').innerHTML=
-    '<button class="confirm-cancel" onclick="confirmCancel()" style="width:100%">বাতিল</button>';
+    '<button class="confirm-cancel" onclick="confirmCancel()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> হোম</button>';
   document.getElementById('confirm-modal').classList.add('open');
 }
 function saveClientNote(){
@@ -1919,7 +1938,30 @@ function copySelected(){
 }
 
 // ── Filter ────────────────────────────────────────────────
-function toggleFilter(f,btn){
+let _filterPressTimer=null;
+function filterPressStart(e,type){
+  _filterPressTimer=setTimeout(async function(){
+    _filterPressTimer=null;
+    if(type==='waiting'){
+      // Copy all 2/10 important files
+      const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];});
+      if(!files.length){showToast('⏳ কোনো ফাইল নেই');return;}
+      const text=files.map(a=>a.name+' — '+a.ref).join('\n');
+      try{await navigator.clipboard.writeText(text);showToast('✅ '+files.length+'টি ফাইল কপি হয়েছে');}
+      catch(e){showToast('❌ কপি ব্যর্থ');}
+    } else if(type==='collected'){
+      // Mark all 9/10 uncollected important/urgent as collected
+      const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
+      if(!files.length){showToast('📥 কোনো ফাইল নেই');return;}
+      const ok=await showConfirm(files.length+'টি ফাইল একসাথে Collected করবেন?');
+      if(!ok)return;
+      const today=new Date();
+      files.forEach(a=>{collected[a.ref]=true;collectedDay[a.ref]=0;collectedDate[a.ref]=today.toDateString();});
+      save();render();showToast('✅ '+files.length+'টি ফাইল Collected');
+    }
+  },600);
+}
+function filterPressEnd(type){if(_filterPressTimer){clearTimeout(_filterPressTimer);_filterPressTimer=null;}}
   if(activeFilter===f){activeFilter='all';document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));}
   else{activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
   render();

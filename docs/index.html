@@ -23,7 +23,7 @@
   body.light .day-warn-important { color: #ea580c; }
   body.light .note-preview { color: #475569; }
   body.light .phone-link { color: #0284c7; }
-  body.light .police-inline-tag { color: #7c3aed; background: #f5f3ff; border-color: #c4b5fd; }
+  body.light .police-inline-tag { color: #d97706; background: transparent; border-color: rgba(217,119,6,0.4); }
   body.light .print-badge { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
   body.light .deu-text { background: #dc2626; color: #fff; }
   /* Status badges — keep colored, just slightly adjusted */
@@ -472,7 +472,7 @@
   /* Ref clickable — no underline on date */
   .ref-link { cursor: pointer; color: #94a3b8; font-size: 12px; }
   .ref-link:hover { color: #c4b5fd; }
-  .police-inline-tag { color: #c4b5fd; font-size: 10px; padding: 1px 6px; border: 1px solid #4c1d95; border-radius: 3px; background: #1e1a3a; cursor: pointer; flex-shrink: 0; display:inline-flex; align-items:center; gap:3px; vertical-align:middle; }
+  .police-inline-tag { color: #f59e0b; font-size: 10px; padding: 1px 5px; border: 1px solid rgba(245,158,11,0.4); border-radius: 3px; background: transparent; cursor: pointer; flex-shrink: 0; display:inline-flex; align-items:center; gap:3px; vertical-align:middle; }
   .day-normal { color: #60a5fa; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
   .day-warn-urgent { color: #ef4444; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
   .day-warn-important { color: #f97316; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
@@ -496,14 +496,14 @@
   /* ── Glass Theme ──────────────────────────────────── */
   body.glass { background: linear-gradient(135deg,#0f1729 0%,#1a0a2e 50%,#0a1a2e 100%) fixed; }
   body.glass .app-bar { background:rgba(15,31,61,0.55);backdrop-filter:blur(16px);border-bottom:1px solid rgba(96,165,250,0.15); }
-  body.glass .card { background:rgba(15,31,61,0.4);backdrop-filter:blur(12px);border-color:rgba(96,165,250,0.18); }
-  body.glass .card.star2 { border-color:rgba(239,68,68,0.85)!important;border-width:2px!important;background:transparent!important; }
-  body.glass .card.star1 { border-color:rgba(245,158,11,0.8)!important;background:transparent!important; }
-  body.glass .card.collected-card { background:rgba(5,30,20,0.55)!important;border-color:rgba(34,197,94,0.5)!important; }
+  body.glass .card { background:rgba(255,255,255,0.04);backdrop-filter:blur(16px);border-color:rgba(255,255,255,0.1);box-shadow:0 8px 32px rgba(0,0,0,0.3),0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.08);transform:translateZ(0); }
+  body.glass .card.star2 { border-color:rgba(239,68,68,0.85)!important;border-width:2px!important;background:rgba(239,68,68,0.07)!important;box-shadow:0 8px 32px rgba(239,68,68,0.18),inset 0 1px 0 rgba(255,255,255,0.06)!important; }
+  body.glass .card.star1 { border-color:rgba(245,158,11,0.8)!important;background:rgba(245,158,11,0.06)!important;box-shadow:0 8px 32px rgba(245,158,11,0.14),inset 0 1px 0 rgba(255,255,255,0.06)!important; }
+  body.glass .card.collected-card { background:rgba(34,197,94,0.06)!important;border-color:rgba(34,197,94,0.5)!important; }
   body.glass .filter-btn { background:rgba(30,41,59,0.45);backdrop-filter:blur(8px);border-color:rgba(100,116,139,0.35); }
   body.glass .filter-btn.active { background:rgba(37,99,235,0.4);border-color:rgba(96,165,250,0.55); }
   body.glass .search-bar { background:rgba(30,41,59,0.4);backdrop-filter:blur(8px);border-color:rgba(100,116,139,0.25); }
-  body.glass .modal-box, body.glass .confirm-box { background:rgba(8,18,38,0.8);backdrop-filter:blur(24px);border-color:rgba(96,165,250,0.2); }
+  body.glass .modal-box, body.glass .confirm-box { background:rgba(8,18,38,0.82);backdrop-filter:blur(28px);border-color:rgba(96,165,250,0.18);box-shadow:0 32px 80px rgba(0,0,0,0.6),0 8px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1); }
   body.glass .icon-filter-btn { background:rgba(30,41,59,0.45);backdrop-filter:blur(8px); }
   body.glass .modal { background:rgba(0,0,0,0.55);backdrop-filter:blur(4px); }
   body.glass .theme-opt { background:rgba(30,41,59,0.45);border-color:rgba(100,116,139,0.35); }
@@ -737,7 +737,7 @@ if('serviceWorker' in navigator){
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✋ ওয়েটফর কনফার্মেশন&#39;)">✋ কনফার্মেশন</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;📄 ওয়েটফর জন্মনিবন্ধন&#39;)">📄 জন্মনিবন্ধন</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;🛬 ওয়েটফর এরাইভাল&#39;)">✈️ এরাইভাল</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✈️↓ ওয়েটফর এরাইভাল&#39;)">✈️ এরাইভাল</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;🪪 ওয়েটফর বাবা মার আইডি&#39;)">🪪 বাবা মার আইডি</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;⚡ ওয়েটফর বিদ্যুৎ বিল&#39;)">⚡ বিদ্যুৎ বিল</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;⚖️ ওয়েটফর নিষ্পত্তি&#39;)">⚖️ নিষ্পত্তি</button>
@@ -911,6 +911,18 @@ function getHoliday(ds){
 }
 
 let allApps=[],printDates={},statusHistory={};
+// Historical store — accumulates all apps ever seen, never loses old records
+let historyStore=JSON.parse(localStorage.getItem('pcc_history_store')||'{}');
+function mergeIntoHistory(apps){
+  let changed=false;
+  apps.forEach(function(a){
+    if(!historyStore[a.ref]){historyStore[a.ref]=a;changed=true;}
+    else{// Update status but keep old record
+      Object.assign(historyStore[a.ref],{status:a.status,name:a.name,phone:a.phone});}
+  });
+  if(changed)localStorage.setItem('pcc_history_store',JSON.stringify(historyStore));
+}
+function getAllHistoryApps(){return Object.values(historyStore);}
 let stars=JSON.parse(localStorage.getItem('pcc_stars')||'{}');
 let delivered=JSON.parse(localStorage.getItem('pcc_delivered')||'{}');
 let codes=JSON.parse(localStorage.getItem('pcc_codes')||'{}');
@@ -1191,7 +1203,7 @@ function _phoneRow(num,waUrl,numColor){
     <button onclick="window.location.href='tel:${num}';confirmCancel()" style="${_ibStyle}">${_svgDial}</button>
     <button onclick="window.open('${waUrl}','_blank');confirmCancel()" style="${_ibStyle}">${_svgWa}</button>
   </div>`;}
-const _svgFolder='<svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>';
+const _svgFolder='<svg width="14" height="14" viewBox="0 0 24 24" fill="#fcd34d" stroke="#fcd34d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>';
 function openPhonePopup(ref,appPhone){
   const policeTag=policeTags[ref]||'';
   const clientPhone=policeTag&&clientPhones[policeTag]?clientPhones[policeTag]:'';
@@ -1202,14 +1214,14 @@ function openPhonePopup(ref,appPhone){
   const waApp='https://wa.me/'+('88'+appPhone).replace(/[^0-9]/g,'');
   let html=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;padding-bottom:6px;border-bottom:2px solid #1e3a5f">
     ${headerIcon}
-    <span style="font-size:13px;font-weight:700;color:var(--text-main,#e2e8f0);letter-spacing:0.3px;text-transform:uppercase">${name}</span>
+    <span style="font-size:13px;font-weight:700;color:var(--popup-name,#e2e8f0);letter-spacing:0.3px;text-transform:uppercase">${name}</span>
   </div>`;
-  html+=_phoneRow(appPhone,waApp,'var(--text-main,#e2e8f0)');
+  html+=_phoneRow(appPhone,waApp,'#60a5fa');
   if(clientPhone){
     const waClient='https://wa.me/'+('88'+clientPhone).replace(/[^0-9]/g,'');
-    html+=_phoneRow(clientPhone,waClient,'#f59e0b');
+    html+=_phoneRow(clientPhone,waClient,'#fcd34d');
     html+=`<div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;padding:4px 0 0">
-      <span style="font-size:13px;font-weight:700;color:#f59e0b">${policeTag}</span>
+      <span style="font-size:13px;font-weight:700;color:#fcd34d">${policeTag}</span>
       ${_svgFolder}
     </div>`;
   }
@@ -1408,7 +1420,7 @@ function openCalDayModal(ds){
     else holidayBanner.style.display='none';
   }
   renderCalDayTags();
-  const files=allApps.filter(a=>a.apply_date===ds);
+  const files=getAllHistoryApps().filter(a=>a.apply_date===ds);
   const filesEl=document.getElementById('cal-day-files');
   if(files.length){
     filesEl.innerHTML=files.map(a=>{
@@ -1442,7 +1454,7 @@ function closeCalDayModal(){document.getElementById('cal-day-modal').classList.r
 // ── Date Modal ────────────────────────────────────────────
 function openDateModal(dateStr,prefix,sourceField,editRef){
   dateModalSourceField=sourceField;dateModalDateStr=dateStr;dateModalEditRef=editRef;
-  const same=sourceField==='apply_date'?allApps.filter(a=>a.apply_date===dateStr):allApps.filter(a=>getEffectivePrintDate(a.ref)===dateStr);
+  const same=sourceField==='apply_date'?getAllHistoryApps().filter(a=>a.apply_date===dateStr):getAllHistoryApps().filter(a=>getEffectivePrintDate(a.ref)===dateStr);
   const dateLine=document.getElementById('date-modal-date-line');const pickerWrap=document.getElementById('date-picker-inline');
   document.getElementById('date-modal-date-text').textContent=`${prefix} ${dateStr} — ${same.length}টি ফাইল`;
   if(sourceField==='print_date'){dateLine.style.cursor='pointer';pickerWrap.style.display='none';document.getElementById('inline-date-picker').value=toInputDate(dateStr);}
@@ -1551,7 +1563,7 @@ function setArchTab(tab){
   renderArchiveFilters();renderArchiveContent();
 }
 function getArchiveYears(){
-  if(archTab==='month'){const yrs=new Set();allApps.forEach(a=>{const p=(a.apply_date||'').toUpperCase().split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}});return [...yrs].sort((a,b)=>b-a);}
+  if(archTab==='month'){const yrs=new Set();getAllHistoryApps().forEach(a=>{const p=(a.apply_date||'').toUpperCase().split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}});return [...yrs].sort((a,b)=>b-a);}
   else if(archTab==='delivered'){const yrs=new Set();deliveredArchive.forEach(a=>{if(a.deliveredDate){const p=a.deliveredDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
   else if(archTab==='reset'){const yrs=new Set();resetArchive.forEach(r=>{if(r.resetDate){const p=r.resetDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
   else{const yrs=new Set();deletedAppsStore.forEach(a=>{if(a.deletedDate){const p=a.deletedDate.split('-');if(p.length===3){const yr=2000+parseInt(p[2]);if(!isNaN(yr))yrs.add(yr);}}});return [...yrs].sort((a,b)=>b-a);}
@@ -1564,7 +1576,7 @@ function renderArchiveFilters(){
   html+=`</div>`;
   if(archTab==='month'&&archYearFilter){
     const months=new Set();
-    allApps.forEach(a=>{const p=(a.apply_date||'').toUpperCase().split('-');if(p.length===3){const yr=2000+parseInt(p[2]);const mo=MONTHS_UP.indexOf(p[1]);if(yr===archYearFilter&&mo>=0)months.add(mo);}});
+    getAllHistoryApps().forEach(a=>{const p=(a.apply_date||'').toUpperCase().split('-');if(p.length===3){const yr=2000+parseInt(p[2]);const mo=MONTHS_UP.indexOf(p[1]);if(yr===archYearFilter&&mo>=0)months.add(mo);}});
     if(months.size>1){html+=`<div class="arch-month-row">`;[...months].sort((a,b)=>b-a).forEach(mo=>{html+=`<span class="arch-month-chip ${archMonthFilter===mo?'active':''}" onclick="setArchMonth(${mo})">${MONTHS_SHORT[mo]}</span>`;});html+=`</div>`;}
   }
   wrap.innerHTML=html;
@@ -2134,6 +2146,7 @@ async function load(){
     const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
     allApps=d.applications;
+    mergeIntoHistory(allApps);
     try{const ur=await fetch('userdata.json',{cache:'no-store'});if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
     render();
   }catch(e){

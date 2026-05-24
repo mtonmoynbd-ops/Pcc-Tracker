@@ -422,8 +422,9 @@ async def main():
                 if status_num == 9 and app.get("cert_url"):
                     app["cert_file"] = await download_cert(page, app)
 
-            # ── Download form docs for ALL active apps ───────────────
-            for app in applications:
+            # ── Download form docs (latest 45 only, skip old 10/10) ──
+            recent_apps = [a for a in applications if a["status"] != "10/10"][:45]
+            for app in recent_apps:
                 if not app.get("form_url"):
                     continue
                 ref = app["ref"]

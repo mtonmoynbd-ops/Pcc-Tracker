@@ -306,11 +306,19 @@ async def scrape_form_docs(page, app):
         return {}
 
 
+DEEP_FLAG = "pcc_deep_done.flag"
+
 async def scrape_all_pages(page):
     """Scrape all pagination pages"""
+    # First run ever: scrape all pages to recover historical records
+    deep_mode = not os.path.exists(DEEP_FLAG)
+    page_limit = 20 if deep_mode else 3
+    if deep_mode:
+        print("🔍 Deep scrape mode: recovering historical records...")
+
     all_apps = []
     page_num = 0
-    while page_num < 3:  # Only first 3 pages (~45 most recent files)
+    while page_num < page_limit:
         page_num += 1
         await page.wait_for_timeout(1500)
         content = await page.content()
@@ -395,6 +403,12 @@ async def main():
 
             # ── Scrape ───────────────────────────────────────────────
             applications = await scrape_all_pages(page)
+
+            # Mark deep scrape done
+            if not os.path.exists(DEEP_FLAG):
+                with open(DEEP_FLAG, 'w') as f:
+                    f.write(datetime.now(BD_TZ).strftime("%d-%b-%Y %I:%M %p"))
+                print("✅ Deep scrape complete — switching to 3-page mode")
             if not applications:
                 send_telegram("⚠️ আবেদন পাওয়া যায়নি।")
                 await browser.close()

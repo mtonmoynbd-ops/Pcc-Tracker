@@ -74,6 +74,9 @@
   /* Modals */
   body.light .modal-box, body.light .confirm-box { background: #ffffff; border-color: #cbd5e1; }
   body.light .confirm-msg button[style*="background:#dbeafe"] { background: #dbeafe !important; }
+  body.light .confirm-msg span[style*="color:#e2e8f0"] { color: #0f172a !important; }
+  body.light .confirm-msg span[style*="color:#fcd34d"] { color: #b45309 !important; }
+  body.light #cert-modal span { color: #1e293b !important; }
   body.light .confirm-msg button[style*="background:#dcfce7"] { background: #dcfce7 !important; }
   body.light .confirm-msg { color: #1e293b; }
   body.light .confirm-msg span[style*="color:#e2e8f0"] { color: #0f172a !important; }
@@ -494,7 +497,7 @@
   body.amoled .theme-opt { background:#0a0a0a;border-color:#1a1a1a;color:#475569; }
   body.amoled .theme-opt.active { background:#001433;border-color:#2563eb;color:#60a5fa; }
   /* ── Glass Theme ──────────────────────────────────── */
-  body.glass { background: linear-gradient(135deg,#0f1729 0%,#1a0a2e 50%,#0a1a2e 100%) fixed; }
+  body.glass { background: #0d1117; }
   body.glass .app-bar { background:rgba(15,31,61,0.55);backdrop-filter:blur(16px);border-bottom:1px solid rgba(96,165,250,0.15); }
   body.glass .card { background:rgba(255,255,255,0.04);backdrop-filter:blur(16px);border-color:rgba(255,255,255,0.1);box-shadow:0 8px 32px rgba(0,0,0,0.3),0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.08);transform:translateZ(0); }
   body.glass .card.star2 { border-color:rgba(239,68,68,0.85)!important;border-width:2px!important;background:rgba(239,68,68,0.07)!important;box-shadow:0 8px 32px rgba(239,68,68,0.18),inset 0 1px 0 rgba(255,255,255,0.06)!important; }
@@ -509,6 +512,23 @@
   body.glass .theme-opt { background:rgba(30,41,59,0.45);border-color:rgba(100,116,139,0.35); }
   body.glass .theme-opt.active { background:rgba(37,99,235,0.4);border-color:#60a5fa;color:#60a5fa; }
   body.glass .note-modal-textarea, body.glass .modal-add-input, body.glass .client-add-input { background:rgba(30,41,59,0.5);backdrop-filter:blur(8px); }
+  /* ── Glass Light Theme ──────────────────────────────── */
+  body.glass-light { background: #e8eef5; color: #1e293b; }
+  body.glass-light .app-bar { background:rgba(255,255,255,0.65);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,0.08); }
+  body.glass-light .card { background:rgba(255,255,255,0.55);backdrop-filter:blur(12px);border-color:rgba(0,0,0,0.1);box-shadow:0 8px 32px rgba(0,0,0,0.08),0 2px 8px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.9);color:#1e293b; }
+  body.glass-light .card.star2 { border-color:rgba(220,38,38,0.6)!important;background:rgba(254,226,226,0.6)!important;box-shadow:0 8px 32px rgba(220,38,38,0.12),inset 0 1px 0 rgba(255,255,255,0.8)!important; }
+  body.glass-light .card.star1 { border-color:rgba(217,119,6,0.55)!important;background:rgba(255,251,235,0.6)!important;box-shadow:0 8px 32px rgba(217,119,6,0.1),inset 0 1px 0 rgba(255,255,255,0.8)!important; }
+  body.glass-light .card.collected-card { background:rgba(220,252,231,0.6)!important;border-color:rgba(22,163,74,0.4)!important; }
+  body.glass-light .filter-btn { background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);border-color:rgba(0,0,0,0.15);color:#374151; }
+  body.glass-light .filter-btn.active { background:rgba(37,99,235,0.15);border-color:#2563eb;color:#1d4ed8; }
+  body.glass-light .search-bar { background:rgba(255,255,255,0.6);backdrop-filter:blur(8px);border-color:rgba(0,0,0,0.1);color:#1e293b; }
+  body.glass-light .modal-box, body.glass-light .confirm-box { background:rgba(255,255,255,0.82);backdrop-filter:blur(24px);border-color:rgba(0,0,0,0.1);color:#1e293b;box-shadow:0 24px 64px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,1); }
+  body.glass-light .icon-filter-btn { background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);border-color:rgba(0,0,0,0.15); }
+  body.glass-light .modal { background:rgba(0,0,0,0.2);backdrop-filter:blur(4px); }
+  body.glass-light .name { color:#0f172a; }
+  body.glass-light .info, body.glass-light .section-title { color:#475569; }
+  body.glass-light .theme-opt { background:rgba(255,255,255,0.55);border-color:rgba(0,0,0,0.15);color:#374151; }
+  body.glass-light .theme-opt.active { background:rgba(37,99,235,0.15);border-color:#2563eb;color:#1d4ed8; }
   /* Collected filter blink */
   @keyframes blink-col { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .filter-btn.collected-blink { animation: blink-col 1.2s ease-in-out infinite; border-color:#22c55e; color:#22c55e; }
@@ -545,7 +565,7 @@
 </style>
 </head>
 <body>
-<script>(function(){var t=localStorage.getItem('pcc_theme');if(t==='light'||t==='amoled'||t==='glass')document.body.className=t;}())</script>
+<script>(function(){var t=localStorage.getItem('pcc_theme');if(t==='light'||t==='amoled'||t==='glass'||t==='glass-light')document.body.className=t;}())</script>
 <script>
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/Pcc-Tracker/sw.js').catch(function(e){console.log('SW:',e);});
@@ -737,7 +757,7 @@ if('serviceWorker' in navigator){
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✋ ওয়েটফর কনফার্মেশন&#39;)">✋ কনফার্মেশন</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;📄 ওয়েটফর জন্মনিবন্ধন&#39;)">📄 জন্মনিবন্ধন</button>
-        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;✈️↓ ওয়েটফর এরাইভাল&#39;)">✈️ এরাইভাল</button>
+        <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;🛬 ওয়েটফর এরাইভাল&#39;)">✈️ এরাইভাল</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;🪪 ওয়েটফর বাবা মার আইডি&#39;)">🪪 বাবা মার আইডি</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;⚡ ওয়েটফর বিদ্যুৎ বিল&#39;)">⚡ বিদ্যুৎ বিল</button>
         <button class="note-tpl-btn" onclick="addNoteTemplate(&#39;⚖️ ওয়েটফর নিষ্পত্তি&#39;)">⚖️ নিষ্পত্তি</button>
@@ -830,6 +850,7 @@ if('serviceWorker' in navigator){
       <button class="theme-opt" id="theme-dark" onclick="setTheme(&#39;dark&#39;)">🌙 Dark</button>
       <button class="theme-opt" id="theme-amoled" onclick="setTheme(&#39;amoled&#39;)">⚫ AMOLED</button>
       <button class="theme-opt" id="theme-glass" onclick="setTheme(&#39;glass&#39;)">🪟 Glass</button>
+      <button class="theme-opt" id="theme-glass-light" onclick="setTheme(&#39;glass-light&#39;)">🔆 Glass Light</button>
     </div>
     <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-bottom:4px">
       <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
@@ -1214,9 +1235,9 @@ function openPhonePopup(ref,appPhone){
   const waApp='https://wa.me/'+('88'+appPhone).replace(/[^0-9]/g,'');
   let html=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:2px;padding-bottom:6px;border-bottom:2px solid #1e3a5f">
     ${headerIcon}
-    <span style="font-size:13px;font-weight:700;color:var(--popup-name,#e2e8f0);letter-spacing:0.3px;text-transform:uppercase">${name}</span>
+    <span style="font-size:13px;font-weight:700;color:#e2e8f0;letter-spacing:0.3px;text-transform:uppercase">${name}</span>
   </div>`;
-  html+=_phoneRow(appPhone,waApp,'#60a5fa');
+  html+=_phoneRow(appPhone,waApp,'#e2e8f0');
   if(clientPhone){
     const waClient='https://wa.me/'+('88'+clientPhone).replace(/[^0-9]/g,'');
     html+=_phoneRow(clientPhone,waClient,'#fcd34d');
@@ -1312,8 +1333,9 @@ function _applyTheme(){
   document.body.classList.toggle('light',themeMode==='light');
   document.body.classList.toggle('amoled',themeMode==='amoled');
   document.body.classList.toggle('glass',themeMode==='glass');
-  ['light','dark','amoled','glass'].forEach(function(m){
-    const el=document.getElementById('theme-'+m);
+  document.body.classList.toggle('glass-light',themeMode==='glass-light');
+  ['light','dark','amoled','glass','glass-light'].forEach(function(m){
+    const el=document.getElementById('theme-'+m.replace('-','-'));
     if(el)el.classList.toggle('active',m===themeMode);
   });
 }

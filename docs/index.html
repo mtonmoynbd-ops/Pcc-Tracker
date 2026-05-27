@@ -380,7 +380,27 @@
   .counts { text-align: right; font-size: 11px; line-height: 1.7; font-weight: 700; }
   .counts .urgent { color: #ef4444; cursor: pointer; white-space: nowrap; }
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
-  .search-bar { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; width: 100%; outline: none; margin-bottom: 8px; margin-top: 8px; }
+  .ticker-wrap { display:flex;align-items:center;gap:6px;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;cursor:pointer;overflow:hidden;height:36px;box-sizing:border-box; }
+  .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap; }
+  .ticker-scroll-area { flex:1;overflow:hidden;position:relative;height:20px; }
+  .ticker-track { display:flex;gap:24px;animation:ticker-move 20s linear infinite;white-space:nowrap;position:absolute;top:0;left:0; }
+  .ticker-track:empty::before { content:'আজ কোনো নতুন আবেদন নেই';font-size:12px;color:#475569; }
+  @keyframes ticker-move { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
+  .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
+  .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
+  .ticker-item .t-ref { color:#60a5fa;font-size:10px; }
+  .ticker-search-icon { font-size:14px;flex-shrink:0;cursor:pointer; }
+  body.light .ticker-wrap { background:#ffffff;border-color:#cbd5e1; }
+  body.light .ticker-today-label { color:#1d4ed8; }
+  body.light .ticker-item { color:#64748b; }
+  body.light .ticker-item .t-name { color:#0f172a; }
+  body.light .ticker-item .t-ref { color:#2563eb; }
+  body.dusk .ticker-wrap { background:#211c2e;border-color:rgba(139,92,246,0.25); }
+  body.dusk .ticker-today-label { color:#a78bfa; }
+  body.glass .ticker-wrap { background:rgba(15,31,61,0.5);backdrop-filter:blur(12px);border-color:rgba(96,165,250,0.2); }
+  body.glass-light .ticker-wrap { background:rgba(255,255,255,0.65);backdrop-filter:blur(8px);border-color:#cbd5e1; }
+  body.glass-light .ticker-today-label { color:#1d4ed8; }
   .filter-row { display: flex; gap: 6px; margin-bottom: 6px; overflow-x: auto; padding-bottom: 2px; align-items: center; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
@@ -762,7 +782,14 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
-<input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম, Ref বা ফোন খুঁজুন..." oninput="render()">
+<div class="ticker-wrap" id="ticker-wrap" onclick="activateSearch()">
+  <span class="ticker-today-label">Today:</span>
+  <div class="ticker-scroll-area" id="ticker-scroll-area">
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
+  <span class="ticker-search-icon" id="ticker-search-icon">🔍</span>
+</div>
+<input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম, Ref বা ফোন..." oninput="render()" onblur="deactivateSearch()" style="display:none">
 
 <div class="filter-row">
   <button class="filter-btn" id="draft-btn" onclick="toggleFilter(&#39;draft&#39;,this)">Draft</button>
@@ -1016,6 +1043,13 @@ if('serviceWorker' in navigator){
       <button class="settings-save-btn" onclick="savePAT()">Save &amp; Backup</button>
       <div id="settings-status" style="font-size:11px;color:#475569;margin-top:10px"></div>
     </div>
+    <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-top:4px">
+      <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">📋 রেজিস্টার</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:8px">অপেক্ষমান ফাইল long press করলে এই নম্বরে WhatsApp খুলবে।</div>
+      <input class="settings-input" id="reg-name-input" placeholder="রেজিস্টারের নাম..." style="margin-bottom:6px">
+      <input class="settings-input" id="reg-phone-input" placeholder="ফোন নম্বর (01xxxxxxxxx)...">
+      <button class="settings-save-btn" onclick="saveRegister()" style="margin-top:8px">রেজিস্টার সেভ করুন</button>
+    </div>
   </div>
 </div>
 
@@ -1146,10 +1180,14 @@ let calOpen=false; // tracks calendar visibility
 
 // ── Custom Confirm ────────────────────────────────────────
 let confirmResolve=null;
+const _homeSVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
 function showConfirm(mainText,subText=''){
   return new Promise(resolve=>{
     confirmResolve=resolve;
     document.getElementById('confirm-msg').innerHTML=`<div style="font-weight:600;margin-bottom:${subText?6:0}px">${mainText}</div>${subText?`<div class="confirm-sub">${subText}</div>`:''}`;
+    // Always restore হ্যাঁ/বাতিল buttons
+    document.getElementById('confirm-modal').querySelector('.confirm-btns').innerHTML=
+      `<button class="confirm-cancel" onclick="confirmCancel()" style="display:flex;align-items:center;gap:5px">${_homeSVG} বাতিল</button><button class="confirm-ok" onclick="confirmOk()">হ্যাঁ</button>`;
     document.getElementById('confirm-modal').classList.add('open');
   });
 }
@@ -1302,6 +1340,8 @@ async function syncFromCloud(){
 }
 function openSettings(){
   document.getElementById('pat-input').value=localStorage.getItem('pcc_pat')||'';
+  document.getElementById('reg-name-input').value=_registerName;
+  document.getElementById('reg-phone-input').value=_registerPhone;
   document.getElementById('settings-status').textContent='';
   _applyTheme();
   document.getElementById('settings-modal').classList.add('open');
@@ -1793,20 +1833,28 @@ function renderArchiveContent(){
   if(archTab==='delivered'){
     let filtered=deliveredArchive;
     if(archYearFilter){filtered=deliveredArchive.filter(a=>{const p=(a.deliveredDate||'').split('-');return p.length===3&&(2000+parseInt(p[2]))===archYearFilter;});}
+    if(archMonthFilter!==null){filtered=filtered.filter(a=>{const p=(a.deliveredDate||'').split('-');if(p.length!==3)return false;const mo=MONTHS_UP.indexOf(p[1].toUpperCase());return mo===archMonthFilter;});}
     if(!filtered.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো Delivered রেকর্ড নেই</div>';return;}
-    // Group by deliveredDate
-    const byDate={};
-    filtered.forEach(a=>{const k=a.deliveredDate||'অজানা';if(!byDate[k])byDate[k]=[];byDate[k].push(a);});
-    el.innerHTML=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,items])=>{
-      const urgents=items.filter(a=>a.starLevel===2);const importants=items.filter(a=>a.starLevel===1);
-      const copyStr=JSON.stringify(items).replace(/"/g,'&quot;');
+    // Group by month like 'month' tab
+    const groups={};
+    filtered.forEach(a=>{
+      const p=(a.deliveredDate||'').split('-');if(p.length!==3)return;
+      const mo=MONTHS_UP.indexOf(p[1].toUpperCase());if(mo<0)return;
+      const yr=2000+parseInt(p[2]);
+      const key=`${yr}-${String(mo).padStart(2,'0')}`;
+      if(!groups[key])groups[key]={label:MONTHS_SHORT[mo]+' '+yr,items:[]};
+      groups[key].items.push(a);
+    });
+    el.innerHTML=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([,g])=>{
+      const urgents=g.items.filter(a=>a.starLevel===2);const importants=g.items.filter(a=>a.starLevel===1);
+      const copyStr=JSON.stringify(g.items).replace(/"/g,'&quot;');
       return `<div class="arch-section">
-        <div class="arch-header"><span class="arch-month-label">✅ ${date}</span>
+        <div class="arch-header"><span class="arch-month-label">✅ ${g.label}</span>
           <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
         <div class="arch-badges">
           ${urgents.length?`<span class="arch-badge urgent">🔴 ${urgents.length}</span>`:''}
           ${importants.length?`<span class="arch-badge important">⭐ ${importants.length}</span>`:''}
-          <span class="arch-badge total">Total ${items.length}</span>
+          <span class="arch-badge total">Total ${g.items.length}</span>
         </div>
         <div class="arch-list">${urgents.map(a=>archItemHTML(a,'🔴')).join('')}${importants.map(a=>archItemHTML(a,'⭐')).join('')}</div>
       </div>`;
@@ -2084,7 +2132,64 @@ function copySelected(){
   clearSelection();render();
 }
 
-// ── Filter ────────────────────────────────────────────────
+// ── Today Ticker ──────────────────────────────────────────
+let _searchActive=false;
+let _registerName=localStorage.getItem('pcc_register_name')||'';
+let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
+
+function buildTicker(){
+  const track=document.getElementById('ticker-track');
+  if(!track)return;
+  const todayStr=todayDateStr();
+  const todayApps=allApps.filter(a=>a.apply_date&&normDate(a.apply_date)===todayStr);
+  if(!todayApps.length){track.innerHTML='<span style="font-size:12px;color:#475569">আজ কোনো নতুন আবেদন নেই</span>';return;}
+  // Duplicate for seamless loop
+  const items=todayApps.map(a=>`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()"><span class="t-name">${a.name}</span> <span class="t-ref">${a.ref}</span></span>`).join('');
+  track.innerHTML=items+items; // double for seamless
+  // Set animation duration based on count
+  const dur=Math.max(15,todayApps.length*5);
+  track.style.animationDuration=dur+'s';
+}
+function normDate(d){
+  // Normalize "21-MAY-26" to compare with today
+  const p=d.toUpperCase().split('-');if(p.length!==3)return '';
+  const mo=MONTHS_UP.indexOf(p[1]);if(mo<0)return '';
+  return `${p[0].padStart(2,'0')}-${String(mo+1).padStart(2,'0')}-${p[2]}`;
+}
+function todayDateStr(){
+  const t=new Date();
+  return `${String(t.getDate()).padStart(2,'0')}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getFullYear()).slice(-2)}`;
+}
+function tickerClick(ref){
+  // Scroll to card and highlight
+  const el=document.getElementById('card-'+ref);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.boxShadow='0 0 0 2px #60a5fa';setTimeout(()=>el.style.boxShadow='',1500);}
+  else{
+    // Card not visible — open pick modal to mark as important/urgent
+    openPickModal(ref);
+  }
+}
+function activateSearch(){
+  _searchActive=true;
+  document.getElementById('ticker-wrap').style.display='none';
+  const sb=document.getElementById('search-bar');
+  sb.style.display='block';
+  setTimeout(()=>sb.focus(),50);
+}
+function deactivateSearch(){
+  if(document.getElementById('search-bar').value)return;
+  _searchActive=false;
+  document.getElementById('ticker-wrap').style.display='flex';
+  document.getElementById('search-bar').style.display='none';
+}
+
+function saveRegister(){
+  _registerName=document.getElementById('reg-name-input').value.trim();
+  _registerPhone=document.getElementById('reg-phone-input').value.trim();
+  localStorage.setItem('pcc_register_name',_registerName);
+  localStorage.setItem('pcc_register_phone',_registerPhone);
+  showToast('✅ রেজিস্টার সেভ হয়েছে');
+}
 let _filterPressTimer=null;
 function filterPressStart(e,type){
   _filterPressTimer=setTimeout(async function(){
@@ -2094,7 +2199,18 @@ function filterPressStart(e,type){
       const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];});
       if(!files.length){showToast('⏳ কোনো ফাইল নেই');return;}
       const text=files.map(a=>a.name+' — '+a.ref).join('\n');
-      try{await navigator.clipboard.writeText(text);showToast('✅ '+files.length+'টি ফাইল কপি হয়েছে');}
+      try{
+        await navigator.clipboard.writeText(text);
+        files.forEach(a=>{blinkStopped[a.ref]=true;});
+        save();render();
+        showToast('✅ '+files.length+'টি ফাইল কপি হয়েছে');
+        // If register phone set, open WhatsApp
+        if(_registerPhone){
+          const waNum='88'+_registerPhone.replace(/[^0-9]/g,'');
+          const waMsg=encodeURIComponent(text);
+          setTimeout(()=>window.open('https://wa.me/'+waNum+'?text='+waMsg,'_blank'),800);
+        }
+      }
       catch(e){showToast('❌ কপি ব্যর্থ');}
     } else if(type==='collected'){
       // Mark all 9/10 uncollected important/urgent as collected
@@ -2132,7 +2248,7 @@ function daysSince(ds,ref){
     const d=parseInt(p[0]),m=MONTHS_UP.indexOf(p[1]),y=2000+parseInt(p[2]);
     if(isNaN(d)||m<0||isNaN(y))return null;
     const aDate=new Date(y,m,d),today=new Date();today.setHours(0,0,0,0);
-    const diff=Math.floor((today-aDate)/86400000);return diff>0?diff:null;
+    const diff=Math.floor((today-aDate)/86400000);return diff>=0?diff:null;
   }catch{return null;}
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2200);}
@@ -2161,6 +2277,8 @@ function cardHTML(app){
   const statusNum=parseInt((app.status||'').split('/')[0])||0;
   const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
   const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
+  const daysDisplay=days===0?'Today':days!==null?'Day:'+String(days).padStart(2,'0'):null;
+  const dayClass2=days===0?'day-count today-badge':(days!==null&&days>7?'day-count day-warn':days!==null?'day-count':'day-count');
   const daysCol=(isCol&&!isDelivered&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
@@ -2181,7 +2299,7 @@ function cardHTML(app){
   const notePreview=(!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()">${noteSVG}${noteVal}</div>`:'';
   const nameClick=`openNoteModal('${app.ref}');event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
-  const daySpan=days?`<span class="${dayClass}" onclick="openDayPopup('${app.ref}',${days},${s});event.stopPropagation()" style="cursor:pointer">Day:${String(days).padStart(2,'0')}</span>`:'';
+  const daySpan=daysDisplay!==null?`<span class="${dayClass}" onclick="openDayPopup('${app.ref}',${days||0},${s});event.stopPropagation()" style="cursor:pointer">${daysDisplay}</span>`:'';
   const colDaySpan=daysCol!==null?`<span class="day-collected">+${String(daysCol).padStart(2,'0')}d</span>`:'';
   const phoneTag=policeTags[app.ref]||'';
   const clientPhone=phoneTag&&clientPhones[phoneTag]?clientPhones[phoneTag]:'';
@@ -2325,6 +2443,7 @@ function render(){
   }
   if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
+  if(!_searchActive)buildTicker();
   document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
   document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
   const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));

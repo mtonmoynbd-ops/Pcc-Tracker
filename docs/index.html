@@ -1562,12 +1562,31 @@ function stagePressStart(e,ref){
   e.stopPropagation();
   const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.add('pressing');
   const isCol=collected[ref]||false,isFwd=forwarded[ref]||false;const stage=isCol?2:isFwd?1:0;
-  stageTimer[ref]=setTimeout(()=>{
+  const s=stars[ref]||0;
+  stageTimer[ref]=setTimeout(async()=>{
     if(btn)btn.classList.remove('pressing');
-    if(stage===0){forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];save();render();showToast('↑ Forwarded');}
-    else if(stage===1){const app=allApps.find(a=>a.ref===ref);collected[ref]=true;if(app)collectedDay[ref]=daysSince(app.apply_date,ref);collectedDate[ref]=todayStr();save();render();showToast('✅ Collected');}
+    if(stage===0){
+      // important/urgent → confirm before forwarding
+      if(s>0){const ok=await showConfirm('Forwarded করবেন?');if(!ok)return;}
+      forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];
+      // Send to register WhatsApp if set
+      const app=allApps.find(a=>a.ref===ref);
+      if(_registerPhone&&app){
+        const waNum='88'+_registerPhone.replace(/[^0-9]/g,'');
+        const msg=encodeURIComponent(app.name+' — '+app.ref);
+        setTimeout(()=>window.open('https://wa.me/'+waNum+'?text='+msg,'_blank'),500);
+      }
+      save();render();showToast('↑ Forwarded');
+    }
+    else if(stage===1){
+      if(s>0){const ok=await showConfirm('Collected করবেন?');if(!ok)return;}
+      const app=allApps.find(a=>a.ref===ref);
+      collected[ref]=true;
+      if(app){collectedDay[ref]=daysSince(app.apply_date,ref)||0;collectedDate[ref]=todayStr();}
+      save();render();showToast('✅ Collected');
+    }
     else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];delete collectedDate[ref];save();render();showToast('↺ Reset');}
-  },stage===2?2000:stage===3?3000:600);
+  },stage===2?2000:600);
 }
 function stagePressEnd(ref){clearTimeout(stageTimer[ref]);const btn=document.getElementById('sbtn-'+ref);if(btn)btn.classList.remove('pressing');}
 
@@ -1917,15 +1936,25 @@ function renderArchiveContent(){
   } else {
     let filtered=deletedAppsStore;
     if(archYearFilter){filtered=deletedAppsStore.filter(a=>{const p=(a.deletedDate||'').split('-');return p.length===3&&(2000+parseInt(p[2]))===archYearFilter;});}
+    if(archMonthFilter!==null){filtered=filtered.filter(a=>{const p=(a.deletedDate||'').split('-');if(p.length!==3)return false;const mo=MONTHS_UP.indexOf(p[1].toUpperCase());return mo===archMonthFilter;});}
     if(!filtered.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো মুছে ফেলা ফাইল নেই</div>';return;}
-    const byDate={};filtered.forEach(a=>{const k=a.deletedDate||'অজানা';if(!byDate[k])byDate[k]=[];byDate[k].push(a);});
-    el.innerHTML=Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,items])=>{
-      const copyStr=JSON.stringify(items).replace(/"/g,'&quot;');
+    // Group by month
+    const groups={};
+    filtered.forEach(a=>{
+      const p=(a.deletedDate||'').split('-');if(p.length!==3)return;
+      const mo=MONTHS_UP.indexOf(p[1].toUpperCase());if(mo<0)return;
+      const yr=2000+parseInt(p[2]);
+      const key=`${yr}-${String(mo).padStart(2,'0')}`;
+      if(!groups[key])groups[key]={label:MONTHS_SHORT[mo]+' '+yr,items:[]};
+      groups[key].items.push(a);
+    });
+    el.innerHTML=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([,g])=>{
+      const copyStr=JSON.stringify(g.items).replace(/"/g,'&quot;');
       return `<div class="arch-section">
-        <div class="arch-header"><span class="arch-month-label">🗑 ${date}</span>
+        <div class="arch-header"><span class="arch-month-label">🗑 ${g.label}</span>
           <button class="arch-copy-btn" onclick="copyArchText(this.getAttribute('data-items'))" data-items="${copyStr}">${copySVG} কপি</button></div>
-        <div class="arch-badges"><span class="arch-badge deleted">মুছে ফেলা ${items.length}</span></div>
-        <div class="arch-list">${items.map(a=>archItemHTML(a,'🗑')).join('')}</div>
+        <div class="arch-badges"><span class="arch-badge deleted">মুছে ফেলা ${g.items.length}</span></div>
+        <div class="arch-list">${g.items.map(a=>archItemHTML(a,'🗑')).join('')}</div>
       </div>`;
     }).join('');
   }
@@ -2213,13 +2242,17 @@ function filterPressStart(e,type){
       }
       catch(e){showToast('❌ কপি ব্যর্থ');}
     } else if(type==='collected'){
-      // Mark all 9/10 uncollected important/urgent as collected
       const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
       if(!files.length){showToast('📥 কোনো ফাইল নেই');return;}
       const ok=await showConfirm(files.length+'টি ফাইল একসাথে Collected করবেন?');
       if(!ok)return;
-      const today=new Date();
-      files.forEach(a=>{collected[a.ref]=true;collectedDay[a.ref]=0;collectedDate[a.ref]=today.toDateString();});
+      const today=todayStr();
+      files.forEach(a=>{
+        collected[a.ref]=true;
+        collectedDay[a.ref]=daysSince(a.apply_date,a.ref)||0;
+        collectedDate[a.ref]=today;
+        forwarded[a.ref]=true; // mark forwarded too if not already
+      });
       save();render();showToast('✅ '+files.length+'টি ফাইল Collected');
     }
   },600);

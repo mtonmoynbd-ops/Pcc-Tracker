@@ -400,8 +400,10 @@
   body.dusk .ticker-today-label { color:#a78bfa; }
   /* Glass themes: NO backdrop-filter on ticker-wrap — causes repaint jank on animated child.
      Use solid semi-transparent bg instead; scroll stays GPU-composited and smooth. */
-  body.glass .ticker-wrap { background:rgba(10,20,48,0.88);border-color:rgba(96,165,250,0.25); }
-  body.glass-light .ticker-wrap { background:rgba(230,238,255,0.92);border-color:#b6c8e8; }
+  /* Glass: ticker uses dark theme style — no blur/glass effect so rAF stays smooth */
+  body.glass .ticker-wrap { background:#0f1f3d !important;border-color:#1e3a5f !important;backdrop-filter:none !important; }
+  body.glass .ticker-scroll-area { contain:unset !important;isolation:unset !important; }
+  body.glass-light .ticker-wrap { background:#ffffff !important;border-color:#cbd5e1 !important;backdrop-filter:none !important; }
   body.glass-light .ticker-today-label { color:#1d4ed8; }
   .filter-row { display: flex; gap: 6px; margin-bottom: 6px; overflow-x: auto; padding-bottom: 2px; align-items: center; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
@@ -2339,20 +2341,17 @@ function buildTicker(){
     return '<span class="ticker-item"'+click+'>'+it.html+'</span>';
   }).join(sep)+sep+'<span style="display:inline-block;width:80px"></span>';
 
-  // 3 copies for bulletproof seamless loop.
-  // loopW = scrollWidth/3 = exact width of one copy.
-  // When _tickerX hits -loopW we snap back by +loopW → identical visual.
-  track.innerHTML=oneBlock+oneBlock+oneBlock;
+  // 3 copies. A zero-width sentinel between copy1 and copy2
+  // gives us copy1's exact pixel width via offsetLeft.
+  var sentinel='<span id="tkr-s" style="display:inline-block;width:0;overflow:hidden;flex-shrink:0"></span>';
+  track.innerHTML=oneBlock+sentinel+oneBlock+oneBlock;
 
-  // Triple rAF: glass theme blur can delay layout; wait 3 frames to be safe.
-  requestAnimationFrame(function(){
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        var loopW=Math.round(track.scrollWidth/3);
-        _startTickerScroll(loopW);
-      });
-    });
-  });
+  // Use setTimeout so even glass-theme blur layouts finish before we measure
+  setTimeout(function(){
+    var s=document.getElementById('tkr-s');
+    var loopW=s?Math.round(s.offsetLeft):Math.round(track.scrollWidth/3);
+    _startTickerScroll(loopW);
+  }, 120);
 }
 function normDate(d){
   // Normalize "21-MAY-26" to compare with today

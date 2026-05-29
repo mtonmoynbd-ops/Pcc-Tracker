@@ -382,9 +382,9 @@
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
   .ticker-wrap { display:flex;align-items:center;gap:0;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;height:36px;box-sizing:border-box;overflow:hidden; }
   .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;line-height:20px;margin-right:8px; }
-  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;display:flex;align-items:center; }
-  .ticker-track { display:inline-flex;align-items:center;white-space:nowrap;will-change:transform; }
-  @keyframes ticker-scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative; }
+  .ticker-track { position:absolute;left:0;top:0;height:20px;display:inline-flex;align-items:center;white-space:nowrap;will-change:transform; }
+  @keyframes ticker-scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
@@ -2218,11 +2218,13 @@ let _registerName=localStorage.getItem('pcc_register_name')||'';
 let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
 
 // ── Ticker JS scroll engine ───────────────────────────────────
-function _startTickerScroll(loopW){
+function _startTickerScroll(totalW){
+  // totalW = full scrollWidth (both copies)
+  // animation moves 0 → -50% = one copy width at 55px/s
   var track=document.getElementById('ticker-track');
   if(!track)return;
-  // speed: 55px/s
-  var dur=(loopW/55).toFixed(2);
+  var oneW=totalW/2;
+  var dur=(oneW/55).toFixed(2);
   track.style.animation='none';
   void track.offsetWidth;
   track.style.animation='ticker-scroll '+dur+'s linear infinite';
@@ -2327,10 +2329,10 @@ function buildTicker(){
   // At -50% the view is identical to 0% → perfect seamless loop.
   // No JS measurement needed — CSS handles it automatically.
   track.innerHTML=oneBlock+oneBlock;
-  // rAF ensures DOM painted before animation starts
   requestAnimationFrame(function(){
-    var loopW=track.scrollWidth/2;
-    _startTickerScroll(loopW);
+    requestAnimationFrame(function(){
+      _startTickerScroll(track.scrollWidth);
+    });
   });
 }
 function normDate(d){

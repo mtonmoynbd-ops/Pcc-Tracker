@@ -101,7 +101,7 @@
   body.dusk .note-modal-clear { background: #2d2640; border-color: rgba(139,92,246,0.25); color: #7c6fa0; }
   body.dusk .note-tpl-btn { background: #2d2640; border-color: rgba(139,92,246,0.25); color: #c4b5fd; font-size: 10px; }
   body.dusk .police-inline-tag { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.35); color: #c4b5fd; }
-  body.dusk .police-filter-pill { background: #2d2640; border-color: rgba(139,92,246,0.35); color: #c4b5fd; }
+  body.dusk .police-filter-pill { background: #1e2d45; border-color: rgba(96,165,250,0.3); color: #93c5fd; }
   body.dusk .police-filter-pill.active { background: rgba(139,92,246,0.25); color: #ede9fe; }
   body.dusk .ready-chip { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
   body.dusk .arch-tab { background: #211c2e; color: #9489b0; border-color: rgba(139,92,246,0.2); }
@@ -382,9 +382,10 @@
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
   .ticker-wrap { display:flex;align-items:center;gap:0;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;height:36px;box-sizing:border-box;overflow:hidden; }
   .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;line-height:20px;margin-right:8px; }
-  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative; }
-  /* rAF moves this via transform. translateZ(0) forces GPU layer = no jank */
-  .ticker-track { position:absolute;top:0;left:0;height:20px;display:inline-flex;align-items:center;white-space:nowrap;transform:translateX(9999px) translateZ(0);will-change:transform; }
+  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;display:flex;align-items:center; }
+  /* CSS animation — browser composites off main thread, smooth on all themes */
+  .ticker-track { display:inline-flex;align-items:center;white-space:nowrap;will-change:transform; }
+  @keyframes ticker-rtl { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
@@ -983,7 +984,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <div class="modal" id="police-filter-modal">
-  <div class="modal-box" style="width:calc(100vw - 24px);max-width:500px">
+  <div class="modal-box" style="width:calc(100vw - 20px);max-width:520px;padding:14px">
     <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client Filter<button class="modal-close" onclick="closePoliceFilterModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button></div>
     <div class="police-filter-list" id="police-filter-list"></div>
   </div>
@@ -1777,21 +1778,39 @@ function openTimelineModal(ref){
     const daysTxt=h.days!==null&&h.days>=0?`<span style="font-size:10px;color:#475569;margin-left:4px">(${h.days}d)</span>`:'';
     // Middle marker: show Forwarded or Collected badge if this entry matches
     let midBadge='';
-    if(fwdDateStr&&h.date===fwdDateStr){midBadge=`<span style="font-size:9px;background:#1e3a5f;color:#60a5fa;border-radius:4px;padding:1px 5px;margin:0 6px">📤 Fwd</span>`;}
-    if(colDateStr&&h.date===colDateStr){midBadge=`<span style="font-size:9px;background:#14291a;color:#4ade80;border-radius:4px;padding:1px 5px;margin:0 6px">📥 Col</span>`;}
+    if(fwdDateStr&&h.date===fwdDateStr){midBadge=`<span style="font-size:9px;background:#1e3a5f;color:#60a5fa;border-radius:4px;padding:1px 5px;margin:0 6px">Fwd</span>`;}
+    if(colDateStr&&h.date===colDateStr){midBadge=`<span style="font-size:9px;background:#14291a;color:#4ade80;border-radius:4px;padding:1px 5px;margin:0 6px">Col</span>`;}
     return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${cleaned}</span>${daysTxt}</div>${midBadge}<span class="timeline-date">${h.date}</span></div>`;
   }).join('');
-  // Always append standalone Forwarded / Collected rows
-  let extraRows='';
+  // Insert Forwarded row after status 2/10 entry, Collected after 9/10 entry
+  // Build final list with inserted rows
+  let listItems=document.getElementById('timeline-list').querySelectorAll('.timeline-item');
+  
+  // Forwarded standalone row (after the entry whose status starts with 2/ or 3/)
   if(forwarded[ref]){
     const fd=fwdDateStr||'—';
-    extraRows+='<div class="timeline-item" style="border-color:#1e3a5f;margin-top:4px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#60a5fa;flex-shrink:0"></div><span class="timeline-status" style="color:#60a5fa">📤 Forwarded</span></div><span class="timeline-date">'+fd+'</span></div>';
+    const fwdRow='<div class="timeline-item" style="background:rgba(30,58,95,0.3);border-color:#1e3a5f;padding-left:12px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:6px;height:6px;border-radius:50%;background:#60a5fa;flex-shrink:0"></div><span style="font-size:12px;color:#60a5fa;font-weight:600">Forwarded</span></div><span class="timeline-date">'+fd+'</span></div>';
+    // Find status 2 row to insert after
+    let inserted=false;
+    listItems.forEach(function(row){
+      const txt=row.querySelector('.timeline-status');
+      if(!inserted&&txt){const n=parseInt((txt.textContent||'').match(/\d+/)||[0]);if(n>=2&&n<=3){row.insertAdjacentHTML('afterend',fwdRow);inserted=true;}}
+    });
+    if(!inserted) document.getElementById('timeline-list').insertAdjacentHTML('beforeend',fwdRow);
   }
+
+  // Collected standalone row (after status 9/10 entry)
   if(collected[ref]||colDateStr){
     const cd=colDateStr||'—';
-    extraRows+='<div class="timeline-item" style="border-color:#14291a;margin-top:4px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#4ade80;flex-shrink:0"></div><span class="timeline-status" style="color:#4ade80">📥 Collected</span></div><span class="timeline-date">'+cd+'</span></div>';
+    const colRow='<div class="timeline-item" style="background:rgba(20,41,26,0.4);border-color:#14291a;padding-left:12px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0"></div><span style="font-size:12px;color:#4ade80;font-weight:600">Collected</span></div><span class="timeline-date">'+cd+'</span></div>';
+    let inserted2=false;
+    listItems=document.getElementById('timeline-list').querySelectorAll('.timeline-item');
+    listItems.forEach(function(row){
+      const txt=row.querySelector('.timeline-status');
+      if(!inserted2&&txt){const n=parseInt((txt.textContent||'').match(/\d+/)||[0]);if(n>=9){row.insertAdjacentHTML('afterend',colRow);inserted2=true;}}
+    });
+    if(!inserted2) document.getElementById('timeline-list').insertAdjacentHTML('beforeend',colRow);
   }
-  if(extraRows) document.getElementById('timeline-list').innerHTML+=extraRows;
 
   document.getElementById('timeline-modal').classList.add('open');
 }
@@ -2020,13 +2039,13 @@ function searchInArchive(q){
 // ── Police ────────────────────────────────────────────────
 function openPoliceFilterModal(){
   const list=document.getElementById('police-filter-list');
-  let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">';
-  html+='<span class="police-filter-pill police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)" style="grid-column:1/-1;text-align:center">সব ফাইল</span>';
+  let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%">';
+  html+='<span class="police-filter-pill police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)" style="grid-column:1/-1;text-align:center;font-size:12px;padding:8px">সব ফাইল</span>';
   clientNames.forEach(function(n){
-    const nSafe=n.replace(/'/g,"\\'");
+    const nSafe=n.replace(/'/g,"\'");
     const activeCount=getDisplayApps().filter(a=>policeTags[a.ref]===n&&!delivered[a.ref]).length;
-    const countBadge=activeCount?'<span style="background:#7c3aed;color:#fff;border-radius:10px;padding:0 5px;font-size:9px;margin-left:4px">'+activeCount+'</span>':'';
-    html+='<span class="police-filter-pill '+(activePoliceFilter===n?'active':'')+'" onclick="setPoliceFilter(\''+nSafe+'\')" style="display:flex;align-items:center;justify-content:space-between;gap:4px"><span>'+n+'</span>'+countBadge+'</span>';
+    const countBadge=activeCount?'<span style="background:#2563eb;color:#fff;border-radius:10px;padding:0 5px;font-size:9px;margin-left:4px">'+activeCount+'</span>':'';
+    html+='<span class="police-filter-pill '+(activePoliceFilter===n?'active':'')+'" onclick="setPoliceFilter(\''+nSafe+'\') " style="display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:12px;padding:8px 10px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n+'</span>'+countBadge+'</span>';
   });
   html+='</div>';
   if(!clientNames.length)html='<div style="color:#475569;font-size:12px;margin-top:8px">Add Clients বাটনে নাম যোগ করুন</div>';
@@ -2192,33 +2211,17 @@ let _registerName=localStorage.getItem('pcc_register_name')||'';
 let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
 
 // ── Ticker JS scroll engine ───────────────────────────────────
-var _tickerRAF=null;
-var _tickerX=0;
-var _tickerLoopW=0; // exact pixel width of ONE content block — loop resets by this
-var _tickerSpeed=50; // px/s
-var _tickerLast=null;
-
-function _tickerStep(ts){
-  if(_tickerLast===null){_tickerLast=ts;}
-  var dt=ts-_tickerLast;
-  _tickerLast=ts;
-  if(dt>80)dt=80; // cap — prevents jump after tab switch
-  _tickerX-=_tickerSpeed*(dt/1000);
-  // Seamless: when position passes -loopW, add loopW back (identical visual position)
-  if(_tickerLoopW>0 && _tickerX<=-_tickerLoopW){_tickerX+=_tickerLoopW;}
-  var track=document.getElementById('ticker-track');
-  if(track){track.style.transform='translateX('+Math.round(_tickerX)+'px) translateZ(0)';}
-  _tickerRAF=requestAnimationFrame(_tickerStep);
-}
-
+// CSS animation ticker — smooth on all themes, no rAF needed
 function _startTickerScroll(loopW){
-  if(_tickerRAF){cancelAnimationFrame(_tickerRAF);_tickerRAF=null;}
-  _tickerLoopW=loopW;
-  var area=document.getElementById('ticker-scroll-area');
-  var areaW=area?area.offsetWidth:200;
-  _tickerX=areaW; // enter from right edge
-  _tickerLast=null;
-  _tickerRAF=requestAnimationFrame(_tickerStep);
+  // loopW = pixel width of one block (track is doubled)
+  // duration: speed ~60px/s
+  var speed=60;
+  var dur=Math.max(8, Math.round(loopW/speed));
+  var track=document.getElementById('ticker-track');
+  if(!track)return;
+  track.style.animation='none';
+  void track.offsetWidth; // force reflow to restart cleanly
+  track.style.animation='ticker-rtl '+dur+'s linear infinite';
 }
 
 
@@ -2316,21 +2319,19 @@ function buildTicker(){
     return '<span class="ticker-item"'+click+'>'+it.html+'</span>';
   }).join(sep)+sep+'<span style="display:inline-block;width:80px"></span>';
 
-  // Build: one block + sentinel + two more copies.
-  // Sentinel span lets us measure block-1 width precisely via offsetLeft.
+  // 2 identical copies — CSS animates from 0 to -50% = seamless infinite loop
+  // Sentinel span measures exact width of block 1
   track.innerHTML=oneBlock
-    +'<span id="ticker-sentinel" style="display:inline-block;width:0;height:0;overflow:hidden"></span>'
-    +oneBlock+oneBlock;
-  track.style.transform='translateX(9999px) translateZ(0)'; // hide until measured
+    +'<span id="ticker-sentinel" style="display:inline-block;width:0;height:0;overflow:hidden;flex-shrink:0"></span>'
+    +oneBlock;
+  track.style.animation='none'; // reset before measuring
 
-  // Triple rAF: wait for layout + paint so offsetLeft is accurate
+  // Double rAF: ensure layout is complete before measuring
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        var sentinel=document.getElementById('ticker-sentinel');
-        var loopW=sentinel?sentinel.offsetLeft:track.scrollWidth/3;
-        _startTickerScroll(loopW);
-      });
+      var sentinel=document.getElementById('ticker-sentinel');
+      var loopW=sentinel?sentinel.offsetLeft:track.scrollWidth/2;
+      _startTickerScroll(loopW);
     });
   });
 }

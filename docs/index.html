@@ -382,9 +382,9 @@
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
   .ticker-wrap { display:flex;align-items:center;gap:0;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;height:36px;box-sizing:border-box;overflow:hidden; }
   .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;line-height:20px;margin-right:8px; }
-  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative;clip-path:inset(0); }
-  /* JS scrolls the track via translateX(x) translateY(-50%) */
-  .ticker-track { position:absolute;top:50%;left:0;transform:translateX(9999px) translateY(-50%);display:inline-flex;align-items:center;white-space:nowrap;will-change:transform; }
+  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative; }
+  /* rAF moves this via transform. translateZ(0) forces GPU layer = no jank */
+  .ticker-track { position:absolute;top:0;left:0;height:20px;display:inline-flex;align-items:center;white-space:nowrap;transform:translateX(9999px) translateZ(0);will-change:transform; }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
@@ -2175,31 +2175,33 @@ let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
 var _tickerRAF=null;
 var _tickerX=0;
 var _tickerHalfW=0;
-var _tickerSpeed=45; // px per second
+var _tickerSpeed=50; // px/s — comfortable reading speed
 var _tickerLast=null;
 
 function _tickerStep(ts){
-  if(!_tickerLast)_tickerLast=ts;
-  var dt=Math.min(ts-_tickerLast,100); // cap at 100ms to avoid jump after tab switch
+  if(_tickerLast===null){_tickerLast=ts;}
+  var dt=ts-_tickerLast;
   _tickerLast=ts;
+  // Cap dt to avoid big jump after tab switch / bg
+  if(dt>80)dt=80;
   _tickerX-=_tickerSpeed*(dt/1000);
-  // Seamless: when we've scrolled past the first half, reset to start
-  if(_tickerX<=-_tickerHalfW) _tickerX+=_tickerHalfW;
+  // Seamless loop: once we scroll the first copy off screen, snap back by exactly halfW
+  if(_tickerX<=-_tickerHalfW){_tickerX+=_tickerHalfW;}
   var track=document.getElementById('ticker-track');
-  if(track) track.style.transform='translateX('+_tickerX+'px) translateY(-50%)';
+  if(track){track.style.transform='translateX('+Math.round(_tickerX)+'px) translateZ(0)';}
   _tickerRAF=requestAnimationFrame(_tickerStep);
 }
 
 function _startTickerScroll(halfW){
   if(_tickerRAF){cancelAnimationFrame(_tickerRAF);_tickerRAF=null;}
-  _tickerHalfW=Math.max(halfW,10);
+  _tickerHalfW=halfW;
   var area=document.getElementById('ticker-scroll-area');
   var areaW=area?area.offsetWidth:200;
-  // Start just off the right edge so content enters from right, not suddenly appears
-  _tickerX=areaW+4;
+  _tickerX=areaW; // start just off right edge
   _tickerLast=null;
   _tickerRAF=requestAnimationFrame(_tickerStep);
 }
+
 
 function buildTicker(){
   var track=document.getElementById('ticker-track');
@@ -2275,28 +2277,30 @@ function buildTicker(){
     items.push({html:'📌 <span class="t-name" style="color:#fcd34d">'+calNotes[calKey].trim().substring(0,50)+'</span>',ref:null});
   }
 
-  // ── Build HTML ─────────────────────────────────────────────
+  // ── Build HTML ────────────────────────────────────────────
   var sep='<span class="ticker-sep">⬥</span>';
   var oneBlock;
   if(!items.length){
+    // Empty — pad with spaces so it still takes visible width and loops properly
     oneBlock='<span class="ticker-item" style="color:#64748b">📭 আজ কোনো আপডেট নেই</span>'
-             +sep+'<span style="display:inline-block;width:120px"></span>'+sep;
+             +sep+'<span style="display:inline-block;width:200px"></span>'+sep;
   } else {
     oneBlock=items.map(function(it){
       var r=it.ref?it.ref.replace(/\\/g,'\\\\').replace(/'/g,"\\'"):'';
       var click=r?' onclick="tickerScrollTo(\''+r+'\');event.stopPropagation()"':'';
       return '<span class="ticker-item"'+click+'>'+it.html+'</span>';
-    }).join(sep)+sep+'<span style="display:inline-block;width:80px"></span>';
+    }).join(sep)+sep+'<span style="display:inline-block;width:60px"></span>';
   }
 
-  // Double for seamless loop — scroll resets at halfW
-  track.innerHTML=oneBlock+oneBlock;
-  // Don't set transform here — keep hidden until rAF sets it from right edge
+  // THREE copies: guarantees seamless loop regardless of scroll-area width
+  // halfW = scrollWidth/3, loop snaps back by halfW when _tickerX <= -halfW
+  track.innerHTML=oneBlock+oneBlock+oneBlock;
+  track.style.transform='translateX(9999px) translateZ(0)'; // hide until measured
 
-  // Measure actual half-width after render (double rAF ensures layout is done)
+  // Double rAF: ensures browser has painted and scrollWidth is accurate
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
-      var halfW=track.scrollWidth/2;
+      var halfW=track.scrollWidth/3;
       _startTickerScroll(halfW);
     });
   });

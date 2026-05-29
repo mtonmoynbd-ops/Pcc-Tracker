@@ -398,11 +398,11 @@
   body.light .ticker-item .t-ref { color:#2563eb; }
   body.dusk .ticker-wrap { background:#211c2e;border-color:rgba(139,92,246,0.25); }
   body.dusk .ticker-today-label { color:#a78bfa; }
-  body.glass .ticker-wrap { background:rgba(15,31,61,0.5);backdrop-filter:blur(12px);border-color:rgba(96,165,250,0.2);isolation:isolate; }
-  body.glass-light .ticker-wrap { background:rgba(255,255,255,0.65);backdrop-filter:blur(8px);border-color:#cbd5e1;isolation:isolate; }
+  /* Glass themes: NO backdrop-filter on ticker-wrap — causes repaint jank on animated child.
+     Use solid semi-transparent bg instead; scroll stays GPU-composited and smooth. */
+  body.glass .ticker-wrap { background:rgba(10,20,48,0.88);border-color:rgba(96,165,250,0.25); }
+  body.glass-light .ticker-wrap { background:rgba(230,238,255,0.92);border-color:#b6c8e8; }
   body.glass-light .ticker-today-label { color:#1d4ed8; }
-  /* Glass: scroll-area gets its own GPU layer so blur doesn't repaint on each frame */
-  body.glass .ticker-scroll-area, body.glass-light .ticker-scroll-area { transform:translateZ(0);will-change:transform; }
   .filter-row { display: flex; gap: 6px; margin-bottom: 6px; overflow-x: auto; padding-bottom: 2px; align-items: center; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
@@ -983,7 +983,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <div class="modal" id="police-filter-modal">
-  <div class="modal-box">
+  <div class="modal-box" style="width:calc(100vw - 24px);max-width:500px">
     <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Client Filter<button class="modal-close" onclick="closePoliceFilterModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button></div>
     <div class="police-filter-list" id="police-filter-list"></div>
   </div>
@@ -1781,15 +1781,15 @@ function openTimelineModal(ref){
     if(colDateStr&&h.date===colDateStr){midBadge=`<span style="font-size:9px;background:#14291a;color:#4ade80;border-radius:4px;padding:1px 5px;margin:0 6px">📥 Col</span>`;}
     return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${cleaned}</span>${daysTxt}</div>${midBadge}<span class="timeline-date">${h.date}</span></div>`;
   }).join('');
-  // Standalone Forwarded/Collected rows if date not already in history
+  // Always append standalone Forwarded / Collected rows
   let extraRows='';
-  if(forwarded[ref]&&fwdDateStr){
-    const alreadyShown=histWithDuration.some(h=>h.date===fwdDateStr);
-    if(!alreadyShown) extraRows+='<div class="timeline-item" style="border-color:#1e3a5f"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#60a5fa;flex-shrink:0"></div><span class="timeline-status" style="color:#60a5fa">Forwarded</span></div><span style="font-size:9px;background:#1e3a5f;color:#60a5fa;border-radius:4px;padding:1px 5px;margin:0 6px">📤</span><span class="timeline-date">'+fwdDateStr+'</span></div>';
+  if(forwarded[ref]){
+    const fd=fwdDateStr||'—';
+    extraRows+='<div class="timeline-item" style="border-color:#1e3a5f;margin-top:4px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#60a5fa;flex-shrink:0"></div><span class="timeline-status" style="color:#60a5fa">📤 Forwarded</span></div><span class="timeline-date">'+fd+'</span></div>';
   }
-  if(colDateStr){
-    const alreadyShown2=histWithDuration.some(h=>h.date===colDateStr);
-    if(!alreadyShown2) extraRows+='<div class="timeline-item" style="border-color:#14291a"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#4ade80;flex-shrink:0"></div><span class="timeline-status" style="color:#4ade80">Collected</span></div><span style="font-size:9px;background:#14291a;color:#4ade80;border-radius:4px;padding:1px 5px;margin:0 6px">📥</span><span class="timeline-date">'+colDateStr+'</span></div>';
+  if(collected[ref]||colDateStr){
+    const cd=colDateStr||'—';
+    extraRows+='<div class="timeline-item" style="border-color:#14291a;margin-top:4px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#4ade80;flex-shrink:0"></div><span class="timeline-status" style="color:#4ade80">📥 Collected</span></div><span class="timeline-date">'+cd+'</span></div>';
   }
   if(extraRows) document.getElementById('timeline-list').innerHTML+=extraRows;
 
@@ -2041,12 +2041,11 @@ function renderClientModal(){
   if(!clientNames.length){list.innerHTML='<div style="font-size:12px;color:#475569;text-align:center;padding:12px">কোনো নাম নেই</div>';return;}
   var editArea=document.getElementById('client-edit-area');
   if(editArea)editArea.style.display='none';
+  list.style.cssText='';
   list.style.display='';
-  // Full-width 2-column grid
-  list.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:2px 0';
   list.innerHTML=clientNames.map(function(n){
-    const ph=clientPhones[n]?'<div style="font-size:10px;color:#94a3b8;margin-top:1px">'+clientPhones[n]+'</div>':'';
-    return '<div class="client-name-row" style="flex-direction:column;align-items:stretch;padding:8px 10px">'      +'<div style="display:flex;justify-content:space-between;align-items:center">'      +'<div style="flex:1;min-width:0"><div style="font-size:13px;color:#93c5fd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n+'</div>'+ph+'</div>'      +'<div style="display:flex;gap:4px;flex-shrink:0">'      +'<button data-edit="'+n+'" onclick="event.stopPropagation();editClient(this.dataset.edit)" style="background:#1e3a5f;border:1px solid #2d5a8e;color:#60a5fa;border-radius:5px;padding:3px 7px;font-size:11px;cursor:pointer">✏️</button>'      +'<button data-del="'+n+'" onclick="event.stopPropagation();deleteClientName(this.dataset.del)" style="background:#2d1b1b;border:1px solid #5a2d2d;color:#f87171;border-radius:5px;padding:3px 7px;font-size:11px;cursor:pointer">✕</button>'      +'</div></div></div>';
+    const ph=clientPhones[n]?'<div style="font-size:10px;color:#64748b;margin-top:1px">'+clientPhones[n]+'</div>':'';
+    return '<div class="client-name-row" style="flex-direction:column;align-items:stretch;padding:8px 10px">'      +'<div style="display:flex;justify-content:space-between;align-items:center">'      +'<div style="flex:1"><div style="font-size:13px;color:#c4b5fd">'+n+'</div>'+ph+'</div>'      +'<div style="display:flex;gap:6px;flex-shrink:0">'      +'<button data-edit="'+n+'" onclick="event.stopPropagation();editClient(this.dataset.edit)" style="background:#1e3a5f;border:1px solid #2d4f6c;color:#60a5fa;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer">✏️</button>'      +'<button data-del="'+n+'" onclick="event.stopPropagation();deleteClientName(this.dataset.del)" style="background:#2d1b1b;border:1px solid #5a2d2d;color:#f87171;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer">✕</button>'      +'</div></div></div>';
   }).join('');
 }
 function editClient(name){
@@ -2195,30 +2194,29 @@ let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
 // ── Ticker JS scroll engine ───────────────────────────────────
 var _tickerRAF=null;
 var _tickerX=0;
-var _tickerHalfW=0;
-var _tickerSpeed=50; // px/s — comfortable reading speed
+var _tickerLoopW=0; // exact pixel width of ONE content block — loop resets by this
+var _tickerSpeed=50; // px/s
 var _tickerLast=null;
 
 function _tickerStep(ts){
   if(_tickerLast===null){_tickerLast=ts;}
   var dt=ts-_tickerLast;
   _tickerLast=ts;
-  // Cap dt to avoid big jump after tab switch / bg
-  if(dt>80)dt=80;
+  if(dt>80)dt=80; // cap — prevents jump after tab switch
   _tickerX-=_tickerSpeed*(dt/1000);
-  // Seamless loop: once we scroll the first copy off screen, snap back by exactly halfW
-  if(_tickerX<=-_tickerHalfW){_tickerX+=_tickerHalfW;}
+  // Seamless: when position passes -loopW, add loopW back (identical visual position)
+  if(_tickerLoopW>0 && _tickerX<=-_tickerLoopW){_tickerX+=_tickerLoopW;}
   var track=document.getElementById('ticker-track');
   if(track){track.style.transform='translateX('+Math.round(_tickerX)+'px) translateZ(0)';}
   _tickerRAF=requestAnimationFrame(_tickerStep);
 }
 
-function _startTickerScroll(halfW){
+function _startTickerScroll(loopW){
   if(_tickerRAF){cancelAnimationFrame(_tickerRAF);_tickerRAF=null;}
-  _tickerHalfW=halfW;
+  _tickerLoopW=loopW;
   var area=document.getElementById('ticker-scroll-area');
   var areaW=area?area.offsetWidth:200;
-  _tickerX=areaW; // start just off right edge
+  _tickerX=areaW; // enter from right edge
   _tickerLast=null;
   _tickerRAF=requestAnimationFrame(_tickerStep);
 }
@@ -2318,16 +2316,21 @@ function buildTicker(){
     return '<span class="ticker-item"'+click+'>'+it.html+'</span>';
   }).join(sep)+sep+'<span style="display:inline-block;width:80px"></span>';
 
-  // THREE copies: guarantees seamless loop regardless of scroll-area width
-  // halfW = scrollWidth/3, loop snaps back by halfW when _tickerX <= -halfW
-  track.innerHTML=oneBlock+oneBlock+oneBlock;
+  // Build: one block + sentinel + two more copies.
+  // Sentinel span lets us measure block-1 width precisely via offsetLeft.
+  track.innerHTML=oneBlock
+    +'<span id="ticker-sentinel" style="display:inline-block;width:0;height:0;overflow:hidden"></span>'
+    +oneBlock+oneBlock;
   track.style.transform='translateX(9999px) translateZ(0)'; // hide until measured
 
-  // Double rAF: ensures browser has painted and scrollWidth is accurate
+  // Triple rAF: wait for layout + paint so offsetLeft is accurate
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
-      var halfW=track.scrollWidth/3;
-      _startTickerScroll(halfW);
+      requestAnimationFrame(function(){
+        var sentinel=document.getElementById('ticker-sentinel');
+        var loopW=sentinel?sentinel.offsetLeft:track.scrollWidth/3;
+        _startTickerScroll(loopW);
+      });
     });
   });
 }

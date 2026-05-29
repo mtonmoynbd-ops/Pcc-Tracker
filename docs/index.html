@@ -382,10 +382,10 @@
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
   .ticker-wrap { display:flex;align-items:center;gap:0;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;height:36px;box-sizing:border-box;overflow:hidden; }
   .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;line-height:20px;margin-right:8px; }
-  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;display:flex;align-items:center; }
-  /* CSS animation — browser composites off main thread, smooth on all themes */
-  .ticker-track { display:inline-flex;align-items:center;white-space:nowrap;will-change:transform; }
-  @keyframes ticker-rtl { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative; }
+  /* ticker-track: absolutely positioned so it can overflow and CSS anim works correctly */
+  .ticker-track { position:absolute;top:50%;left:0;transform:translateY(-50%);display:inline-flex;align-items:center;white-space:nowrap;will-change:transform; }
+  @keyframes ticker-rtl { 0%{transform:translateY(-50%) translateX(0)} 100%{transform:translateY(-50%) translateX(-50%)} }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
@@ -1777,39 +1777,45 @@ function openTimelineModal(ref){
     const cleaned=trimStatus(h.status);const n2=parseInt((h.status||'').split('/')[0])||0;const sc='s'+Math.min(n2,10);const color=clr[sc]||'#94a3b8';
     const daysTxt=h.days!==null&&h.days>=0?`<span style="font-size:10px;color:#475569;margin-left:4px">(${h.days}d)</span>`:'';
     // Middle marker: show Forwarded or Collected badge if this entry matches
-    let midBadge='';
-    if(fwdDateStr&&h.date===fwdDateStr){midBadge=`<span style="font-size:9px;background:#1e3a5f;color:#60a5fa;border-radius:4px;padding:1px 5px;margin:0 6px">Fwd</span>`;}
-    if(colDateStr&&h.date===colDateStr){midBadge=`<span style="font-size:9px;background:#14291a;color:#4ade80;border-radius:4px;padding:1px 5px;margin:0 6px">Col</span>`;}
-    return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${cleaned}</span>${daysTxt}</div>${midBadge}<span class="timeline-date">${h.date}</span></div>`;
+    return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${cleaned}</span>${daysTxt}</div><span class="timeline-date">${h.date}</span></div>`;
   }).join('');
-  // Insert Forwarded row after status 2/10 entry, Collected after 9/10 entry
-  // Build final list with inserted rows
-  let listItems=document.getElementById('timeline-list').querySelectorAll('.timeline-item');
-  
-  // Forwarded standalone row (after the entry whose status starts with 2/ or 3/)
+  // ── Standalone rows — same style as history rows ─────────
+  const tlist=document.getElementById('timeline-list');
+
+  // Forwarded: 📤 icon, after status 2/10 row, blue color
   if(forwarded[ref]){
     const fd=fwdDateStr||'—';
-    const fwdRow='<div class="timeline-item" style="background:rgba(30,58,95,0.3);border-color:#1e3a5f;padding-left:12px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:6px;height:6px;border-radius:50%;background:#60a5fa;flex-shrink:0"></div><span style="font-size:12px;color:#60a5fa;font-weight:600">Forwarded</span></div><span class="timeline-date">'+fd+'</span></div>';
-    // Find status 2 row to insert after
-    let inserted=false;
-    listItems.forEach(function(row){
+    const fwdRow='<div class="timeline-item" style="background:rgba(30,58,95,0.25);border-color:rgba(96,165,250,0.3)">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex:1">'+
+      '<div style="width:8px;height:8px;border-radius:50%;background:#60a5fa;flex-shrink:0"></div>'+
+      '<span class="timeline-status" style="color:#60a5fa">📤 Forwarded</span>'+
+      '</div><span class="timeline-date">'+fd+'</span></div>';
+    // Insert after status 2/10 row
+    let ins1=false;
+    tlist.querySelectorAll('.timeline-item').forEach(function(row){
+      if(ins1)return;
       const txt=row.querySelector('.timeline-status');
-      if(!inserted&&txt){const n=parseInt((txt.textContent||'').match(/\d+/)||[0]);if(n>=2&&n<=3){row.insertAdjacentHTML('afterend',fwdRow);inserted=true;}}
+      if(txt&&/^2\//.test(txt.textContent.trim())){row.insertAdjacentHTML('afterend',fwdRow);ins1=true;}
     });
-    if(!inserted) document.getElementById('timeline-list').insertAdjacentHTML('beforeend',fwdRow);
+    if(!ins1)tlist.insertAdjacentHTML('beforeend',fwdRow);
   }
 
-  // Collected standalone row (after status 9/10 entry)
+  // Collected: 📦 icon, after status 9/10 row, green color
   if(collected[ref]||colDateStr){
     const cd=colDateStr||'—';
-    const colRow='<div class="timeline-item" style="background:rgba(20,41,26,0.4);border-color:#14291a;padding-left:12px"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:6px;height:6px;border-radius:50%;background:#4ade80;flex-shrink:0"></div><span style="font-size:12px;color:#4ade80;font-weight:600">Collected</span></div><span class="timeline-date">'+cd+'</span></div>';
-    let inserted2=false;
-    listItems=document.getElementById('timeline-list').querySelectorAll('.timeline-item');
-    listItems.forEach(function(row){
+    const colRow='<div class="timeline-item" style="background:rgba(20,41,26,0.25);border-color:rgba(74,222,128,0.3)">'+
+      '<div style="display:flex;align-items:center;gap:8px;flex:1">'+
+      '<div style="width:8px;height:8px;border-radius:50%;background:#4ade80;flex-shrink:0"></div>'+
+      '<span class="timeline-status" style="color:#4ade80">📦 Collected</span>'+
+      '</div><span class="timeline-date">'+cd+'</span></div>';
+    // Insert after status 9/10 row
+    let ins2=false;
+    tlist.querySelectorAll('.timeline-item').forEach(function(row){
+      if(ins2)return;
       const txt=row.querySelector('.timeline-status');
-      if(!inserted2&&txt){const n=parseInt((txt.textContent||'').match(/\d+/)||[0]);if(n>=9){row.insertAdjacentHTML('afterend',colRow);inserted2=true;}}
+      if(txt&&/^9\//.test(txt.textContent.trim())){row.insertAdjacentHTML('afterend',colRow);ins2=true;}
     });
-    if(!inserted2) document.getElementById('timeline-list').insertAdjacentHTML('beforeend',colRow);
+    if(!ins2)tlist.insertAdjacentHTML('beforeend',colRow);
   }
 
   document.getElementById('timeline-modal').classList.add('open');
@@ -2213,14 +2219,12 @@ let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
 // ── Ticker JS scroll engine ───────────────────────────────────
 // CSS animation ticker — smooth on all themes, no rAF needed
 function _startTickerScroll(loopW){
-  // loopW = pixel width of one block (track is doubled)
-  // duration: speed ~60px/s
-  var speed=60;
+  var speed=55; // px/s
   var dur=Math.max(8, Math.round(loopW/speed));
   var track=document.getElementById('ticker-track');
   if(!track)return;
   track.style.animation='none';
-  void track.offsetWidth; // force reflow to restart cleanly
+  void track.offsetWidth;
   track.style.animation='ticker-rtl '+dur+'s linear infinite';
 }
 
@@ -2326,11 +2330,11 @@ function buildTicker(){
     +oneBlock;
   track.style.animation='none'; // reset before measuring
 
-  // Double rAF: ensure layout is complete before measuring
+  // Double rAF: layout complete, then measure
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
-      var sentinel=document.getElementById('ticker-sentinel');
-      var loopW=sentinel?sentinel.offsetLeft:track.scrollWidth/2;
+      // scrollWidth/2 because track has 2 identical copies
+      var loopW=track.scrollWidth/2;
       _startTickerScroll(loopW);
     });
   });
@@ -2666,8 +2670,11 @@ function render(){
   if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
   if(!_searchActive)buildTicker();
-  document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
-  document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
+  // Live count: currently active urgent/important (not delivered)
+  const liveUrgent=getDisplayApps().filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2).length;
+  const liveImportant=getDisplayApps().filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1).length;
+  document.getElementById('cnt-urgent').textContent=String(liveUrgent).padStart(2,'0');
+  document.getElementById('cnt-important').textContent=String(liveImportant).padStart(2,'0');
   const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));
   const draftBtn=document.getElementById('draft-btn');
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}

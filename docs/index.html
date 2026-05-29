@@ -398,9 +398,11 @@
   body.light .ticker-item .t-ref { color:#2563eb; }
   body.dusk .ticker-wrap { background:#211c2e;border-color:rgba(139,92,246,0.25); }
   body.dusk .ticker-today-label { color:#a78bfa; }
-  body.glass .ticker-wrap { background:rgba(15,31,61,0.5);backdrop-filter:blur(12px);border-color:rgba(96,165,250,0.2); }
-  body.glass-light .ticker-wrap { background:rgba(255,255,255,0.65);backdrop-filter:blur(8px);border-color:#cbd5e1; }
+  body.glass .ticker-wrap { background:rgba(15,31,61,0.5);backdrop-filter:blur(12px);border-color:rgba(96,165,250,0.2);isolation:isolate; }
+  body.glass-light .ticker-wrap { background:rgba(255,255,255,0.65);backdrop-filter:blur(8px);border-color:#cbd5e1;isolation:isolate; }
   body.glass-light .ticker-today-label { color:#1d4ed8; }
+  /* Glass: scroll-area gets its own GPU layer so blur doesn't repaint on each frame */
+  body.glass .ticker-scroll-area, body.glass-light .ticker-scroll-area { transform:translateZ(0);will-change:transform; }
   .filter-row { display: flex; gap: 6px; margin-bottom: 6px; overflow-x: auto; padding-bottom: 2px; align-items: center; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
@@ -2279,18 +2281,23 @@ function buildTicker(){
 
   // ── Build HTML ────────────────────────────────────────────
   var sep='<span class="ticker-sep">⬥</span>';
-  var oneBlock;
-  if(!items.length){
-    // Empty — pad with spaces so it still takes visible width and loops properly
-    oneBlock='<span class="ticker-item" style="color:#64748b">📭 আজ কোনো আপডেট নেই</span>'
-             +sep+'<span style="display:inline-block;width:200px"></span>'+sep;
-  } else {
-    oneBlock=items.map(function(it){
-      var r=it.ref?it.ref.replace(/\\/g,'\\\\').replace(/'/g,"\\'"):'';
-      var click=r?' onclick="tickerScrollTo(\''+r+'\');event.stopPropagation()"':'';
-      return '<span class="ticker-item"'+click+'>'+it.html+'</span>';
-    }).join(sep)+sep+'<span style="display:inline-block;width:60px"></span>';
+
+  // fileItems = আজকের file-related updates (apps/drafts/status changes)
+  // nonFileItems = holiday / calNote (always show)
+  var fileItems=items.filter(function(it){return it.ref;});
+  var nonFileItems=items.filter(function(it){return !it.ref;});
+
+  // If no file updates today → add "কোনো ফাইল আপডেট নেই" message
+  if(!fileItems.length){
+    items.unshift({html:'📭 <span style="color:#64748b">আজ কোনো ফাইল আপডেট নেই</span>',ref:null});
   }
+
+  var oneBlock;
+  oneBlock=items.map(function(it){
+    var r=it.ref?it.ref.replace(/\\/g,'\\\\').replace(/'/g,"\\'"):'';
+    var click=r?' onclick="tickerScrollTo(\''+r+'\');event.stopPropagation()"':'';
+    return '<span class="ticker-item"'+click+'>'+it.html+'</span>';
+  }).join(sep)+sep+'<span style="display:inline-block;width:80px"></span>';
 
   // THREE copies: guarantees seamless loop regardless of scroll-area width
   // halfW = scrollWidth/3, loop snaps back by halfW when _tickerX <= -halfW

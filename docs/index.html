@@ -489,6 +489,8 @@
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 18px; width: calc(100vw - 32px); max-width: 360px; max-height: 82vh; overflow-y: auto; box-sizing: border-box; }
   .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .modal-close { background: none; border: none; color: #64748b; font-size: 20px; cursor: pointer; flex-shrink: 0; }
+  .modal-close svg { animation: home-blink 2s ease-in-out infinite; }
+  @keyframes home-blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
   .count-top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
   .adj-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .adj-num { font-size: 18px; font-weight: 700; min-width: 28px; text-align: center; flex-shrink: 0; }
@@ -565,8 +567,8 @@
   .client-add-input { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; }
   .client-add-btn { background: #7c3aed; border: none; color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
   .client-name-list { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
-  .client-name-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; border-radius: 8px; padding: 10px 14px; }
-  .client-name-row span { font-size: 13px; color: #c4b5fd; }
+  .client-name-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; border-radius: 8px; padding: 10px 14px; border:1px solid #2a3a52; }
+  .client-name-row span { font-size: 13px; color: #93c5fd; }
   .client-del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 18px; }
   .pick-item { background: #1e293b; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #c4b5fd; cursor: pointer; border: 1px solid #334155; margin-bottom: 6px; }
   .pick-item.active-pick { background: #2d1f5e; border-color: #7c3aed; }
@@ -988,7 +990,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <div class="modal" id="client-modal">
-  <div class="modal-box">
+  <div class="modal-box" style="width:calc(100vw - 24px);max-width:500px">
     <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg> Add Clients<button class="modal-close" onclick="closeClientModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button></div>
     <div class="client-add-row">
       <input class="client-add-input" id="client-add-input" type="text" placeholder="ক্লায়েন্ট নাম..." onkeydown="if(event.key===&#39;Enter&#39;)document.getElementById(&#39;client-add-phone&#39;).focus()">
@@ -1052,7 +1054,6 @@ if('serviceWorker' in navigator){
     </div>
     <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-top:4px">
       <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">📋 রেজিস্টার</div>
-      <div style="font-size:11px;color:#64748b;margin-bottom:8px">অপেক্ষমান ফাইল long press করলে এই নম্বরে WhatsApp খুলবে।</div>
       <input class="settings-input" id="reg-name-input" placeholder="রেজিস্টারের নাম..." style="margin-bottom:6px">
       <input class="settings-input" id="reg-phone-input" placeholder="ফোন নম্বর (01xxxxxxxxx)...">
       <button class="settings-save-btn" onclick="saveRegister()" style="margin-top:8px">রেজিস্টার সেভ করুন</button>
@@ -1764,11 +1765,34 @@ function openTimelineModal(ref){
     }
     return{...h,days};
   });
+  // Middle column: forwarded & collected date markers
+  // forwarded date: look for latest statusHistory entry that is forwarded-type
+  let fwdDateStr='';
+  const fwdHistEntry=hist.slice().reverse().find(h=>{const n=parseInt((h.status||'').split('/')[0])||0;return n>=3&&n<=5;});
+  if(forwarded[ref]&&fwdHistEntry&&fwdHistEntry.date)fwdDateStr=fwdHistEntry.date;
+  const colDateStr=collectedDate[ref]||'';
+
   document.getElementById('timeline-list').innerHTML=histWithDuration.map(h=>{
     const cleaned=trimStatus(h.status);const n2=parseInt((h.status||'').split('/')[0])||0;const sc='s'+Math.min(n2,10);const color=clr[sc]||'#94a3b8';
     const daysTxt=h.days!==null&&h.days>=0?`<span style="font-size:10px;color:#475569;margin-left:4px">(${h.days}d)</span>`:'';
-    return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${cleaned}</span>${daysTxt}</div><span class="timeline-date">${h.date}</span></div>`;
+    // Middle marker: show Forwarded or Collected badge if this entry matches
+    let midBadge='';
+    if(fwdDateStr&&h.date===fwdDateStr){midBadge=`<span style="font-size:9px;background:#1e3a5f;color:#60a5fa;border-radius:4px;padding:1px 5px;margin:0 6px">📤 Fwd</span>`;}
+    if(colDateStr&&h.date===colDateStr){midBadge=`<span style="font-size:9px;background:#14291a;color:#4ade80;border-radius:4px;padding:1px 5px;margin:0 6px">📥 Col</span>`;}
+    return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${cleaned}</span>${daysTxt}</div>${midBadge}<span class="timeline-date">${h.date}</span></div>`;
   }).join('');
+  // Standalone Forwarded/Collected rows if date not already in history
+  let extraRows='';
+  if(forwarded[ref]&&fwdDateStr){
+    const alreadyShown=histWithDuration.some(h=>h.date===fwdDateStr);
+    if(!alreadyShown) extraRows+='<div class="timeline-item" style="border-color:#1e3a5f"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#60a5fa;flex-shrink:0"></div><span class="timeline-status" style="color:#60a5fa">Forwarded</span></div><span style="font-size:9px;background:#1e3a5f;color:#60a5fa;border-radius:4px;padding:1px 5px;margin:0 6px">📤</span><span class="timeline-date">'+fwdDateStr+'</span></div>';
+  }
+  if(colDateStr){
+    const alreadyShown2=histWithDuration.some(h=>h.date===colDateStr);
+    if(!alreadyShown2) extraRows+='<div class="timeline-item" style="border-color:#14291a"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#4ade80;flex-shrink:0"></div><span class="timeline-status" style="color:#4ade80">Collected</span></div><span style="font-size:9px;background:#14291a;color:#4ade80;border-radius:4px;padding:1px 5px;margin:0 6px">📥</span><span class="timeline-date">'+colDateStr+'</span></div>';
+  }
+  if(extraRows) document.getElementById('timeline-list').innerHTML+=extraRows;
+
   document.getElementById('timeline-modal').classList.add('open');
 }
 function closeTimelineModal(){document.getElementById('timeline-modal').classList.remove('open');}
@@ -2018,18 +2042,13 @@ function renderClientModal(){
   var editArea=document.getElementById('client-edit-area');
   if(editArea)editArea.style.display='none';
   list.style.display='';
+  // Full-width 2-column grid
+  list.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:2px 0';
   list.innerHTML=clientNames.map(function(n){
-    const ph=clientPhones[n]?'<div style="font-size:10px;color:#64748b;margin-top:1px">'+clientPhones[n]+'</div>':'';
-    return '<div class="client-name-row" style="flex-direction:column;align-items:stretch;padding:8px 10px">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center">'
-      +'<div style="flex:1"><div style="font-size:13px;color:#c4b5fd">'+n+'</div>'+ph+'</div>'
-      +'<div style="display:flex;gap:6px;flex-shrink:0">'
-      +'<button data-edit="'+n+'" onclick="event.stopPropagation();editClient(this.dataset.edit)" style="background:#1e3a5f;border:1px solid #2563eb;color:#60a5fa;padding:3px 8px;border-radius:6px;font-size:11px;cursor:pointer">✏️</button>'
-      +'<button class="client-del-btn" data-del="'+n+'" onclick="event.stopPropagation();deleteClientName(this.dataset.del)">×</button>'
-      +'</div></div></div>';
+    const ph=clientPhones[n]?'<div style="font-size:10px;color:#94a3b8;margin-top:1px">'+clientPhones[n]+'</div>':'';
+    return '<div class="client-name-row" style="flex-direction:column;align-items:stretch;padding:8px 10px">'      +'<div style="display:flex;justify-content:space-between;align-items:center">'      +'<div style="flex:1;min-width:0"><div style="font-size:13px;color:#93c5fd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n+'</div>'+ph+'</div>'      +'<div style="display:flex;gap:4px;flex-shrink:0">'      +'<button data-edit="'+n+'" onclick="event.stopPropagation();editClient(this.dataset.edit)" style="background:#1e3a5f;border:1px solid #2d5a8e;color:#60a5fa;border-radius:5px;padding:3px 7px;font-size:11px;cursor:pointer">✏️</button>'      +'<button data-del="'+n+'" onclick="event.stopPropagation();deleteClientName(this.dataset.del)" style="background:#2d1b1b;border:1px solid #5a2d2d;color:#f87171;border-radius:5px;padding:3px 7px;font-size:11px;cursor:pointer">✕</button>'      +'</div></div></div>';
   }).join('');
 }
-let editingClientOldName='';
 function editClient(name){
   editingClientOldName=name;
   const list=document.getElementById('client-name-list');

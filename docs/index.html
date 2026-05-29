@@ -380,12 +380,11 @@
   .counts { text-align: right; font-size: 11px; line-height: 1.7; font-weight: 700; }
   .counts .urgent { color: #ef4444; cursor: pointer; white-space: nowrap; }
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
-  .ticker-wrap { display:flex;align-items:center;gap:6px;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;cursor:pointer;overflow:hidden;height:36px;box-sizing:border-box; }
-  .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap; }
-  .ticker-scroll-area { flex:1;overflow:hidden;position:relative;height:20px; }
-  .ticker-track { display:flex;gap:24px;animation:ticker-move 20s linear infinite;white-space:nowrap;position:absolute;top:0;left:0; }
-  .ticker-track:empty::before { content:'আজ কোনো নতুন আবেদন নেই';font-size:12px;color:#475569; }
-  @keyframes ticker-move { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .ticker-wrap { display:flex;align-items:center;gap:6px;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;overflow:hidden;height:36px;box-sizing:border-box; }
+  .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;line-height:1;display:flex;align-items:center; }
+  .ticker-scroll-area { flex:1;overflow:hidden;position:relative;height:20px;display:flex;align-items:center; }
+  .ticker-track { display:inline-flex;gap:32px;white-space:nowrap;position:absolute;top:50%;transform:translateY(-50%); }
+  @keyframes ticker-scroll { 0%{left:100%} 100%{left:-100%} }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
@@ -739,6 +738,12 @@
   .expand-toggle.open{background:rgba(250,204,21,0.6);height:2px}
   .loading{text-align:center;padding:40px;color:#475569}
   #toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+  /* Search-in-ticker mode */
+  .ticker-wrap.search-mode { cursor:text; }
+  .ticker-wrap.search-mode .ticker-scroll-area { display:none; }
+  #search-bar { caret-color:#60a5fa; }
+  body.light #search-bar { color:#1e293b; }
+  body.dusk #search-bar { color:#e8e0f0; }
 </style>
 </head>
 <body>
@@ -782,14 +787,14 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
-<div class="ticker-wrap" id="ticker-wrap" onclick="activateSearch()">
-  <span class="ticker-today-label">Today:</span>
-  <div class="ticker-scroll-area" id="ticker-scroll-area">
+<div class="ticker-wrap" id="ticker-wrap">
+  <span class="ticker-today-label" id="ticker-today-lbl">Today:</span>
+  <div class="ticker-scroll-area" id="ticker-scroll-area" onclick="activateSearch()">
     <div class="ticker-track" id="ticker-track"></div>
   </div>
-  <span class="ticker-search-icon" id="ticker-search-icon">🔍</span>
+  <input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম, Ref বা ফোন..." oninput="render();if(!this.value)deactivateSearch();" onblur="deactivateSearch()" onkeydown="if(event.key==='Escape'){this.value='';render();deactivateSearch();}" style="display:none;flex:1;margin:0;border:none;background:transparent;outline:none;font-size:12px;color:inherit;padding:0 4px;">
+  <span class="ticker-search-icon" id="ticker-search-icon" onclick="activateSearch()">🔍</span>
 </div>
-<input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম, Ref বা ফোন..." oninput="render()" onblur="deactivateSearch()" style="display:none">
 
 <div class="filter-row">
   <button class="filter-btn" id="draft-btn" onclick="toggleFilter(&#39;draft&#39;,this)">Draft</button>
@@ -2169,15 +2174,64 @@ let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
 function buildTicker(){
   const track=document.getElementById('ticker-track');
   if(!track)return;
-  const todayStr=todayDateStr();
-  const todayApps=allApps.filter(a=>a.apply_date&&normDate(a.apply_date)===todayStr);
-  if(!todayApps.length){track.innerHTML='<span style="font-size:12px;color:#475569">আজ কোনো নতুন আবেদন নেই</span>';return;}
-  // Duplicate for seamless loop
-  const items=todayApps.map(a=>`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()"><span class="t-name">${a.name}</span> <span class="t-ref">${a.ref}</span></span>`).join('');
-  track.innerHTML=items+items; // double for seamless
-  // Set animation duration based on count
-  const dur=Math.max(15,todayApps.length*5);
-  track.style.animationDuration=dur+'s';
+  const tds=todayDateStr();
+  const items=[];
+
+  // ① আজকের নতুন আবেদন
+  allApps.filter(a=>a.apply_date&&normDate(a.apply_date)===tds).forEach(a=>{
+    items.push(`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()">📋 <span class="t-name">${a.name}</span> <span class="t-ref">${a.ref}</span></span>`);
+  });
+
+  // ② আজকের Draft ফাইল
+  allApps.filter(a=>{const s=(a.status||'').toLowerCase();return s.includes('draft')&&a.apply_date&&normDate(a.apply_date)===tds;}).forEach(a=>{
+    items.push(`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()">✏️ Draft: <span class="t-name">${a.name}</span></span>`);
+  });
+
+  // ③ Urgent ফাইল (star2)
+  allApps.filter(a=>(stars[a.ref]||0)===2&&!delivered[a.ref]).forEach(a=>{
+    items.push(`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()" style="color:#ef4444">🔴 Urgent: <span class="t-name" style="color:#fca5a5">${a.name}</span> <span class="t-ref" style="color:#f87171">${a.ref}</span></span>`);
+  });
+
+  // ④ Important ফাইল (star1) — স্ট্যাটাস সহ
+  allApps.filter(a=>(stars[a.ref]||0)===1&&!delivered[a.ref]).forEach(a=>{
+    const st=trimStatus(a.status||'');
+    items.push(`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()" style="color:#f59e0b">⭐ <span class="t-name" style="color:#fcd34d">${a.name}</span>${st?` <span class="t-ref" style="color:#f59e0b">[${st}]</span>`:''}</span>`);
+  });
+
+  // ⑤ আজকের ছুটি (ক্যালেন্ডার থেকে)
+  const todayFull=new Date();
+  const dd=String(todayFull.getDate()).padStart(2,'0');
+  const mon=MONTHS_SHORT[todayFull.getMonth()];
+  const yy=String(todayFull.getFullYear()).slice(2);
+  const hKey=`${dd}-${mon}-${yy}`;
+  const holiday=getHoliday(hKey);
+  if(holiday){
+    const icon=holiday.type==='public'?'🟠':'🟣';
+    items.push(`<span class="ticker-item" style="color:${holiday.type==='public'?'#fb923c':'#a78bfa'}">${icon} আজ ছুটি: <span class="t-name" style="color:${holiday.type==='public'?'#fdba74':'#c4b5fd'}">${holiday.name}</span></span>`);
+  }
+
+  // ⑥ আজকের calNotes (ক্যালেন্ডার নোট)
+  const calKey=`${String(todayFull.getFullYear())}-${String(todayFull.getMonth()+1).padStart(2,'0')}-${dd}`;
+  const calNote=calNotes[calKey];
+  if(calNote&&calNote.trim()){
+    items.push(`<span class="ticker-item" style="color:#fbbf24">📌 <span class="t-name" style="color:#fcd34d">${calNote.trim().substring(0,40)}</span></span>`);
+  }
+
+  if(!items.length){
+    track.innerHTML='<span style="font-size:12px;color:#475569">আজ কোনো আপডেট নেই</span>';
+    track.style.animation='none';
+    return;
+  }
+
+  // Duplicate items for seamless infinite right-to-left scroll
+  const joined=items.join('<span style="color:#334155;margin:0 8px">•</span>');
+  track.innerHTML=joined+'<span style="padding:0 40px"></span>'+joined;
+  // Duration based on item count — faster speed
+  const dur=Math.max(10,items.length*4);
+  track.style.left='100%';
+  track.style.animation='none';
+  void track.offsetWidth; // force reflow
+  track.style.animation=`ticker-scroll ${dur}s linear infinite`;
 }
 function normDate(d){
   // Normalize "21-MAY-26" to compare with today
@@ -2200,16 +2254,23 @@ function tickerClick(ref){
 }
 function activateSearch(){
   _searchActive=true;
-  document.getElementById('ticker-wrap').style.display='none';
+  const wrap=document.getElementById('ticker-wrap');
   const sb=document.getElementById('search-bar');
+  const lbl=document.getElementById('ticker-today-lbl');
+  wrap.classList.add('search-mode');
+  if(lbl)lbl.style.display='none';
   sb.style.display='block';
   setTimeout(()=>sb.focus(),50);
 }
 function deactivateSearch(){
   if(document.getElementById('search-bar').value)return;
   _searchActive=false;
-  document.getElementById('ticker-wrap').style.display='flex';
-  document.getElementById('search-bar').style.display='none';
+  const wrap=document.getElementById('ticker-wrap');
+  const sb=document.getElementById('search-bar');
+  const lbl=document.getElementById('ticker-today-lbl');
+  wrap.classList.remove('search-mode');
+  if(lbl)lbl.style.display='';
+  sb.style.display='none';
 }
 
 function saveRegister(){

@@ -381,14 +381,16 @@
   .counts .urgent { color: #ef4444; cursor: pointer; white-space: nowrap; }
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
   .ticker-wrap { display:flex;align-items:center;gap:6px;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;overflow:hidden;height:36px;box-sizing:border-box; }
-  .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;line-height:1;display:flex;align-items:center; }
-  .ticker-scroll-area { flex:1;overflow:hidden;position:relative;height:20px;display:flex;align-items:center; }
-  .ticker-track { display:inline-flex;gap:32px;white-space:nowrap;position:absolute;top:50%;transform:translateY(-50%); }
-  @keyframes ticker-scroll { 0%{left:100%} 100%{left:-100%} }
+  .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;display:flex;align-items:center;line-height:20px; }
+  .ticker-scroll-area { flex:1;overflow:hidden;height:20px;cursor:pointer; }
+  /* ticker-track is inline-flex doubled — translateX 0 to -50% = seamless loop */
+  .ticker-track { display:inline-flex;align-items:center;height:20px;white-space:nowrap;will-change:transform; }
+  @keyframes ticker-rtl { from{transform:translateX(0)} to{transform:translateX(-50%)} }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
   .ticker-item .t-ref { color:#60a5fa;font-size:10px; }
+  .ticker-sep { color:#334155;padding:0 14px;flex-shrink:0; }
   .ticker-search-icon { font-size:14px;flex-shrink:0;cursor:pointer; }
   body.light .ticker-wrap { background:#ffffff;border-color:#cbd5e1; }
   body.light .ticker-today-label { color:#1d4ed8; }
@@ -2177,61 +2179,77 @@ function buildTicker(){
   const tds=todayDateStr();
   const items=[];
 
-  // ① আজকের নতুন আবেদন
-  allApps.filter(a=>a.apply_date&&normDate(a.apply_date)===tds).forEach(a=>{
-    items.push(`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()">📋 <span class="t-name">${a.name}</span> <span class="t-ref">${a.ref}</span></span>`);
+  // 1 today new apps (non-draft)
+  allApps.filter(function(a){
+    if(!a.apply_date||normDate(a.apply_date)!==tds)return false;
+    return !(a.status||'').toLowerCase().includes('draft');
+  }).forEach(function(a){
+    var ref=a.ref.replace(/'/g,"\\'");
+    items.push('<span class="ticker-item" onclick="tickerScrollTo(\''+ref+'\');event.stopPropagation()">📋 <span class="t-name">'+a.name+'</span> <span class="t-ref">'+a.ref+'</span></span>');
   });
 
-  // ② আজকের Draft ফাইল
-  allApps.filter(a=>{const s=(a.status||'').toLowerCase();return s.includes('draft')&&a.apply_date&&normDate(a.apply_date)===tds;}).forEach(a=>{
-    items.push(`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()">✏️ Draft: <span class="t-name">${a.name}</span></span>`);
+  // 2 today draft
+  allApps.filter(function(a){
+    var s=(a.status||'').toLowerCase();
+    return s.includes('draft')&&a.apply_date&&normDate(a.apply_date)===tds;
+  }).forEach(function(a){
+    var ref=a.ref.replace(/'/g,"\\'");
+    items.push('<span class="ticker-item" onclick="tickerScrollTo(\''+ref+'\');event.stopPropagation()">✏️ Draft: <span class="t-name">'+a.name+'</span> <span class="t-ref">'+a.ref+'</span></span>');
   });
 
-  // ③ Urgent ফাইল (star2)
-  allApps.filter(a=>(stars[a.ref]||0)===2&&!delivered[a.ref]).forEach(a=>{
-    items.push(`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()" style="color:#ef4444">🔴 Urgent: <span class="t-name" style="color:#fca5a5">${a.name}</span> <span class="t-ref" style="color:#f87171">${a.ref}</span></span>`);
+  // 3 urgent star2
+  allApps.filter(function(a){return (stars[a.ref]||0)===2&&!delivered[a.ref];}).forEach(function(a){
+    var ref=a.ref.replace(/'/g,"\\'");
+    items.push('<span class="ticker-item" onclick="tickerScrollTo(\''+ref+'\');event.stopPropagation()">🔴 <span class="t-name" style="color:#fca5a5">'+a.name+'</span> <span class="t-ref" style="color:#f87171">'+a.ref+'</span></span>');
   });
 
-  // ④ Important ফাইল (star1) — স্ট্যাটাস সহ
-  allApps.filter(a=>(stars[a.ref]||0)===1&&!delivered[a.ref]).forEach(a=>{
-    const st=trimStatus(a.status||'');
-    items.push(`<span class="ticker-item" onclick="tickerClick('${a.ref}');event.stopPropagation()" style="color:#f59e0b">⭐ <span class="t-name" style="color:#fcd34d">${a.name}</span>${st?` <span class="t-ref" style="color:#f59e0b">[${st}]</span>`:''}</span>`);
+  // 4 important star1
+  allApps.filter(function(a){return (stars[a.ref]||0)===1&&!delivered[a.ref];}).forEach(function(a){
+    var ref=a.ref.replace(/'/g,"\\'");
+    var st=trimStatus(a.status||'');
+    items.push('<span class="ticker-item" onclick="tickerScrollTo(\''+ref+'\');event.stopPropagation()">⭐ <span class="t-name" style="color:#fcd34d">'+a.name+'</span>'+(st?' <span class="t-ref" style="color:#f59e0b">['+st+']</span>':'')+'</span>');
   });
 
-  // ⑤ আজকের ছুটি (ক্যালেন্ডার থেকে)
-  const todayFull=new Date();
-  const dd=String(todayFull.getDate()).padStart(2,'0');
-  const mon=MONTHS_SHORT[todayFull.getMonth()];
-  const yy=String(todayFull.getFullYear()).slice(2);
-  const hKey=`${dd}-${mon}-${yy}`;
-  const holiday=getHoliday(hKey);
+  // 5 today holiday — key format: "DD-Mon-YY" e.g. "29-May-26"
+  var _tn=new Date();
+  var _dd=String(_tn.getDate()).padStart(2,'0');
+  var _mon=MONTHS_SHORT[_tn.getMonth()];
+  var _yy=String(_tn.getFullYear()).slice(2);
+  var hKey=_dd+'-'+_mon+'-'+_yy;
+  var holiday=getHoliday(hKey);
   if(holiday){
-    const icon=holiday.type==='public'?'🟠':'🟣';
-    items.push(`<span class="ticker-item" style="color:${holiday.type==='public'?'#fb923c':'#a78bfa'}">${icon} আজ ছুটি: <span class="t-name" style="color:${holiday.type==='public'?'#fdba74':'#c4b5fd'}">${holiday.name}</span></span>`);
+    var icon=holiday.type==='public'?'🟠':'🟣';
+    var col=holiday.type==='public'?'#fb923c':'#a78bfa';
+    var tcol=holiday.type==='public'?'#fdba74':'#c4b5fd';
+    items.push('<span class="ticker-item" style="color:'+col+'">'+icon+' আজ ছুটি: <span class="t-name" style="color:'+tcol+'">'+holiday.name+'</span></span>');
   }
 
-  // ⑥ আজকের calNotes (ক্যালেন্ডার নোট)
-  const calKey=`${String(todayFull.getFullYear())}-${String(todayFull.getMonth()+1).padStart(2,'0')}-${dd}`;
-  const calNote=calNotes[calKey];
+  // 6 calNotes
+  var calKey=_tn.getFullYear()+'-'+String(_tn.getMonth()+1).padStart(2,'0')+'-'+_dd;
+  var calNote=calNotes[calKey];
   if(calNote&&calNote.trim()){
-    items.push(`<span class="ticker-item" style="color:#fbbf24">📌 <span class="t-name" style="color:#fcd34d">${calNote.trim().substring(0,40)}</span></span>`);
+    items.push('<span class="ticker-item" style="color:#fbbf24">📌 <span class="t-name" style="color:#fcd34d">'+calNote.trim().substring(0,40)+'</span></span>');
   }
 
   if(!items.length){
-    track.innerHTML='<span style="font-size:12px;color:#475569">আজ কোনো আপডেট নেই</span>';
-    track.style.animation='none';
-    return;
+    items.push('<span class="ticker-item" style="color:#475569">📭 আজ কোনো নতুন আবেদন নেই</span>');
   }
 
-  // Duplicate items for seamless infinite right-to-left scroll
-  const joined=items.join('<span style="color:#334155;margin:0 8px">•</span>');
-  track.innerHTML=joined+'<span style="padding:0 40px"></span>'+joined;
-  // Duration based on item count — faster speed
-  const dur=Math.max(10,items.length*4);
-  track.style.left='100%';
+  // Seamless infinite RTL scroll:
+  // Double the content — animation goes 0% to -50% (translateX).
+  // At -50% the view is identical to 0% so loop is perfectly seamless.
+  var sep='<span class="ticker-sep">⬥</span>';
+  var oneBlock=items.join(sep)+sep;
+  track.innerHTML=oneBlock+oneBlock; // two identical copies
+
+  // Speed: ~90px/s. Estimate total px width by char count * 7px.
+  var charCount=items.reduce(function(s,i){return s+i.replace(/<[^>]+>/g,'').length;},0)+items.length*4;
+  var pxEst=charCount*7;
+  var dur=Math.max(5,Math.round(pxEst/90));
+
   track.style.animation='none';
-  void track.offsetWidth; // force reflow
-  track.style.animation=`ticker-scroll ${dur}s linear infinite`;
+  void track.offsetWidth;
+  track.style.animation='ticker-rtl '+dur+'s linear infinite';
 }
 function normDate(d){
   // Normalize "21-MAY-26" to compare with today
@@ -2243,15 +2261,25 @@ function todayDateStr(){
   const t=new Date();
   return `${String(t.getDate()).padStart(2,'0')}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getFullYear()).slice(-2)}`;
 }
-function tickerClick(ref){
-  // Scroll to card and highlight
-  const el=document.getElementById('card-'+ref);
-  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.boxShadow='0 0 0 2px #60a5fa';setTimeout(()=>el.style.boxShadow='',1500);}
-  else{
-    // Card not visible — open pick modal to mark as important/urgent
-    openPickModal(ref);
+function tickerScrollTo(ref){
+  // Scroll to card and highlight with flash
+  var el=document.getElementById('card-'+ref);
+  if(el){
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    el.style.transition='box-shadow 0.2s';
+    el.style.boxShadow='0 0 0 2px #60a5fa, 0 0 16px rgba(96,165,250,0.4)';
+    setTimeout(function(){el.style.boxShadow='';},1800);
+  } else {
+    // Card filtered out — clear filter and try again
+    if(activeFilter!=='all'){activeFilter='all';document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});}
+    render();
+    setTimeout(function(){
+      var el2=document.getElementById('card-'+ref);
+      if(el2){el2.scrollIntoView({behavior:'smooth',block:'center'});el2.style.boxShadow='0 0 0 2px #60a5fa';setTimeout(function(){el2.style.boxShadow='';},1800);}
+    },120);
   }
 }
+function tickerClick(ref){tickerScrollTo(ref);}
 function activateSearch(){
   _searchActive=true;
   const wrap=document.getElementById('ticker-wrap');

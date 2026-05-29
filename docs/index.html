@@ -382,9 +382,9 @@
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
   .ticker-wrap { display:flex;align-items:center;gap:0;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;height:36px;box-sizing:border-box;overflow:hidden; }
   .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;line-height:20px;margin-right:8px; }
-  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative;contain:strict;isolation:isolate; }
-  /* rAF animates translateX. translateZ(0) = dedicated GPU layer, no jank */
-  .ticker-track { position:absolute;top:50%;left:0;transform:translateY(-50%) translateX(9999px) translateZ(0);display:inline-flex;align-items:center;white-space:nowrap;will-change:transform;backface-visibility:hidden; }
+  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;display:flex;align-items:center; }
+  .ticker-track { display:inline-flex;align-items:center;white-space:nowrap;will-change:transform; }
+  @keyframes ticker-scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
@@ -2218,32 +2218,14 @@ let _registerName=localStorage.getItem('pcc_register_name')||'';
 let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
 
 // ── Ticker JS scroll engine ───────────────────────────────────
-var _tickerRAF=null;
-var _tickerX=0;
-var _tickerLoopW=0;
-var _tickerSpeed=50;
-var _tickerLast=null;
-
-function _tickerStep(ts){
-  if(_tickerLast===null){_tickerLast=ts;}
-  var dt=ts-_tickerLast;
-  _tickerLast=ts;
-  if(dt>80)dt=80;
-  _tickerX-=_tickerSpeed*(dt/1000);
-  if(_tickerLoopW>0&&_tickerX<=-_tickerLoopW){_tickerX+=_tickerLoopW;}
-  var track=document.getElementById('ticker-track');
-  if(track){track.style.transform='translateY(-50%) translateX('+Math.round(_tickerX)+'px) translateZ(0)';}
-  _tickerRAF=requestAnimationFrame(_tickerStep);
-}
-
 function _startTickerScroll(loopW){
-  if(_tickerRAF){cancelAnimationFrame(_tickerRAF);_tickerRAF=null;}
-  _tickerLoopW=loopW;
-  var area=document.getElementById('ticker-scroll-area');
-  var areaW=area?area.offsetWidth:200;
-  _tickerX=areaW;
-  _tickerLast=null;
-  _tickerRAF=requestAnimationFrame(_tickerStep);
+  var track=document.getElementById('ticker-track');
+  if(!track)return;
+  // speed: 55px/s
+  var dur=(loopW/55).toFixed(2);
+  track.style.animation='none';
+  void track.offsetWidth;
+  track.style.animation='ticker-scroll '+dur+'s linear infinite';
 }
 
 
@@ -2341,17 +2323,15 @@ function buildTicker(){
     return '<span class="ticker-item"'+click+'>'+it.html+'</span>';
   }).join(sep)+sep+'<span style="display:inline-block;width:80px"></span>';
 
-  // 3 copies. A zero-width sentinel between copy1 and copy2
-  // gives us copy1's exact pixel width via offsetLeft.
-  var sentinel='<span id="tkr-s" style="display:inline-block;width:0;overflow:hidden;flex-shrink:0"></span>';
-  track.innerHTML=oneBlock+sentinel+oneBlock+oneBlock;
-
-  // Use setTimeout so even glass-theme blur layouts finish before we measure
-  setTimeout(function(){
-    var s=document.getElementById('tkr-s');
-    var loopW=s?Math.round(s.offsetLeft):Math.round(track.scrollWidth/3);
+  // 2 identical copies. CSS animates translateX(0→-50%).
+  // At -50% the view is identical to 0% → perfect seamless loop.
+  // No JS measurement needed — CSS handles it automatically.
+  track.innerHTML=oneBlock+oneBlock;
+  // rAF ensures DOM painted before animation starts
+  requestAnimationFrame(function(){
+    var loopW=track.scrollWidth/2;
     _startTickerScroll(loopW);
-  }, 120);
+  });
 }
 function normDate(d){
   // Normalize "21-MAY-26" to compare with today

@@ -382,9 +382,9 @@
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
   .ticker-wrap { display:flex;align-items:center;gap:0;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;height:36px;box-sizing:border-box;overflow:hidden; }
   .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;line-height:20px;margin-right:8px; }
-  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative; }
+  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative;contain:strict;isolation:isolate; }
   /* rAF animates translateX. translateZ(0) = dedicated GPU layer, no jank */
-  .ticker-track { position:absolute;top:50%;left:0;transform:translateY(-50%) translateX(9999px);display:inline-flex;align-items:center;white-space:nowrap;will-change:transform; }
+  .ticker-track { position:absolute;top:50%;left:0;transform:translateY(-50%) translateX(9999px) translateZ(0);display:inline-flex;align-items:center;white-space:nowrap;will-change:transform;backface-visibility:hidden; }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
@@ -2230,7 +2230,7 @@ function _tickerStep(ts){
   _tickerX-=_tickerSpeed*(dt/1000);
   if(_tickerLoopW>0&&_tickerX<=-_tickerLoopW){_tickerX+=_tickerLoopW;}
   var track=document.getElementById('ticker-track');
-  if(track){track.style.transform='translateY(-50%) translateX('+Math.round(_tickerX)+'px)';}
+  if(track){track.style.transform='translateY(-50%) translateX('+Math.round(_tickerX)+'px) translateZ(0)';}
   _tickerRAF=requestAnimationFrame(_tickerStep);
 }
 
@@ -2339,18 +2339,18 @@ function buildTicker(){
     return '<span class="ticker-item"'+click+'>'+it.html+'</span>';
   }).join(sep)+sep+'<span style="display:inline-block;width:80px"></span>';
 
-  // 2 identical copies — CSS animates from 0 to -50% = seamless infinite loop
-  // Sentinel span measures exact width of block 1
-  track.innerHTML=oneBlock
-    +'<span id="ticker-sentinel" style="display:inline-block;width:0;height:0;overflow:hidden;flex-shrink:0"></span>'
-    +oneBlock;
-  track.style.animation='none'; // reset before measuring
+  // 3 copies for bulletproof seamless loop.
+  // loopW = scrollWidth/3 = exact width of one copy.
+  // When _tickerX hits -loopW we snap back by +loopW → identical visual.
+  track.innerHTML=oneBlock+oneBlock+oneBlock;
 
-  // Double rAF: layout done, measure, start
+  // Triple rAF: glass theme blur can delay layout; wait 3 frames to be safe.
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
-      var loopW=track.scrollWidth/2;
-      _startTickerScroll(loopW);
+      requestAnimationFrame(function(){
+        var loopW=Math.round(track.scrollWidth/3);
+        _startTickerScroll(loopW);
+      });
     });
   });
 }

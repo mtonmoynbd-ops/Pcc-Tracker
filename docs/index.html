@@ -382,10 +382,10 @@
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
   .ticker-wrap { display:flex;align-items:center;gap:6px;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;overflow:hidden;height:36px;box-sizing:border-box; }
   .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;display:flex;align-items:center;line-height:20px; }
-  .ticker-scroll-area { flex:1;overflow:hidden;height:20px;cursor:pointer; }
-  /* ticker-track is inline-flex doubled — translateX 0 to -50% = seamless loop */
-  .ticker-track { display:inline-flex;align-items:center;height:20px;white-space:nowrap;will-change:transform; }
-  @keyframes ticker-rtl { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .ticker-scroll-area { flex:1;overflow:hidden;height:20px;cursor:pointer;position:relative; }
+  /* Outer wrapper scrolls; inner track is 200% wide with two identical halves */
+  .ticker-track { display:inline-flex;align-items:center;height:20px;white-space:nowrap;will-change:transform;animation:ticker-rtl 28s linear infinite; }
+  @keyframes ticker-rtl { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
@@ -741,11 +741,10 @@
   .loading{text-align:center;padding:40px;color:#475569}
   #toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
   /* Search-in-ticker mode */
-  .ticker-wrap.search-mode { cursor:text; }
-  .ticker-wrap.search-mode .ticker-scroll-area { display:none; }
-  #search-bar { caret-color:#60a5fa; }
+  #search-bar { caret-color:#60a5fa;color:#e2e8f0; }
   body.light #search-bar { color:#1e293b; }
   body.dusk #search-bar { color:#e8e0f0; }
+  body.glass-light #search-bar { color:#1e293b; }
 </style>
 </head>
 <body>
@@ -791,11 +790,11 @@ if('serviceWorker' in navigator){
 
 <div class="ticker-wrap" id="ticker-wrap">
   <span class="ticker-today-label" id="ticker-today-lbl">Today:</span>
-  <div class="ticker-scroll-area" id="ticker-scroll-area" onclick="activateSearch()">
+  <div class="ticker-scroll-area" id="ticker-scroll-area">
     <div class="ticker-track" id="ticker-track"></div>
   </div>
-  <input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম, Ref বা ফোন..." oninput="render();if(!this.value)deactivateSearch();" onblur="deactivateSearch()" onkeydown="if(event.key==='Escape'){this.value='';render();deactivateSearch();}" style="display:none;flex:1;margin:0;border:none;background:transparent;outline:none;font-size:12px;color:inherit;padding:0 4px;">
-  <span class="ticker-search-icon" id="ticker-search-icon" onclick="activateSearch()">🔍</span>
+  <input class="search-bar" type="text" id="search-bar" placeholder="নাম, Ref বা ফোন..." oninput="render();" onkeydown="if(event.key==='Escape'){this.value='';render();deactivateSearch();}" style="display:none;flex:1;margin:0;border:none;background:transparent;outline:none;font-size:12px;color:inherit;padding:0 4px;">
+  <span class="ticker-search-icon" id="ticker-search-icon" onclick="toggleSearch()" style="cursor:pointer;flex-shrink:0;font-size:14px;user-select:none">🔍</span>
 </div>
 
 <div class="filter-row">
@@ -2174,81 +2173,107 @@ let _registerName=localStorage.getItem('pcc_register_name')||'';
 let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
 
 function buildTicker(){
-  const track=document.getElementById('ticker-track');
+  var track=document.getElementById('ticker-track');
   if(!track)return;
-  const tds=todayDateStr();
-  const items=[];
 
-  // 1 today new apps (non-draft)
+  var today=new Date();
+  var tds=todayDateStr(); // "DD-MM-YY"
+
+  // Helper: is a date string today?
+  function isToday(ds){ return ds&&normDate(ds)===tds; }
+
+  var items=[];
+
+  // ── আজকের সব আপডেট ──────────────────────────────────────
+  // 1) আজকের নতুন আবেদন (draft নয়)
   allApps.filter(function(a){
-    if(!a.apply_date||normDate(a.apply_date)!==tds)return false;
-    return !(a.status||'').toLowerCase().includes('draft');
+    return isToday(a.apply_date)&&!(a.status||'').toLowerCase().includes('draft');
   }).forEach(function(a){
-    var ref=a.ref.replace(/'/g,"\\'");
-    items.push('<span class="ticker-item" onclick="tickerScrollTo(\''+ref+'\');event.stopPropagation()">📋 <span class="t-name">'+a.name+'</span> <span class="t-ref">'+a.ref+'</span></span>');
+    var ref=a.ref.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    items.push({html:'📋 <span class="t-name">'+a.name+'</span> <span class="t-ref">'+a.ref+'</span>',ref:a.ref,type:'app'});
   });
 
-  // 2 today draft
+  // 2) আজকের Draft ফাইল
   allApps.filter(function(a){
-    var s=(a.status||'').toLowerCase();
-    return s.includes('draft')&&a.apply_date&&normDate(a.apply_date)===tds;
+    return (a.status||'').toLowerCase().includes('draft')&&isToday(a.apply_date);
   }).forEach(function(a){
-    var ref=a.ref.replace(/'/g,"\\'");
-    items.push('<span class="ticker-item" onclick="tickerScrollTo(\''+ref+'\');event.stopPropagation()">✏️ Draft: <span class="t-name">'+a.name+'</span> <span class="t-ref">'+a.ref+'</span></span>');
+    items.push({html:'✏️ Draft: <span class="t-name">'+a.name+'</span> <span class="t-ref">'+a.ref+'</span>',ref:a.ref,type:'draft'});
   });
 
-  // 3 urgent star2
-  allApps.filter(function(a){return (stars[a.ref]||0)===2&&!delivered[a.ref];}).forEach(function(a){
-    var ref=a.ref.replace(/'/g,"\\'");
-    items.push('<span class="ticker-item" onclick="tickerScrollTo(\''+ref+'\');event.stopPropagation()">🔴 <span class="t-name" style="color:#fca5a5">'+a.name+'</span> <span class="t-ref" style="color:#f87171">'+a.ref+'</span></span>');
+  // 3) আজকে Urgent (star2) হয়েছে — statusHistory তে আজকের entry আছে কিনা
+  allApps.filter(function(a){ return (stars[a.ref]||0)===2&&!delivered[a.ref]; }).forEach(function(a){
+    var hist=statusHistory[a.ref]||[];
+    var todayEntry=hist.filter(function(h){ return isToday((h.date||'').replace(/\//g,'-')); });
+    if(todayEntry.length||isToday(a.apply_date)){
+      items.push({html:'🔴 <span class="t-name" style="color:#fca5a5">'+a.name+'</span> <span class="t-ref" style="color:#f87171">Urgent</span>',ref:a.ref,type:'urgent'});
+    }
   });
 
-  // 4 important star1
-  allApps.filter(function(a){return (stars[a.ref]||0)===1&&!delivered[a.ref];}).forEach(function(a){
-    var ref=a.ref.replace(/'/g,"\\'");
+  // 4) আজকে Important (star1) হয়েছে
+  allApps.filter(function(a){ return (stars[a.ref]||0)===1&&!delivered[a.ref]; }).forEach(function(a){
+    var hist=statusHistory[a.ref]||[];
+    var todayEntry=hist.filter(function(h){ return isToday((h.date||'').replace(/\//g,'-')); });
+    if(todayEntry.length||isToday(a.apply_date)){
+      var st=trimStatus(a.status||'');
+      items.push({html:'⭐ <span class="t-name" style="color:#fcd34d">'+a.name+'</span>'+(st?' <span class="t-ref" style="color:#f59e0b">['+st+']</span>':''),ref:a.ref,type:'important'});
+    }
+  });
+
+  // 5) আজকের স্ট্যাটাস চেঞ্জ হয়েছে (urgent/important ছাড়া)
+  allApps.filter(function(a){
+    var s=stars[a.ref]||0; if(s>0)return false; // already handled above
+    var hist=statusHistory[a.ref]||[];
+    return hist.some(function(h){ return isToday((h.date||'').replace(/\//g,'-')); });
+  }).forEach(function(a){
     var st=trimStatus(a.status||'');
-    items.push('<span class="ticker-item" onclick="tickerScrollTo(\''+ref+'\');event.stopPropagation()">⭐ <span class="t-name" style="color:#fcd34d">'+a.name+'</span>'+(st?' <span class="t-ref" style="color:#f59e0b">['+st+']</span>':'')+'</span>');
+    items.push({html:'🔄 <span class="t-name">'+a.name+'</span>'+(st?' <span class="t-ref">['+st+']</span>':''),ref:a.ref,type:'status'});
   });
 
-  // 5 today holiday — key format: "DD-Mon-YY" e.g. "29-May-26"
-  var _tn=new Date();
-  var _dd=String(_tn.getDate()).padStart(2,'0');
-  var _mon=MONTHS_SHORT[_tn.getMonth()];
-  var _yy=String(_tn.getFullYear()).slice(2);
+  // 6) আজকের ছুটি — key "DD-Mon-YY"
+  var _dd=String(today.getDate()).padStart(2,'0');
+  var _mon=MONTHS_SHORT[today.getMonth()];
+  var _yy=String(today.getFullYear()).slice(2);
   var hKey=_dd+'-'+_mon+'-'+_yy;
   var holiday=getHoliday(hKey);
   if(holiday){
     var icon=holiday.type==='public'?'🟠':'🟣';
     var col=holiday.type==='public'?'#fb923c':'#a78bfa';
     var tcol=holiday.type==='public'?'#fdba74':'#c4b5fd';
-    items.push('<span class="ticker-item" style="color:'+col+'">'+icon+' আজ ছুটি: <span class="t-name" style="color:'+tcol+'">'+holiday.name+'</span></span>');
+    items.push({html:'<span style="color:'+col+'">'+icon+' আজ ছুটি: <span class="t-name" style="color:'+tcol+'">'+holiday.name+'</span></span>',ref:null,type:'holiday'});
   }
 
-  // 6 calNotes
-  var calKey=_tn.getFullYear()+'-'+String(_tn.getMonth()+1).padStart(2,'0')+'-'+_dd;
+  // 7) আজকের calNotes
+  var calKey=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+_dd;
   var calNote=calNotes[calKey];
   if(calNote&&calNote.trim()){
-    items.push('<span class="ticker-item" style="color:#fbbf24">📌 <span class="t-name" style="color:#fcd34d">'+calNote.trim().substring(0,40)+'</span></span>');
+    items.push({html:'📌 <span class="t-name" style="color:#fcd34d">'+calNote.trim().substring(0,50)+'</span>',ref:null,type:'note'});
   }
 
-  if(!items.length){
-    items.push('<span class="ticker-item" style="color:#475569">📭 আজ কোনো নতুন আবেদন নেই</span>');
-  }
-
-  // Seamless infinite RTL scroll:
-  // Double the content — animation goes 0% to -50% (translateX).
-  // At -50% the view is identical to 0% so loop is perfectly seamless.
+  // ── Build HTML ────────────────────────────────────────────
   var sep='<span class="ticker-sep">⬥</span>';
-  var oneBlock=items.join(sep)+sep;
-  track.innerHTML=oneBlock+oneBlock; // two identical copies
+  var spanList;
+  if(!items.length){
+    // Empty — one static message, still loops
+    spanList='<span class="ticker-item" style="color:#64748b">📭 আজ কোনো আপডেট নেই</span>'+sep;
+  } else {
+    spanList=items.map(function(it){
+      var click=it.ref?(' onclick="tickerScrollTo(\''+it.ref.replace(/'/g,"\\'")+'\');event.stopPropagation()"'):'';
+      return '<span class="ticker-item"'+click+'>'+it.html+'</span>';
+    }).join(sep)+sep;
+  }
 
-  // Speed: ~90px/s. Estimate total px width by char count * 7px.
-  var charCount=items.reduce(function(s,i){return s+i.replace(/<[^>]+>/g,'').length;},0)+items.length*4;
-  var pxEst=charCount*7;
-  var dur=Math.max(5,Math.round(pxEst/90));
+  // Double for seamless loop — animation moves -50%
+  track.innerHTML=spanList+spanList;
+
+  // Speed: adjust duration so 1 loop ≈ content width / speed_px_per_s
+  // Estimate ~8px per char of visible text
+  var visChars=items.length?items.reduce(function(s,i){return s+i.html.replace(/<[^>]+>/g,'').length;},0)+items.length*6:30;
+  var totalPx=visChars*8;
+  var speedPxS=55; // comfortable reading speed
+  var dur=Math.max(12, Math.round(totalPx/speedPxS));
 
   track.style.animation='none';
-  void track.offsetWidth;
+  void track.offsetWidth; // force reflow to restart cleanly
   track.style.animation='ticker-rtl '+dur+'s linear infinite';
 }
 function normDate(d){
@@ -2282,23 +2307,39 @@ function tickerScrollTo(ref){
 function tickerClick(ref){tickerScrollTo(ref);}
 function activateSearch(){
   _searchActive=true;
-  const wrap=document.getElementById('ticker-wrap');
-  const sb=document.getElementById('search-bar');
-  const lbl=document.getElementById('ticker-today-lbl');
+  var wrap=document.getElementById('ticker-wrap');
+  var sb=document.getElementById('search-bar');
+  var lbl=document.getElementById('ticker-today-lbl');
+  var sa=document.getElementById('ticker-scroll-area');
   wrap.classList.add('search-mode');
   if(lbl)lbl.style.display='none';
+  if(sa)sa.style.display='none';
   sb.style.display='block';
-  setTimeout(()=>sb.focus(),50);
+  setTimeout(function(){sb.focus();},50);
 }
 function deactivateSearch(){
-  if(document.getElementById('search-bar').value)return;
   _searchActive=false;
-  const wrap=document.getElementById('ticker-wrap');
-  const sb=document.getElementById('search-bar');
-  const lbl=document.getElementById('ticker-today-lbl');
+  var wrap=document.getElementById('ticker-wrap');
+  var sb=document.getElementById('search-bar');
+  var lbl=document.getElementById('ticker-today-lbl');
+  var sa=document.getElementById('ticker-scroll-area');
+  sb.value='';
   wrap.classList.remove('search-mode');
   if(lbl)lbl.style.display='';
+  if(sa)sa.style.display='';
   sb.style.display='none';
+  render();
+}
+function toggleSearch(){
+  var sb=document.getElementById('search-bar');
+  if(sb.style.display==='none'||sb.style.display===''){
+    activateSearch();
+  } else {
+    // if text present — do nothing (search already active), else close
+    if(!sb.value.trim()){
+      deactivateSearch();
+    }
+  }
 }
 
 function saveRegister(){

@@ -382,8 +382,9 @@
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
   .ticker-wrap { display:flex;align-items:center;gap:6px;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;overflow:hidden;height:36px;box-sizing:border-box; }
   .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;display:flex;align-items:center;line-height:20px; }
-  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative;contain:strict;isolation:isolate; }
-  .ticker-track { position:absolute;top:50%;left:0;transform:translateY(-50%) translateX(9999px) translateZ(0);display:inline-flex;align-items:center;white-space:nowrap;will-change:transform;backface-visibility:hidden; }
+  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative; }
+  .ticker-track { position:absolute;top:50%;left:0;display:inline-flex;align-items:center;white-space:nowrap;will-change:transform; }
+  @keyframes ticker-rtl { from{transform:translateY(-50%) translateX(0)} to{transform:translateY(-50%) translateX(-50%)} }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
@@ -2265,28 +2266,43 @@ function buildTicker(){
 
   const spacer='<span style="display:inline-block;width:80px;flex-shrink:0"></span>';
   const oneBlock=parts.join(sep)+sep+spacer;
-  track.innerHTML=oneBlock+oneBlock+oneBlock; // 3 copies for seamless loop
+  // 2 copies — CSS animation moves 0% to -50% = seamless loop
+  track.innerHTML=oneBlock+oneBlock;
 
-  // JS scroll: enter from right, loop continuously
-  const area=document.getElementById('ticker-scroll-area');
-  const areaW=area?area.offsetWidth:300;
-
+  // CSS animation: seamless RTL scroll
+  // We set initial left offset so content enters from right edge
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
-      const loopW=Math.round(track.scrollWidth/3);
-      let x=areaW; // start off right edge
+      const area=document.getElementById('ticker-scroll-area');
+      const areaW=area?area.offsetWidth:300;
+      const halfW=track.scrollWidth/2;
+      const dur=Math.max(10,Math.round(halfW/60));
+      // Start position: shift track right by areaW so it enters from right
+      // Animation handles the loop: each iteration moves one copy width
+      track.style.transform='translateY(-50%) translateX('+areaW+'px)';
+      track.style.animation='none';
+      void track.offsetWidth;
+      // Custom animation: from current right position to -halfW
+      track.style.transition='none';
+      // Use JS-driven first entry, then CSS loop
+      let startX=areaW;
+      const speed=60;
       let last=null;
-      const speed=55; // px/s — smooth, readable
-      function step(ts){
+      let raf=null;
+      function enterStep(ts){
         if(last===null)last=ts;
-        const dt=Math.min(ts-last,80);
-        last=ts;
-        x-=speed*(dt/1000);
-        if(x<=-loopW)x+=loopW; // seamless reset
-        track.style.transform='translateY(-50%) translateX('+Math.round(x)+'px)';
-        requestAnimationFrame(step);
+        const dt=Math.min(ts-last,50);last=ts;
+        startX-=speed*(dt/1000);
+        if(startX<=0){
+          // Handoff to CSS animation
+          track.style.transform='translateY(-50%) translateX(0%)';
+          track.style.animation='ticker-rtl '+dur+'s linear infinite';
+          return;
+        }
+        track.style.transform='translateY(-50%) translateX('+Math.round(startX)+'px)';
+        raf=requestAnimationFrame(enterStep);
       }
-      requestAnimationFrame(step);
+      raf=requestAnimationFrame(enterStep);
     });
   });
 }

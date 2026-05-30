@@ -380,16 +380,15 @@
   .counts { text-align: right; font-size: 11px; line-height: 1.7; font-weight: 700; }
   .counts .urgent { color: #ef4444; cursor: pointer; white-space: nowrap; }
   .counts .important { color: #f59e0b; cursor: pointer; white-space: nowrap; }
-  .ticker-wrap { display:flex;align-items:center;gap:6px;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;cursor:pointer;overflow:hidden;height:36px;box-sizing:border-box; }
-  .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap; }
-  .ticker-scroll-area { flex:1;overflow:hidden;position:relative;height:20px; }
-  .ticker-track { display:flex;gap:24px;animation:ticker-move 20s linear infinite;white-space:nowrap;position:absolute;top:0;left:0; }
-  .ticker-track:empty::before { content:'আজ কোনো নতুন আবেদন নেই';font-size:12px;color:#475569; }
-  @keyframes ticker-move { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .ticker-wrap { display:flex;align-items:center;gap:6px;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:8px;padding:6px 10px;margin-bottom:8px;margin-top:8px;overflow:hidden;height:36px;box-sizing:border-box; }
+  .ticker-today-label { font-size:11px;font-weight:700;color:#60a5fa;flex-shrink:0;white-space:nowrap;display:flex;align-items:center;line-height:20px; }
+  .ticker-scroll-area { flex:1;min-width:0;overflow:hidden;height:20px;position:relative;contain:strict;isolation:isolate; }
+  .ticker-track { position:absolute;top:50%;left:0;transform:translateY(-50%) translateX(9999px) translateZ(0);display:inline-flex;align-items:center;white-space:nowrap;will-change:transform;backface-visibility:hidden; }
   .ticker-item { font-size:12px;color:#94a3b8;cursor:pointer;flex-shrink:0;padding:0 4px;border-radius:4px;transition:color 0.15s; }
   .ticker-item:hover,.ticker-item:active { color:#e2e8f0; }
   .ticker-item .t-name { color:#e2e8f0;font-weight:600; }
   .ticker-item .t-ref { color:#60a5fa;font-size:10px; }
+  .ticker-sep { color:#334155;padding:0 12px;flex-shrink:0; }
   .ticker-search-icon { font-size:14px;flex-shrink:0;cursor:pointer; }
   body.light .ticker-wrap { background:#ffffff;border-color:#cbd5e1; }
   body.light .ticker-today-label { color:#1d4ed8; }
@@ -487,6 +486,8 @@
   .modal-box { background: #0f1f3d; border: 1px solid #1e3a5f; border-radius: 16px; padding: 18px; width: calc(100vw - 32px); max-width: 360px; max-height: 82vh; overflow-y: auto; box-sizing: border-box; }
   .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .modal-close { background: none; border: none; color: #64748b; font-size: 20px; cursor: pointer; flex-shrink: 0; }
+  .modal-close svg { animation: home-blink 2s ease-in-out infinite; }
+  @keyframes home-blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
   .count-top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
   .adj-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .adj-num { font-size: 18px; font-weight: 700; min-width: 28px; text-align: center; flex-shrink: 0; }
@@ -782,14 +783,14 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 
-<div class="ticker-wrap" id="ticker-wrap" onclick="activateSearch()">
-  <span class="ticker-today-label">Today:</span>
+<div class="ticker-wrap" id="ticker-wrap">
+  <span class="ticker-today-label" id="ticker-today-lbl">Today:</span>
   <div class="ticker-scroll-area" id="ticker-scroll-area">
     <div class="ticker-track" id="ticker-track"></div>
   </div>
-  <span class="ticker-search-icon" id="ticker-search-icon">🔍</span>
+  <input type="text" id="search-bar" placeholder="নাম, Ref বা ফোন..." oninput="render();" onkeydown="if(event.key==='Escape'){this.value='';render();deactivateSearch();}" style="display:none;flex:1;border:none;background:transparent;outline:none;font-size:12px;color:#e2e8f0;padding:0 4px;caret-color:#60a5fa">
+  <span class="ticker-search-icon" id="ticker-search-icon" onclick="toggleSearch()" style="cursor:pointer;flex-shrink:0;font-size:14px;user-select:none">🔍</span>
 </div>
-<input class="search-bar" type="text" id="search-bar" placeholder="🔍 নাম, Ref বা ফোন..." oninput="render()" onblur="deactivateSearch()" style="display:none">
 
 <div class="filter-row">
   <button class="filter-btn" id="draft-btn" onclick="toggleFilter(&#39;draft&#39;,this)">Draft</button>
@@ -1045,7 +1046,6 @@ if('serviceWorker' in navigator){
     </div>
     <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-top:4px">
       <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">📋 রেজিস্টার</div>
-      <div style="font-size:11px;color:#64748b;margin-bottom:8px">অপেক্ষমান ফাইল long press করলে এই নম্বরে WhatsApp খুলবে।</div>
       <input class="settings-input" id="reg-name-input" placeholder="রেজিস্টারের নাম..." style="margin-bottom:6px">
       <input class="settings-input" id="reg-phone-input" placeholder="ফোন নম্বর (01xxxxxxxxx)...">
       <button class="settings-save-btn" onclick="saveRegister()" style="margin-top:8px">রেজিস্টার সেভ করুন</button>
@@ -2218,81 +2218,77 @@ function buildTicker(){
   const tds=todayDateStr();
   function isToday(ds){return !!(ds&&normDate(ds)===tds);}
 
-  // Groups: key → list of apps
-  const grp={applied:[],draft:[],printed:[],collected_ready:[],box_ready:[],status_update:[]};
+  const grp={applied:[],draft:[],printed:[],collect_ready:[],box_ready:[],status_update:[]};
 
-  // 1) Applied today (non-draft)
   allApps.filter(a=>isToday(a.apply_date)&&!(a.status||'').toLowerCase().includes('draft'))
     .forEach(a=>grp.applied.push(a));
-
-  // 2) Draft today
   allApps.filter(a=>(a.status||'').toLowerCase().includes('draft')&&isToday(a.apply_date))
     .forEach(a=>grp.draft.push(a));
 
-  // 3) statusHistory আজকের entries
   allApps.forEach(a=>{
     const hist=statusHistory[a.ref]||[];
     const todayH=hist.filter(h=>isToday((h.date||'').replace(/\//g,'-')));
     if(!todayH.length)return;
     const lastSt=todayH[todayH.length-1].status||a.status||'';
     const n=parseInt(lastSt.split('/')[0])||0;
-
-    if(n===5){// Printed
-      if(!grp.printed.some(x=>x.ref===a.ref))grp.printed.push(a);
-    } else if(n===9&&!collected[a.ref]){// 9/10 — Collect pending
-      if(!grp.collected_ready.some(x=>x.ref===a.ref))grp.collected_ready.push(a);
-    } else if(n===9&&collected[a.ref]){// 9/10 — already collected (box)
-      if(!grp.box_ready.some(x=>x.ref===a.ref))grp.box_ready.push(a);
-    } else {// অন্য status update
-      if(!grp.status_update.some(x=>x.ref===a.ref)
-        &&!grp.applied.some(x=>x.ref===a.ref)
-        &&!grp.draft.some(x=>x.ref===a.ref))
-        grp.status_update.push(a);
-    }
+    const add=(g)=>{if(!grp[g].some(x=>x.ref===a.ref))grp[g].push(a);};
+    if(n===5) add('printed');
+    else if(n===9&&collected[a.ref]) add('box_ready');
+    else if(n===9) add('collect_ready');
+    else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref))
+      add('status_update');
   });
 
-  // collected এ আজকে যারা গেছে (collectedDate===today)
+  // Collected today
   allApps.filter(a=>collectedDate[a.ref]&&isToday(collectedDate[a.ref])&&collected[a.ref])
     .forEach(a=>{if(!grp.box_ready.some(x=>x.ref===a.ref))grp.box_ready.push(a);});
 
   function nameSpans(apps){
     return apps.map(a=>{
-      const r=a.ref.replace(/['"]/g,'');
-      return '<span class="t-name" style="cursor:pointer" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';
-    }).join(', ');
+      const r=a.ref.replace(/['"<>]/g,'');
+      return '<span class="t-name" style="cursor:pointer;color:#e2e8f0" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';
+    }).join('<span style="color:#475569">, </span>');
   }
 
-  const sep='<span style="color:#334155;padding:0 10px;flex-shrink:0">⬥</span>';
+  const sep='<span style="color:#334155;padding:0 14px;flex-shrink:0">⬥</span>';
   const parts=[];
-
-  if(grp.printed.length)
-    parts.push('<span class="ticker-item">🖨️ Printed <b style="color:#34d399">'+grp.printed.length+'</b>: '+nameSpans(grp.printed)+'</span>');
-
-  if(grp.collected_ready.length)
-    parts.push('<span class="ticker-item">📥 Collect <b style="color:#22c55e">'+grp.collected_ready.length+'</b>: '+nameSpans(grp.collected_ready)+'</span>');
-
-  if(grp.box_ready.length)
-    parts.push('<span class="ticker-item">📦 Ready <b style="color:#4ade80">'+grp.box_ready.length+'</b>: '+nameSpans(grp.box_ready)+'</span>');
-
-  if(grp.applied.length)
-    parts.push('<span class="ticker-item">📋 Applied <b>'+grp.applied.length+'</b>: '+nameSpans(grp.applied)+'</span>');
-
-  if(grp.draft.length)
-    parts.push('<span class="ticker-item" style="color:#f59e0b">✏️ Draft <b>'+grp.draft.length+'</b>: '+nameSpans(grp.draft)+'</span>');
-
-  if(grp.status_update.length)
-    parts.push('<span class="ticker-item" style="color:#94a3b8">🔄 Status Update <b>'+grp.status_update.length+'</b>: '+nameSpans(grp.status_update)+'</span>');
+  if(grp.printed.length)       parts.push('<span class="ticker-item">🖨️ <span style="color:#34d399">Printed '+grp.printed.length+'</span>: '+nameSpans(grp.printed)+'</span>');
+  if(grp.collect_ready.length) parts.push('<span class="ticker-item">📥 <span style="color:#22c55e">Collect '+grp.collect_ready.length+'</span>: '+nameSpans(grp.collect_ready)+'</span>');
+  if(grp.box_ready.length)     parts.push('<span class="ticker-item">📦 <span style="color:#4ade80">Ready '+grp.box_ready.length+'</span>: '+nameSpans(grp.box_ready)+'</span>');
+  if(grp.applied.length)       parts.push('<span class="ticker-item">📋 <span style="color:#94a3b8">Applied '+grp.applied.length+'</span>: '+nameSpans(grp.applied)+'</span>');
+  if(grp.draft.length)         parts.push('<span class="ticker-item">✏️ <span style="color:#f59e0b">Draft '+grp.draft.length+'</span>: '+nameSpans(grp.draft)+'</span>');
+  if(grp.status_update.length) parts.push('<span class="ticker-item">🔄 <span style="color:#94a3b8">Status Update '+grp.status_update.length+'</span>: '+nameSpans(grp.status_update)+'</span>');
 
   if(!parts.length){
-    track.innerHTML='<span class="ticker-item" style="color:#475569">📭 আজ কোনো আপডেট নেই</span>';
-    track.style.animationDuration='15s';
-    return;
+    parts.push('<span class="ticker-item" style="color:#475569">📭 আজ কোনো আপডেট নেই</span>');
   }
 
-  const oneBlock=parts.join(sep)+sep+'<span style="display:inline-block;width:60px"></span>';
-  track.innerHTML=oneBlock+oneBlock;
-  const dur=Math.max(14,parts.length*7);
-  track.style.animationDuration=dur+'s';
+  const spacer='<span style="display:inline-block;width:80px;flex-shrink:0"></span>';
+  const oneBlock=parts.join(sep)+sep+spacer;
+  track.innerHTML=oneBlock+oneBlock+oneBlock; // 3 copies for seamless loop
+
+  // JS scroll: enter from right, loop continuously
+  const area=document.getElementById('ticker-scroll-area');
+  const areaW=area?area.offsetWidth:300;
+
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      const loopW=Math.round(track.scrollWidth/3);
+      let x=areaW; // start off right edge
+      let last=null;
+      const speed=55; // px/s — smooth, readable
+      function step(ts){
+        if(last===null)last=ts;
+        const dt=Math.min(ts-last,80);
+        last=ts;
+        x-=speed*(dt/1000);
+        if(x<=-loopW)x+=loopW; // seamless reset
+        track.style.transform='translateY(-50%) translateX('+Math.round(x)+'px)';
+        requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  });
 }
 
 function normDate(d){
@@ -2316,17 +2312,34 @@ function tickerClick(ref){
 }
 function activateSearch(){
   _searchActive=true;
-  document.getElementById('ticker-wrap').style.display='none';
-  const sb=document.getElementById('search-bar');
+  var sa=document.getElementById('ticker-scroll-area');
+  var lbl=document.getElementById('ticker-today-lbl');
+  var sb=document.getElementById('search-bar');
+  if(sa)sa.style.display='none';
+  if(lbl)lbl.style.display='none';
   sb.style.display='block';
-  setTimeout(()=>sb.focus(),50);
+  setTimeout(function(){sb.focus();},50);
 }
 function deactivateSearch(){
-  if(document.getElementById('search-bar').value)return;
   _searchActive=false;
-  document.getElementById('ticker-wrap').style.display='flex';
-  document.getElementById('search-bar').style.display='none';
+  var sa=document.getElementById('ticker-scroll-area');
+  var lbl=document.getElementById('ticker-today-lbl');
+  var sb=document.getElementById('search-bar');
+  sb.value='';
+  if(sa)sa.style.display='';
+  if(lbl)lbl.style.display='';
+  sb.style.display='none';
+  render();
 }
+function toggleSearch(){
+  var sb=document.getElementById('search-bar');
+  if(sb.style.display==='none'||sb.style.display===''){
+    activateSearch();
+  } else {
+    if(!sb.value.trim()) deactivateSearch();
+  }
+}
+
 
 function saveRegister(){
   _registerName=document.getElementById('reg-name-input').value.trim();
@@ -2427,12 +2440,15 @@ function cardHTML(app){
   const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
   const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
   const _defLim=s===2?7:s===1?14:24;
-  const _lim=customLimits[app.ref]||_defLim;
+  const _lim=(customLimits&&customLimits[app.ref])||_defLim;
   const _rem=days!==null?(_lim-days):null;
-  const daysDisplay=days===0?'Today':days!==null?(
-    showRemaining&&s>0?(_rem>0?'বাকি '+_rem+'d':'Over '+Math.abs(_rem)+'d')
-    :('Day:'+String(days).padStart(2,'0'))
-  ):null;
+  // Collected card → no Day/Rem, show Aged separately
+  let daysDisplay=null;
+  if(!isCol&&days!==null){
+    daysDisplay=days===0?'Today':(showRemaining&&s>0
+      ?'Rem:'+String(Math.max(0,_rem)).padStart(2,'0')
+      :'Day:'+String(days).padStart(2,'0'));
+  }
   const dayClass2=days===0?'day-count today-badge':(days!==null&&days>7?'day-count day-warn':days!==null?'day-count':'day-count');
   const daysCol=(isCol&&!isDelivered&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
@@ -2455,7 +2471,7 @@ function cardHTML(app){
   const nameClick=`openNoteModal('${app.ref}');event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
   const daySpan=daysDisplay!==null?`<span class="${dayClass}" onclick="openDayPopup('${app.ref}',${days||0},${s});event.stopPropagation()" style="cursor:pointer">${daysDisplay}</span>`:'';
-  const colDaySpan=daysCol!==null?`<span class="day-collected">+${String(daysCol).padStart(2,'0')}d</span>`:'';
+  const colDaySpan=daysCol!==null?'<span class="day-collected">Aged:'+String(daysCol).padStart(2,'0')+'</span>':'';
   const phoneTag=policeTags[app.ref]||'';
   const clientPhone=phoneTag&&clientPhones[phoneTag]?clientPhones[phoneTag]:'';
   const hasClientPhone=!!(clientPhone);

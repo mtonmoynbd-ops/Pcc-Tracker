@@ -1398,71 +1398,77 @@ function openDayPopup(ref,days,star){
   const color=star===2?'#ef4444':star===1?'#f59e0b':'#60a5fa';
   const icon=star===2?'🔴':star===1?'⭐':'📄';
   const defLimit=star===2?7:star===1?14:24;
-  const limit=customLimits[ref]||defLimit;
 
-  function buildDayPopupHTML(){
-    const expDate=addDaysToDate(app.apply_date,limit);
-    const remaining=limit-days;
-    const remTxt=remaining>0
-      ?`<span style="color:${color};font-weight:700">${remaining} দিন বাকি</span>`
-      :`<span style="color:#ef4444;font-weight:700">⚠️ ${Math.abs(remaining)} দিন পার</span>`;
+  window._dayRef=ref;
+  window._dayStar=star;
+  window._dayDays=days;
+  window._dayApp=app;
+  window._dayColor=color;
+  window._dayDefLimit=defLimit;
 
-    // Day counter display toggle
-    const remToggle=`<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#64748b;cursor:pointer;margin-top:8px">
-      <input type="checkbox" id="rem-toggle" ${showRemaining?'checked':''} onchange="showRemaining=this.checked;localStorage.setItem('pcc_show_remaining',showRemaining);render();" style="cursor:pointer">
-      কার্ডে Remaining দিন দেখাও
-    </label>`;
-
-    // Limit adjuster
-    const adjuster=`<div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #1e3a5f">
-      <span style="font-size:11px;color:#64748b;flex:1">সীমা সেট করুন (দিন)</span>
-      <button onclick="adjustDayLimit('${ref}',-1)" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;border-radius:5px;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
-      <span id="day-limit-val" style="font-size:13px;font-weight:700;color:#e2e8f0;min-width:28px;text-align:center">${limit}</span>
-      <button onclick="adjustDayLimit('${ref}',1)" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;border-radius:5px;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
-      ${limit!==defLimit?`<button onclick="resetDayLimit('${ref}','${defLimit}')" style="background:#2d1b1b;border:1px solid #5a2d2d;color:#f87171;border-radius:5px;padding:0 8px;height:28px;font-size:10px;cursor:pointer">রিসেট</button>`:''}
-    </div>`;
-
-    let body='';
-    if(star===2||star===1){
-      body=`আবেদন: <b style="color:#e2e8f0">${app.apply_date}</b><br>
-        অতিবাহিত: <b style="color:#e2e8f0">${days} দিন</b><br>
-        সীমা: <b style="color:${color}">${limit}d</b> &nbsp;|&nbsp; ${remTxt}<br>
-        সম্ভাব্য ডেলিভারি: <b style="color:${color}">${expDate}</b>`;
-    } else {
-      const callDate=addDaysToDate(app.apply_date,12);
-      const custDel=addDaysToDate(app.apply_date,limit);
-      const daysToCall=12-days; const daysToDel=limit-days;
-      body=`আবেদন: <b style="color:#e2e8f0">${app.apply_date}</b><br>
-        অতিবাহিত: <b style="color:#e2e8f0">${days} দিন</b><br>
-        সম্ভাব্য পুলিশ কল: <b style="color:#a78bfa">${callDate}</b> ${daysToCall>0?`(${daysToCall}d বাকি)`:'(পার)'}<br>
-        সম্ভাব্য ডেলিভারি: <b style="color:#34d399">${custDel}</b> ${daysToDel>0?`(${daysToDel}d বাকি)`:'(পার)'}`;
-    }
-
-    return `<div style="font-weight:700;font-size:13px;margin-bottom:10px">${icon} ${app.name}</div>
-      <div style="font-size:12px;line-height:2.2;color:#94a3b8">${body}</div>
-      ${remToggle}${adjuster}`;
-  }
-
-  function refreshDayPopup(){
-    document.getElementById('confirm-msg').innerHTML=buildDayPopupHTML();
-  }
-
-  // expose helpers to global for onclick
   window.adjustDayLimit=function(r,delta){
-    customLimits[r]=Math.max(1,(customLimits[r]||defLimit)+delta);
+    customLimits[r]=Math.max(1,(customLimits[r]||window._dayDefLimit)+delta);
     localStorage.setItem('pcc_custom_limits',JSON.stringify(customLimits));
-    refreshDayPopup(); render();
+    renderDayPopup(); render();
   };
-  window.resetDayLimit=function(r,def){
+  window.resetDayLimit=function(r){
     delete customLimits[r];
     localStorage.setItem('pcc_custom_limits',JSON.stringify(customLimits));
-    refreshDayPopup(); render();
+    renderDayPopup(); render();
+  };
+  window.toggleRemaining=function(val){
+    showRemaining=val;
+    localStorage.setItem('pcc_show_remaining',JSON.stringify(val));
+    renderDayPopup(); render();
   };
 
-  document.getElementById('confirm-msg').innerHTML=buildDayPopupHTML();
+  renderDayPopup();
   document.getElementById('confirm-modal').querySelector('.confirm-btns').innerHTML=
     '<button class="confirm-ok" onclick="confirmCancel()" style="width:100%">ঠিক আছে</button>';
   document.getElementById('confirm-modal').classList.add('open');
+}
+
+function renderDayPopup(){
+  const ref=window._dayRef, star=window._dayStar, days=window._dayDays;
+  const app=window._dayApp, color=window._dayColor, defLimit=window._dayDefLimit;
+  if(!app)return;
+  const limit=customLimits[ref]||defLimit;
+  const expDate=addDaysToDate(app.apply_date,limit);
+  const remaining=limit-days;
+
+  let body='';
+  if(star===2||star===1){
+    const remStr=remaining>0?(remaining+' দিন বাকি'):(Math.abs(remaining)+' দিন পার ⚠️');
+    const remCol=remaining>0?color:'#ef4444';
+    body='আবেদন: <b style="color:#e2e8f0">'+app.apply_date+'</b><br>'
+      +'অতিবাহিত: <b style="color:#e2e8f0">'+days+' দিন</b><br>'
+      +'সীমা: <b style="color:'+color+'">'+limit+'d</b> &nbsp;|&nbsp; <span style="color:'+remCol+';font-weight:700">'+remStr+'</span><br>'
+      +'সম্ভাব্য ডেলিভারি: <b style="color:'+color+'">'+expDate+'</b>';
+  } else {
+    const callDate=addDaysToDate(app.apply_date,12);
+    const custDel=addDaysToDate(app.apply_date,limit);
+    const daysToCall=12-days; const daysToDel=limit-days;
+    body='আবেদন: <b style="color:#e2e8f0">'+app.apply_date+'</b><br>'
+      +'অতিবাহিত: <b style="color:#e2e8f0">'+days+' দিন</b><br>'
+      +'সম্ভাব্য পুলিশ কল: <b style="color:#a78bfa">'+callDate+'</b> '+(daysToCall>0?'('+daysToCall+'d বাকি)':'(পার)')+' <br>'
+      +'সম্ভাব্য ডেলিভারি: <b style="color:#34d399">'+custDel+'</b> '+(daysToDel>0?'('+daysToDel+'d বাকি)':'(পার)');
+  }
+
+  const chk=showRemaining?'checked':'';
+  const resetBtn=customLimits[ref]?('<button onclick="resetDayLimit(\''+ref+'\')" style="background:#2d1b1b;border:1px solid #5a2d2d;color:#f87171;border-radius:5px;padding:0 8px;height:28px;font-size:10px;cursor:pointer">রিসেট</button>'):'';
+
+  const html='<div style="font-weight:700;font-size:13px;margin-bottom:10px">'+(star===2?'🔴':star===1?'⭐':'📄')+' '+app.name+'</div>'
+    +'<div style="font-size:12px;line-height:2.2;color:#94a3b8">'+body+'</div>'
+    +'<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#64748b;cursor:pointer;margin-top:8px">'
+    +'<input type="checkbox" '+chk+' onchange="toggleRemaining(this.checked)" style="cursor:pointer"> কার্ডে Remaining দিন দেখাও</label>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #1e3a5f">'
+    +'<span style="font-size:11px;color:#64748b;flex:1">সীমা সেট করুন (দিন)</span>'
+    +'<button onclick="adjustDayLimit(\''+ref+'\',-1)" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;border-radius:5px;width:28px;height:28px;font-size:16px;cursor:pointer">−</button>'
+    +'<span style="font-size:13px;font-weight:700;color:#e2e8f0;min-width:28px;text-align:center">'+limit+'</span>'
+    +'<button onclick="adjustDayLimit(\''+ref+'\',1)" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;border-radius:5px;width:28px;height:28px;font-size:16px;cursor:pointer">+</button>'
+    +resetBtn+'</div>';
+
+  document.getElementById('confirm-msg').innerHTML=html;
 }
 
 // Phone popup — show applicant + client number
@@ -2542,7 +2548,7 @@ function cardHTML(app){
   const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
   const _lim=customLimits&&customLimits[app.ref]?(customLimits[app.ref]):(star===2?7:star===1?14:24);
   const _rem=days!==null?(_lim-days):null;
-  const daysDisplay=days===0?'Today':days!==null?(showRemaining&&star>0?(_rem>0?'남'+_rem+'d':'⚠️'+Math.abs(_rem)+'d'):('Day:'+String(days).padStart(2,'0'))):null;
+  const daysDisplay=days===0?'Today':days!==null?(showRemaining&&star>0?(_rem>0?'বাকি '+_rem+'d':'Over '+Math.abs(_rem)+'d'):('Day:'+String(days).padStart(2,'0'))):null;
   const dayClass2=days===0?'day-count today-badge':(days!==null&&days>7?'day-count day-warn':days!==null?'day-count':'day-count');
   const daysCol=(isCol&&!isDelivered&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);

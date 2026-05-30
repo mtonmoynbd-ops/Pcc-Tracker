@@ -823,7 +823,10 @@ if('serviceWorker' in navigator){
 
 <div class="select-bar" id="select-bar">
   <div class="select-bar-info"><span id="sel-count">0</span> selected</div>
-  <div style="display:flex;gap:6px">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+    <button class="sel-star-btn" onclick="markSelected(2)" style="background:#7f1d1d;border:1px solid #ef4444;color:#fca5a5;padding:7px 10px;border-radius:8px;font-size:12px;cursor:pointer">🔴 Urgent</button>
+    <button class="sel-star-btn" onclick="markSelected(1)" style="background:#451a03;border:1px solid #f59e0b;color:#fcd34d;padding:7px 10px;border-radius:8px;font-size:12px;cursor:pointer">⭐ Important</button>
+    <button class="sel-star-btn" onclick="markSelected(0)" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:7px 10px;border-radius:8px;font-size:12px;cursor:pointer">☆ Normal</button>
     <button class="sel-delete-btn" onclick="deleteSelected()">🗑</button>
     <button class="sel-cancel-btn" onclick="clearSelection()">বাতিল</button>
     <button class="sel-copy-btn" onclick="copySelected()">📋 কপি</button>
@@ -1807,6 +1810,35 @@ function openTimelineModal(ref){
     const daysTxt=h.days!==null&&h.days>=0?`<span style="font-size:10px;color:#475569;margin-left:4px">(${h.days}d)</span>`:'';
     return `<div class="timeline-item"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div><span class="timeline-status" style="color:${color}">${cleaned}</span>${daysTxt}</div><span class="timeline-date">${h.date}</span></div>`;
   }).join('');
+  // ── Standalone rows ─────────────────────────────────────
+  const tlist=document.getElementById('timeline-list');
+
+  // Forwarded: after 2/10 row
+  if(forwarded[ref]){
+    const hist2=statusHistory[ref]||[];
+    const fwdEntry=hist2.slice().reverse().find(h=>{const n=parseInt((h.status||'').split('/')[0])||0;return n>=3&&n<=5;});
+    const fd=fwdEntry&&fwdEntry.date?fwdEntry.date:'—';
+    const fwdRow='<div class="timeline-item" style="background:rgba(30,58,95,0.25);border-color:rgba(96,165,250,0.3)"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#60a5fa;flex-shrink:0"></div><span class="timeline-status" style="color:#60a5fa">📤 Forwarded</span></div><span class="timeline-date">'+fd+'</span></div>';
+    let ins=false;
+    tlist.querySelectorAll('.timeline-item').forEach(function(row){
+      if(ins)return;const txt=row.querySelector('.timeline-status');
+      if(txt&&/^2\//.test(txt.textContent.trim())){row.insertAdjacentHTML('afterend',fwdRow);ins=true;}
+    });
+    if(!ins)tlist.insertAdjacentHTML('beforeend',fwdRow);
+  }
+
+  // Collected: after 9/10 row
+  if(collected[ref]||collectedDate[ref]){
+    const cd=collectedDate[ref]||'—';
+    const colRow='<div class="timeline-item" style="background:rgba(20,41,26,0.25);border-color:rgba(74,222,128,0.3)"><div style="display:flex;align-items:center;gap:8px;flex:1"><div style="width:8px;height:8px;border-radius:50%;background:#4ade80;flex-shrink:0"></div><span class="timeline-status" style="color:#4ade80">📦 Collected</span></div><span class="timeline-date">'+cd+'</span></div>';
+    let ins2=false;
+    tlist.querySelectorAll('.timeline-item').forEach(function(row){
+      if(ins2)return;const txt=row.querySelector('.timeline-status');
+      if(txt&&/^9\//.test(txt.textContent.trim())){row.insertAdjacentHTML('afterend',colRow);ins2=true;}
+    });
+    if(!ins2)tlist.insertAdjacentHTML('beforeend',colRow);
+  }
+
   document.getElementById('timeline-modal').classList.add('open');
 }
 function closeTimelineModal(){document.getElementById('timeline-modal').classList.remove('open');}
@@ -2200,6 +2232,23 @@ async function resetCounts(){
 function toggleSelect(ref){if(selected.has(ref))selected.delete(ref);else selected.add(ref);updateSelectBar();const w=document.getElementById('wrap-'+ref);if(w)w.classList.toggle('selected',selected.has(ref));}
 function updateSelectBar(){const bar=document.getElementById('select-bar');if(selected.size>0){selectMode=true;bar.classList.add('visible');document.getElementById('sel-count').textContent=selected.size;}else{selectMode=false;bar.classList.remove('visible');}}
 function clearSelection(){selected.forEach(r=>{const w=document.getElementById('wrap-'+r);if(w)w.classList.remove('selected');});selected.clear();selectMode=false;document.getElementById('select-bar').classList.remove('visible');}
+function markSelected(starLevel){
+  if(!selected.size)return;
+  selected.forEach(function(ref){
+    const prev=stars[ref]||0;
+    stars[ref]=starLevel;
+    const app=allApps.find(function(a){return a.ref===ref;});
+    const entry=app?(app.name+' '+ref):ref;
+    // Update counts
+    if(prev===2){counts.urgent=Math.max(0,counts.urgent-1);history.urgent=history.urgent.filter(function(e){return e!==entry;});}
+    if(prev===1){counts.important=Math.max(0,counts.important-1);history.important=history.important.filter(function(e){return e!==entry;});}
+    if(starLevel===2){counts.urgent++;if(!history.urgent.includes(entry))history.urgent.push(entry);}
+    if(starLevel===1){counts.important++;if(!history.important.includes(entry))history.important.push(entry);}
+  });
+  save();clearSelection();render();
+  const lbl=starLevel===2?'🔴 Urgent':starLevel===1?'⭐ Important':'☆ Normal';
+  showToast(lbl+' করা হয়েছে');
+}
 function copySelected(){
   const lines=[];
   allApps.forEach(a=>{if(selected.has(a.ref)){lines.push(`${a.name} ${a.ref}`);const n=parseInt((a.status||'').split('/')[0])||0;if(n===2)blinkStopped[a.ref]=true;const s=stars[a.ref]||0;if(s>0&&!forwarded[a.ref])forwarded[a.ref]=true;}});
@@ -2217,7 +2266,22 @@ function buildTicker(){
   const track=document.getElementById('ticker-track');
   if(!track)return;
   const tds=todayDateStr();
-  function isToday(ds){return !!(ds&&normDate(ds)===tds);}
+  function isToday(ds){
+    if(!ds)return false;
+    // Try normDate first
+    if(normDate(ds)===tds)return true;
+    // Also try: ds might be "DD-Mon-YYYY" (4-digit year)
+    const p=ds.toUpperCase().split('-');
+    if(p.length===3){
+      const dd=p[0].padStart(2,'0');
+      const mo=MONTHS_UP.indexOf(p[1].substring(0,3));
+      if(mo>=0){
+        const yr=p[2].length===4?p[2].slice(2):p[2];
+        return (dd+'-'+String(mo+1).padStart(2,'0')+'-'+yr)===tds;
+      }
+    }
+    return false;
+  }
 
   const grp={applied:[],draft:[],printed:[],collect_ready:[],box_ready:[],status_update:[]};
 
@@ -2514,7 +2578,7 @@ function cardHTML(app){
         onclick="handleTap('${app.ref}')">
         <div class="card-top">
           <div class="name" onclick="${nameClick}">${app._hl?hlText(app.name,app._hl):app.name}</div>
-          <div class="card-top-right">${stageBtn}<button class="star-btn" onclick="event.stopPropagation();toggleStar('${app.ref}')">${si}</button></div>
+          <div class="card-top-right">${stageBtn}</div>
         </div>
         <div class="info">
           ${refHTML} &nbsp;|&nbsp;

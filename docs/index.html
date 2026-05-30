@@ -2218,97 +2218,83 @@ function buildTicker(){
   const tds=todayDateStr();
   function isToday(ds){return !!(ds&&normDate(ds)===tds);}
 
-  // ── আজকের সব আপডেট সংগ্রহ ──
-  const groups={};  // statusNum → [{ref,name}]
+  // Groups: key → list of apps
+  const grp={applied:[],draft:[],printed:[],collected_ready:[],box_ready:[],status_update:[]};
 
-  // 1) আজকের নতুন আবেদন
-  allApps.filter(a=>isToday(a.apply_date)&&!(a.status||'').toLowerCase().includes('draft')).forEach(a=>{
-    if(!groups['new'])groups['new']=[];
-    groups['new'].push(a);
-  });
+  // 1) Applied today (non-draft)
+  allApps.filter(a=>isToday(a.apply_date)&&!(a.status||'').toLowerCase().includes('draft'))
+    .forEach(a=>grp.applied.push(a));
 
-  // 2) আজকের Draft
-  allApps.filter(a=>(a.status||'').toLowerCase().includes('draft')&&isToday(a.apply_date)).forEach(a=>{
-    if(!groups['draft'])groups['draft']=[];
-    groups['draft'].push(a);
-  });
+  // 2) Draft today
+  allApps.filter(a=>(a.status||'').toLowerCase().includes('draft')&&isToday(a.apply_date))
+    .forEach(a=>grp.draft.push(a));
 
-  // 3) statusHistory তে আজকের entry — status number অনুযায়ী গ্রুপ
+  // 3) statusHistory আজকের entries
   allApps.forEach(a=>{
     const hist=statusHistory[a.ref]||[];
-    const todayEntries=hist.filter(h=>isToday((h.date||'').replace(/\//g,'-')));
-    if(!todayEntries.length)return;
-    // সর্বশেষ status নাও
-    const lastEntry=todayEntries[todayEntries.length-1];
-    const n=parseInt((lastEntry.status||a.status||'').split('/')[0])||0;
-    const key='s'+n;
-    if(!groups[key])groups[key]=[];
-    // duplicate এড়াও
-    if(!groups[key].some(x=>x.ref===a.ref))groups[key].push(a);
+    const todayH=hist.filter(h=>isToday((h.date||'').replace(/\//g,'-')));
+    if(!todayH.length)return;
+    const lastSt=todayH[todayH.length-1].status||a.status||'';
+    const n=parseInt(lastSt.split('/')[0])||0;
+
+    if(n===5){// Printed
+      if(!grp.printed.some(x=>x.ref===a.ref))grp.printed.push(a);
+    } else if(n===9&&!collected[a.ref]){// 9/10 — Collect pending
+      if(!grp.collected_ready.some(x=>x.ref===a.ref))grp.collected_ready.push(a);
+    } else if(n===9&&collected[a.ref]){// 9/10 — already collected (box)
+      if(!grp.box_ready.some(x=>x.ref===a.ref))grp.box_ready.push(a);
+    } else {// অন্য status update
+      if(!grp.status_update.some(x=>x.ref===a.ref)
+        &&!grp.applied.some(x=>x.ref===a.ref)
+        &&!grp.draft.some(x=>x.ref===a.ref))
+        grp.status_update.push(a);
+    }
   });
 
-  // ── label map ──
-  const statusLabel={
-    's1':'আবেদন',  's2':'Waiting',
-    's3':'Forwarded','s4':'Forwarded',
-    's5':'Printed',
-    's6':'Processing','s7':'Processing',
-    's8':'Ready','s9':'Ready',
-    's10':'Delivered',
-    'new':'আবেদন','draft':'Draft'
-  };
-  const statusColor={
-    's5':'#34d399','s8':'#34d399','s9':'#34d399',
-    's3':'#60a5fa','s4':'#60a5fa',
-    'new':'#94a3b8','draft':'#f59e0b'
-  };
+  // collected এ আজকে যারা গেছে (collectedDate===today)
+  allApps.filter(a=>collectedDate[a.ref]&&isToday(collectedDate[a.ref])&&collected[a.ref])
+    .forEach(a=>{if(!grp.box_ready.some(x=>x.ref===a.ref))grp.box_ready.push(a);});
+
+  function nameSpans(apps){
+    return apps.map(a=>{
+      const r=a.ref.replace(/['"]/g,'');
+      return '<span class="t-name" style="cursor:pointer" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';
+    }).join(', ');
+  }
 
   const sep='<span style="color:#334155;padding:0 10px;flex-shrink:0">⬥</span>';
   const parts=[];
 
-  // Status 5 (Printed) — বিশেষভাবে: "Printed 3files: নাম, নাম"
-  if(groups['s5']&&groups['s5'].length){
-    const apps=groups['s5'];
-    const names=apps.map(a=>{const r=a.ref.replace(/['\\']/g,'');return '<span class="t-name" style="cursor:pointer" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';}).join(', ');
-    parts.push('<span class="ticker-item">🖨️ Printed <b style="color:#34d399">'+apps.length+'</b> file: '+names+'</span>');
-  }
+  if(grp.printed.length)
+    parts.push('<span class="ticker-item">🖨️ Printed <b style="color:#34d399">'+grp.printed.length+'</b>: '+nameSpans(grp.printed)+'</span>');
 
-  // অন্য status আপডেট
-  ['s8','s9','s3','s4','s6','s7','s1','s2'].forEach(function(key){
-    if(!groups[key]||!groups[key].length)return;
-    const apps=groups[key];
-    const lbl=statusLabel[key]||key;
-    const col=statusColor[key]||'#94a3b8';
-    const names=apps.map(a=>{const r=a.ref.replace(/['\\']/g,'');return '<span class="t-name" style="cursor:pointer" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';}).join(', ');
-    parts.push('<span class="ticker-item"><span style="color:'+col+'">'+lbl+' '+apps.length+'</span>: '+names+'</span>');
-  });
+  if(grp.collected_ready.length)
+    parts.push('<span class="ticker-item">📥 Collect <b style="color:#22c55e">'+grp.collected_ready.length+'</b>: '+nameSpans(grp.collected_ready)+'</span>');
 
-  // নতুন আবেদন
-  if(groups['new']&&groups['new'].length){
-    const apps=groups['new'];
-    const names=apps.map(a=>{const r=a.ref.replace(/['\\']/g,'');return '<span class="t-name" style="cursor:pointer" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';}).join(', ');
-    parts.push('<span class="ticker-item">📋 নতুন '+apps.length+': '+names+'</span>');
-  }
+  if(grp.box_ready.length)
+    parts.push('<span class="ticker-item">📦 Ready <b style="color:#4ade80">'+grp.box_ready.length+'</b>: '+nameSpans(grp.box_ready)+'</span>');
 
-  // Draft
-  if(groups['draft']&&groups['draft'].length){
-    const apps=groups['draft'];
-    const names=apps.map(a=>{const r=a.ref.replace(/['\\']/g,'');return '<span class="t-name" style="cursor:pointer" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';}).join(', ');
-    parts.push('<span class="ticker-item" style="color:#f59e0b">✏️ Draft '+apps.length+': '+names+'</span>');
-  }
+  if(grp.applied.length)
+    parts.push('<span class="ticker-item">📋 Applied <b>'+grp.applied.length+'</b>: '+nameSpans(grp.applied)+'</span>');
+
+  if(grp.draft.length)
+    parts.push('<span class="ticker-item" style="color:#f59e0b">✏️ Draft <b>'+grp.draft.length+'</b>: '+nameSpans(grp.draft)+'</span>');
+
+  if(grp.status_update.length)
+    parts.push('<span class="ticker-item" style="color:#94a3b8">🔄 Status Update <b>'+grp.status_update.length+'</b>: '+nameSpans(grp.status_update)+'</span>');
 
   if(!parts.length){
-    // আজ কোনো আপডেট নেই
     track.innerHTML='<span class="ticker-item" style="color:#475569">📭 আজ কোনো আপডেট নেই</span>';
     track.style.animationDuration='15s';
     return;
   }
 
   const oneBlock=parts.join(sep)+sep+'<span style="display:inline-block;width:60px"></span>';
-  track.innerHTML=oneBlock+oneBlock; // double for seamless loop
-  const dur=Math.max(12,parts.length*6);
+  track.innerHTML=oneBlock+oneBlock;
+  const dur=Math.max(14,parts.length*7);
   track.style.animationDuration=dur+'s';
 }
+
 function normDate(d){
   // Normalize "21-MAY-26" to compare with today
   const p=d.toUpperCase().split('-');if(p.length!==3)return '';
@@ -2440,7 +2426,13 @@ function cardHTML(app){
   const statusNum=parseInt((app.status||'').split('/')[0])||0;
   const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
   const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
-  const daysDisplay=days===0?'Today':days!==null?'Day:'+String(days).padStart(2,'0'):null;
+  const _defLim=s===2?7:s===1?14:24;
+  const _lim=customLimits[app.ref]||_defLim;
+  const _rem=days!==null?(_lim-days):null;
+  const daysDisplay=days===0?'Today':days!==null?(
+    showRemaining&&s>0?(_rem>0?'বাকি '+_rem+'d':'Over '+Math.abs(_rem)+'d')
+    :('Day:'+String(days).padStart(2,'0'))
+  ):null;
   const dayClass2=days===0?'day-count today-badge':(days!==null&&days>7?'day-count day-warn':days!==null?'day-count':'day-count');
   const daysCol=(isCol&&!isDelivered&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);

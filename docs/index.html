@@ -806,8 +806,8 @@ if('serviceWorker' in navigator){
   <button class="filter-btn" id="draft-btn" onclick="toggleFilter(&#39;draft&#39;,this)">Draft</button>
   <button class="filter-btn" id="f15-btn" onclick="toggleFilter(&#39;1-5&#39;,this)">1-5</button>
   <button class="filter-btn" id="f68-btn" onclick="toggleFilter(&#39;6-8&#39;,this)">6-8</button>
-  <button class="filter-btn" id="waiting-btn" onclick="toggleFilter(&#39;waiting&#39;,this)" oncontextmenu="return false" ontouchstart="filterPressStart(event,'waiting')" ontouchend="filterPressEnd('waiting')" ontouchcancel="filterPressEnd('waiting')">⏳</button>
-  <button class="filter-btn" id="collect-btn" onclick="toggleFilter(&#39;collected&#39;,this)" oncontextmenu="return false" ontouchstart="filterPressStart(event,'collected')" ontouchend="filterPressEnd('collected')" ontouchcancel="filterPressEnd('collected')">📥</button>
+  <button class="filter-btn" id="waiting-btn" style="display:none" onclick="toggleFilter(&#39;waiting&#39;,this)" oncontextmenu="return false" ontouchstart="filterPressStart(event,'waiting')" ontouchend="filterPressEnd('waiting')" ontouchcancel="filterPressEnd('waiting')">⏳</button>
+  <button class="filter-btn" id="collect-btn" style="display:none" onclick="toggleFilter(&#39;collected&#39;,this)" oncontextmenu="return false" ontouchstart="filterPressStart(event,'collected')" ontouchend="filterPressEnd('collected')" ontouchcancel="filterPressEnd('collected')">📥</button>
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
   </button>
@@ -2715,16 +2715,14 @@ function render(){
   if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
   if(!_searchActive)buildTicker();
-  const _u=allApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2).length;
-  const _i=allApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1).length;
-  document.getElementById('cnt-urgent').textContent=String(_u).padStart(2,'0');
-  document.getElementById('cnt-important').textContent=String(_i).padStart(2,'0');
+  document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
+  document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
   const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));
   const draftBtn=document.getElementById('draft-btn');
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
   // Collect blink: urgent/important uncollected cards exist
   const hasUncollected=getDisplayApps().some(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
-  const waitingCount=allApps.filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];}).length;
+  const waitingCount=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];}).length;
   const waitingBtn=document.getElementById('waiting-btn');
   if(waitingBtn){
     waitingBtn.textContent=waitingCount>0?'⏳ '+waitingCount:'⏳';
@@ -2732,7 +2730,7 @@ function render(){
     if(waitingCount>0&&activeFilter!=='waiting'){waitingBtn.style.animation='blink-col 1.2s ease-in-out infinite';waitingBtn.style.borderColor='#f59e0b';waitingBtn.style.color='#f59e0b';}
     else{waitingBtn.style.animation='';waitingBtn.style.borderColor='';waitingBtn.style.color='';}
   }
-  const collectCount=allApps.filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];}).length;
+  const collectCount=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];}).length;
   const collectBtn=document.getElementById('collect-btn');
   if(collectBtn){
     collectBtn.textContent=collectCount>0?'📥 '+collectCount:'📥';

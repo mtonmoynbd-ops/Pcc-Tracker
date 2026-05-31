@@ -574,7 +574,7 @@
 
   .settings-input { width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; color: #e2e8f0; font-size: 13px; outline: none; margin-bottom: 10px; }
   .settings-save-btn { background: #1d4ed8; border: none; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
-  .select-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1f3d; border-top: 1px solid #1e3a5f; padding: 12px 16px; z-index: 50; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; }
+  .select-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: #0f1f3d; border-top: 1px solid #1e3a5f; padding: 12px 16px; z-index: 50; flex-direction: column; gap: 0; }
   .select-bar.visible { display: flex; }
   .select-bar-info { font-size: 12px; color: #94a3b8; flex-shrink: 0; }
   .select-bar-info span { color: #60a5fa; font-weight: 700; }
@@ -822,11 +822,16 @@ if('serviceWorker' in navigator){
 <div id="toast"></div>
 
 <div class="select-bar" id="select-bar">
-  <div class="select-bar-info"><span id="sel-count">0</span> selected</div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-    <button class="sel-star-btn" onclick="markSelected(2)" style="background:#7f1d1d;border:1px solid #ef4444;color:#fca5a5;padding:7px 10px;border-radius:8px;font-size:12px;cursor:pointer">🔴 Urgent</button>
-    <button class="sel-star-btn" onclick="markSelected(1)" style="background:#451a03;border:1px solid #f59e0b;color:#fcd34d;padding:7px 10px;border-radius:8px;font-size:12px;cursor:pointer">⭐ Important</button>
-    <button class="sel-star-btn" onclick="markSelected(0)" style="background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:7px 10px;border-radius:8px;font-size:12px;cursor:pointer">☆ Normal</button>
+  <!-- Row 1: Mark as -->
+  <div style="display:flex;gap:6px;width:100%;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #1e3a5f">
+    <span style="font-size:10px;color:#475569;align-self:center;flex-shrink:0;text-transform:uppercase;letter-spacing:0.5px">Mark:</span>
+    <button onclick="markSelected(2)" style="flex:1;background:#7f1d1d;border:1px solid #ef4444;color:#fca5a5;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">🔴 Urgent</button>
+    <button onclick="markSelected(1)" style="flex:1;background:#451a03;border:1px solid #f59e0b;color:#fcd34d;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">⭐ Important</button>
+    <button onclick="markSelected(0)" style="flex:1;background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">☆ Normal</button>
+  </div>
+  <!-- Row 2: Count + Actions -->
+  <div style="display:flex;align-items:center;gap:6px;width:100%">
+    <div class="select-bar-info" style="flex:1"><span id="sel-count">0</span> selected</div>
     <button class="sel-delete-btn" onclick="deleteSelected()">🗑</button>
     <button class="sel-cancel-btn" onclick="clearSelection()">বাতিল</button>
     <button class="sel-copy-btn" onclick="copySelected()">📋 কপি</button>
@@ -2296,12 +2301,12 @@ function buildTicker(){
     if(!todayH.length)return;
     const lastSt=todayH[todayH.length-1].status||a.status||'';
     const n=parseInt(lastSt.split('/')[0])||0;
-    const add=(g)=>{if(!grp[g].some(x=>x.ref===a.ref))grp[g].push(a);};
-    if(n===5) add('printed');
-    else if(n===9&&collected[a.ref]) add('box_ready');
-    else if(n===9) add('collect_ready');
+    const add=(g,st)=>{if(!grp[g].some(x=>x.ref===a.ref))grp[g].push({...a,_tickerSt:st});};
+    if(n===5) add('printed',lastSt);
+    else if(n===9&&collected[a.ref]) add('box_ready',lastSt);
+    else if(n===9) add('collect_ready',lastSt);
     else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref))
-      add('status_update');
+      add('status_update',lastSt);
   });
 
   // Collected today
@@ -2322,7 +2327,14 @@ function buildTicker(){
   if(grp.box_ready.length)     parts.push('<span class="ticker-item">📦 <span style="color:#4ade80">Ready '+grp.box_ready.length+'</span>: '+nameSpans(grp.box_ready)+'</span>');
   if(grp.applied.length)       parts.push('<span class="ticker-item">📋 <span style="color:#94a3b8">Applied '+grp.applied.length+'</span>: '+nameSpans(grp.applied)+'</span>');
   if(grp.draft.length)         parts.push('<span class="ticker-item">✏️ <span style="color:#f59e0b">Draft '+grp.draft.length+'</span>: '+nameSpans(grp.draft)+'</span>');
-  if(grp.status_update.length) parts.push('<span class="ticker-item">🔄 <span style="color:#94a3b8">Status Update '+grp.status_update.length+'</span>: '+nameSpans(grp.status_update)+'</span>');
+  if(grp.status_update.length){
+    const suSpans=grp.status_update.map(a=>{
+      const r=a.ref.replace(/['"<>]/g,'');
+      const st=a._tickerSt?(' <span style="color:#60a5fa;font-size:10px">['+a._tickerSt+']</span>'):'';
+      return '<span style="cursor:pointer;color:#e2e8f0" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+st+'</span>';
+    }).join('<span style="color:#475569">, </span>');
+    parts.push('<span class="ticker-item">🔄 <span style="color:#94a3b8">Status Update '+grp.status_update.length+'</span>: '+suSpans+'</span>');
+  }
 
   if(!parts.length){
     parts.push('<span class="ticker-item" style="color:#475569">📭 আজ কোনো আপডেট নেই</span>');
@@ -2350,7 +2362,7 @@ function buildTicker(){
       track.style.transition='none';
       // Use JS-driven first entry, then CSS loop
       let startX=areaW;
-      const speed=60;
+      const speed=45;
       let last=null;
       let raf=null;
       function enterStep(ts){
@@ -2382,12 +2394,28 @@ function todayDateStr(){
   return `${String(t.getDate()).padStart(2,'0')}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getFullYear()).slice(-2)}`;
 }
 function tickerClick(ref){
-  // Scroll to card and highlight
-  const el=document.getElementById('card-'+ref);
-  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.style.boxShadow='0 0 0 2px #60a5fa';setTimeout(()=>el.style.boxShadow='',1500);}
-  else{
-    // Card not visible — open pick modal to mark as important/urgent
-    openPickModal(ref);
+  var el=document.getElementById('card-'+ref);
+  if(el){
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    // Strong flash: bright border + scale + glow
+    el.style.transition='box-shadow 0.1s,transform 0.1s';
+    el.style.transform='scale(1.015)';
+    el.style.boxShadow='0 0 0 3px #60a5fa, 0 0 24px rgba(96,165,250,0.6)';
+    setTimeout(function(){el.style.transform='';el.style.boxShadow='0 0 0 2px #60a5fa';},300);
+    setTimeout(function(){el.style.boxShadow='';el.style.transition='';},2200);
+  } else {
+    if(typeof activeFilter!=='undefined'&&activeFilter!=='all'){
+      activeFilter='all';
+      document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+      render();
+    }
+    setTimeout(function(){
+      var el2=document.getElementById('card-'+ref);
+      if(el2){el2.scrollIntoView({behavior:'smooth',block:'center'});
+        el2.style.transition='box-shadow 0.1s';
+        el2.style.boxShadow='0 0 0 3px #60a5fa, 0 0 24px rgba(96,165,250,0.6)';
+        setTimeout(function(){el2.style.boxShadow='';},2200);}
+    },150);
   }
 }
 function activateSearch(){
@@ -2525,9 +2553,12 @@ function cardHTML(app){
   // Collected card → no Day/Rem, show Aged separately
   let daysDisplay=null;
   if(!isCol&&days!==null){
-    daysDisplay=days===0?'Today':(showRemaining&&s>0
-      ?'Rem:'+String(Math.max(0,_rem)).padStart(2,'0')
-      :'Day:'+String(days).padStart(2,'0'));
+    if(days===0) daysDisplay='Today';
+    else if(showRemaining&&s>0){
+      daysDisplay=_rem>0?'Rem:'+String(_rem).padStart(2,'0'):'Over:'+String(Math.abs(_rem)).padStart(2,'0');
+    } else {
+      daysDisplay='Day:'+String(days).padStart(2,'0');
+    }
   }
   const dayClass2=days===0?'day-count today-badge':(days!==null&&days>7?'day-count day-warn':days!==null?'day-count':'day-count');
   const daysCol=(isCol&&!isDelivered&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;

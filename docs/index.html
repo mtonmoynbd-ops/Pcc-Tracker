@@ -2431,42 +2431,41 @@ function buildTicker(){
   // 2 copies — CSS animation moves 0% to -50% = seamless loop
   track.innerHTML=oneBlock+oneBlock;
 
-  // Step 1: reset, measure scrollWidth before any transform
-  track.style.animation='none';
-  track.style.transition='none';
-  track.style.transform='translateY(-50%) translateX(0px)';
-  void track.offsetWidth; // force reflow
-
   requestAnimationFrame(function(){
-    var area=document.getElementById('ticker-scroll-area');
-    var areaW=area?area.offsetWidth:300;
-    var halfW=track.scrollWidth/2;
-    if(halfW<20){halfW=track.offsetWidth/2;}
-    if(halfW<20){halfW=Math.max(300,track.textContent.length*7);}
-    var dur=Math.max(8,Math.round(halfW/speed));
-
-    // Step 2: JS-driven entry from right
-    var startX=areaW;
-    var last=null;
-    function enterStep(ts){
-      if(last===null)last=ts;
-      var dt=Math.min(ts-last,50);last=ts;
-      startX-=speed*(dt/1000);
-      if(startX<=0){
-        // Step 3: hand off to CSS infinite loop
-        track.style.transform='translateY(-50%) translateX(0%)';
-        void track.offsetWidth;
-        track.style.animation='ticker-rtl '+dur+'s linear infinite';
-        window._tickerRaf=null;
-        return;
+    requestAnimationFrame(function(){
+      const area=document.getElementById('ticker-scroll-area');
+      const areaW=area?area.offsetWidth:300;
+      const halfW=track.scrollWidth/2;
+      const dur=Math.max(10,Math.round(halfW/60));
+      // Start position: shift track right by areaW so it enters from right
+      // Animation handles the loop: each iteration moves one copy width
+      track.style.transform='translateY(-50%) translateX('+areaW+'px)';
+      track.style.animation='none';
+      void track.offsetWidth;
+      // Custom animation: from current right position to -halfW
+      track.style.transition='none';
+      // Use JS-driven first entry, then CSS loop
+      let startX=areaW;
+      const speed=45;
+      let last=null;
+      let raf=null;
+      function enterStep(ts){
+        if(last===null)last=ts;
+        const dt=Math.min(ts-last,50);last=ts;
+        startX-=speed*(dt/1000);
+        if(startX<=0){
+          // Handoff to CSS animation
+          track.style.transform='translateY(-50%) translateX(0%)';
+          track.style.animation='ticker-rtl '+dur+'s linear infinite';
+          return;
+        }
+        track.style.transform='translateY(-50%) translateX('+Math.round(startX)+'px)';
+        raf=requestAnimationFrame(enterStep);
       }
-      track.style.transform='translateY(-50%) translateX('+Math.round(startX)+'px)';
-      window._tickerRaf=requestAnimationFrame(enterStep);
-    }
-    window._tickerRaf=requestAnimationFrame(enterStep);
+      raf=requestAnimationFrame(enterStep);
+    });
   });
 }
-
 function normDate(d){
   // Normalize "21-MAY-26" to compare with today
   const p=d.toUpperCase().split('-');if(p.length!==3)return '';
@@ -2698,14 +2697,14 @@ function _renderFwdHistory(months){
       +'</div>'
       // date chips + panels — hidden by default
       +'<div id="fwd-dates-'+mi+'" style="display:none;padding:6px 4px 2px">'
-      +'<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px">';
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     dateKeys.forEach(function(dk,di){
       var cnt=dateMap[dk]?dateMap[dk].length:0;
       var cid=mi+'_'+di;
       var lbl=_chip2(dk,cnt);
       h+='<button id="fwd-chip-'+cid+'" onclick="fwdDateToggle(\''+cid+'\')" '
-        +'style="font-size:10px;padding:2px 4px;border-radius:10px;border:1px solid rgba(96,165,250,0.35);'
-        +'background:rgba(30,58,95,0.4);color:#60a5fa;cursor:pointer;font-weight:600;flex:1;min-width:0;text-align:center">'+lbl+'</button>';
+        +'style="font-size:10px;padding:3px 2px;border-radius:10px;border:1px solid rgba(96,165,250,0.35);'
+        +'background:rgba(30,58,95,0.4);color:#60a5fa;cursor:pointer;font-weight:600;width:100%;text-align:center">'+lbl+'</button>';
     });
     h+='</div>';
     dateKeys.forEach(function(dk,di){
@@ -2738,14 +2737,14 @@ function _renderColHistory(months){
       +'<span style="color:#475569;font-size:10px">('+total+')</span>'
       +'</div>'
       +'<div id="col-dates-'+mi+'" style="display:none;padding:6px 4px 2px">'
-      +'<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px">';
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     pdKeys.forEach(function(pdKey,di){
       var cnt=pdMap[pdKey]?pdMap[pdKey].length:0;
       var cid=mi+'_'+di;
       var lbl=_chip2(pdKey,cnt);
       h+='<button id="col-chip-'+cid+'" onclick="colPdToggle(\''+cid+'\')" '
-        +'style="font-size:10px;padding:2px 4px;border-radius:10px;border:1px solid rgba(34,197,94,0.35);'
-        +'background:rgba(5,46,22,0.4);color:#4ade80;cursor:pointer;font-weight:600;flex:1;min-width:0;text-align:center">'+lbl+'</button>';
+        +'style="font-size:10px;padding:3px 2px;border-radius:10px;border:1px solid rgba(34,197,94,0.35);'
+        +'background:rgba(5,46,22,0.4);color:#4ade80;cursor:pointer;font-weight:600;width:100%;text-align:center">'+lbl+'</button>';
     });
     h+='</div>';
     pdKeys.forEach(function(pdKey,di){

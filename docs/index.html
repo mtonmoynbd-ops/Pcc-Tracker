@@ -2559,6 +2559,59 @@ function _renderLogModal(logArr,contentId,labelPrefix,emptyMsg){
       +itemsHtml+'</div>';
   }).join('');
 }
+function _buildFwdHistory(){
+  // Merge forwardedLog[] (new) + legacy forwarded{} data from allApps
+  const combined=[...forwardedLog];
+  const loggedRefs=new Set(forwardedLog.map(function(e){return e.ref;}));
+  // Add legacy entries: any app that is forwarded but not in forwardedLog
+  allApps.forEach(function(a){
+    if(forwarded[a.ref]&&!loggedRefs.has(a.ref)){
+      combined.push({date:'(পুরানো)',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
+    }
+  });
+  return combined;
+}
+function _buildColHistory(){
+  // Merge collectedLog[] (new) + legacy collectedDate{} data
+  const combined=[...collectedLog];
+  const loggedRefs=new Set(collectedLog.map(function(e){return e.ref;}));
+  allApps.forEach(function(a){
+    if(collected[a.ref]&&!loggedRefs.has(a.ref)){
+      combined.push({date:collectedDate[a.ref]||'(পুরানো)',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
+    }
+  });
+  // Also include delivered archive items that were collected
+  deliveredArchive.forEach(function(a){
+    if(a.ref&&!loggedRefs.has(a.ref)&&a.deliveredDate){
+      // Only if not already in combined
+      if(!combined.some(function(e){return e.ref===a.ref;})){
+        combined.push({date:a.deliveredDate,ref:a.ref,name:a.name||'',printDate:a.printDate||''});
+      }
+    }
+  });
+  return combined;
+}
+function _renderLogGroups(entries){
+  if(!entries.length)return '';
+  const groups={};
+  [...entries].reverse().forEach(function(entry){
+    const d=entry.date||'?';
+    if(!groups[d])groups[d]=[];
+    groups[d].push(entry);
+  });
+  return Object.entries(groups).map(function([date,items]){
+    return '<div style="margin-bottom:12px">'
+      +'<div style="font-size:10px;color:#64748b;padding:4px 0 3px">📅 '+date+'  <span style="color:#475569">'+items.length+' file</span></div>'
+      +items.map(function(a){
+        return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
+          +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
+          +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
+          +(a.printDate?'<span style="color:#60a5fa;font-size:10px">🖨️ '+a.printDate+'</span>':'')
+          +'</div>';
+      }).join('')
+      +'</div>';
+  }).join('');
+}
 function openForwardedLogModal(){
   const el=document.getElementById('fwd-log-content');
   if(!el)return;
@@ -2581,26 +2634,10 @@ function openForwardedLogModal(){
       }).join('')
       +'</div>';
   }
-  if(forwardedLog.length){
-    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">📤 Forwarded ইতিহাস</div>';
-    const groups={};
-    [...forwardedLog].reverse().forEach(function(entry){
-      const d=entry.date||'?';
-      if(!groups[d])groups[d]=[];
-      groups[d].push(entry);
-    });
-    html+=Object.entries(groups).map(function([date,items]){
-      return '<div style="margin-bottom:12px">'
-        +'<div style="font-size:10px;color:#64748b;padding:4px 0 3px">📅 '+date+'  <span style="color:#475569">'+items.length+' file</span></div>'
-        +items.map(function(a){
-          return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
-            +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
-            +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
-            +(a.printDate?'<span style="color:#60a5fa;font-size:10px">🖨️ '+a.printDate+'</span>':'')
-            +'</div>';
-        }).join('')
-        +'</div>';
-    }).join('');
+  const hist=_buildFwdHistory();
+  if(hist.length){
+    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">📤 Forwarded ইতিহাস ('+hist.length+')</div>';
+    html+=_renderLogGroups(hist);
   }
   if(!html)html='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো রেকর্ড নেই</div>';
   el.innerHTML=html;
@@ -2630,26 +2667,10 @@ function openCollectedLogModal(){
       }).join('')
       +'</div>';
   }
-  if(collectedLog.length){
-    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">📥 Collected ইতিহাস</div>';
-    const groups={};
-    [...collectedLog].reverse().forEach(function(entry){
-      const d=entry.date||'?';
-      if(!groups[d])groups[d]=[];
-      groups[d].push(entry);
-    });
-    html+=Object.entries(groups).map(function([date,items]){
-      return '<div style="margin-bottom:12px">'
-        +'<div style="font-size:10px;color:#64748b;padding:4px 0 3px">📅 '+date+'  <span style="color:#475569">'+items.length+' file</span></div>'
-        +items.map(function(a){
-          return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
-            +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
-            +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
-            +(a.printDate?'<span style="color:#22c55e;font-size:10px">🖨️ '+a.printDate+'</span>':'')
-            +'</div>';
-        }).join('')
-        +'</div>';
-    }).join('');
+  const hist=_buildColHistory();
+  if(hist.length){
+    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">📥 Collected ইতিহাস ('+hist.length+')</div>';
+    html+=_renderLogGroups(hist);
   }
   if(!html)html='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো রেকর্ড নেই</div>';
   el.innerHTML=html;
@@ -2894,13 +2915,15 @@ function render(){
   const collectedCount=getDisplayApps().filter(function(a){return collected[a.ref]&&!delivered[a.ref];}).length;
   const readyChip=collectedCount>0?`<span class="ready-chip" onclick="toggleFilter('ready',this)">📦 Ready ${collectedCount}</span>`:'';
   function secRow(title,count,titleCls,countCls){
-    const dc=!dateShown?`${dateChip}${readyChip}`:'' ;if(!dateShown&&(dateChip||readyChip))dateShown=true;
+    const dc=!dateShown?dateChip:'' ;if(!dateShown&&dateChip)dateShown=true;
     return `<div class="section-row">
       <div class="section-title ${titleCls||''}">${title}</div>
       ${dc}
       ${count!==null?`<div class="section-count ${countCls||''}">${count} file</div>`:''}
     </div>`;
   }
+  // Always render readyChip at top if collected files exist
+  if(readyChip)html+=`<div style="padding:0 0 4px 0">${readyChip}</div>`;
   if(star2.length){html+=secRow('🔴 Urgent',star2.length,'urgent-title','urgent-count');star2.forEach(a=>html+=cardHTML(a));}
   if(star1.length){html+=secRow('⭐ Important',star1.length,'important-title','important-count');star1.forEach(a=>html+=cardHTML(a));}
   if(normal.length){html+=secRow('Normal',normal.length,'normal-title','normal-count');normal.forEach(a=>html+=cardHTML(a));}

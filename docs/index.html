@@ -1269,7 +1269,7 @@ function fromInputDate(str){
   try{if(!str)return '';const[y,mo,d]=str.split('-');return String(parseInt(d)).padStart(2,'0')+'-'+MONTHS_SHORT[parseInt(mo)-1]+'-'+String(y).slice(2);}catch{return '';}
 }
 function getEffectivePrintDate(ref){return manualPrintDates[ref]||printDates[ref]||null;}
-function getDisplayApps(){return allApps.filter(a=>a.status!=='10/10'&&!deletedRefs.has(a.ref));}
+function getDisplayApps(){return allApps.filter(a=>(a.status!=='10/10'||(stars[a.ref]||0)>0&&!delivered[a.ref])&&!deletedRefs.has(a.ref));}
 function todayStr(){const d=new Date();return String(d.getDate()).padStart(2,'0')+'-'+MONTHS_SHORT[d.getMonth()]+'-'+String(d.getFullYear()).slice(2);}
 function getTodayDisplay(){const d=new Date();return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;}
 function trimStatus(s){
@@ -2363,8 +2363,11 @@ function buildTicker(){
     if(n===5) add('printed',lastSt);
     else if(n===9&&collected[a.ref]) add('box_ready',lastSt);
     else if(n===9) add('collect_ready',lastSt);
-    else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref))
-      add('status_update',lastSt);
+    else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref)){
+      // Only show status_update for urgent/important (stars>0) or rejected/draft
+      const isRejected=(lastSt||'').toLowerCase().includes('reject');
+      if((stars[a.ref]||0)>0||isRejected) add('status_update',lastSt);
+    }
   });
 
   // Collected today
@@ -2419,7 +2422,7 @@ function buildTicker(){
       const area=document.getElementById('ticker-scroll-area');
       const areaW=area?area.offsetWidth:300;
       const halfW=track.scrollWidth/2;
-      const dur=Math.max(10,Math.round(halfW/60));
+      const dur=Math.max(10,Math.round(halfW/speed));
       // Start position: shift track right by areaW so it enters from right
       // Animation handles the loop: each iteration moves one copy width
       track.style.transform='translateY(-50%) translateX('+areaW+'px)';
@@ -2532,116 +2535,188 @@ function saveRegister(){
 let _filterPressTimer=null;
 
 // ── Waiting / Collect Log Modals ─────────────────────────
-function _groupByMonthDate(entries){
-  // Returns {monthLabel: {dateLabel: [entries]}}
-  const months={};
-  [...entries].reverse().forEach(function(e){
-    const d=e.date||'';
-    // d = "DD-MMM-YY" or similar — extract month+year as group
-    const parts=d.split('-');
-    const monthKey=parts.length>=3?parts[1]+'-'+parts[2]:'অজানা';
-    const dateKey=d||'অজানা';
-    if(!months[monthKey])months[monthKey]={};
-    if(!months[monthKey][dateKey])months[monthKey][dateKey]=[];
-    months[monthKey][dateKey].push(e);
+
+function _buildFwdLogData(){
+  var loggedRefs=new Set(forwardedLog.map(function(e){return e.ref;}));
+  var hist=forwardedLog.slice();
+  allApps.forEach(function(a){
+    if(forwarded[a.ref]&&!loggedRefs.has(a.ref)){
+      hist.push({date:'\u09aa\u09c1\u09b0\u09be\u09a8\u09cb',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
+    }
+  });
+  var months={};
+  hist.forEach(function(e){
+    var parts=(e.date||'').split('-');
+    var mk=parts.length>=3?(parts[1]+'-'+parts[2]):'\u09aa\u09c1\u09b0\u09be\u09a8\u09cb';
+    if(!months[mk])months[mk]={};
+    if(!months[mk][e.date])months[mk][e.date]=[];
+    months[mk][e.date].push(e);
   });
   return months;
 }
-function _renderGroupedLog(entries,dotColor){
-  if(!entries.length)return '';
-  const months=_groupByMonthDate(entries);
-  return Object.entries(months).map(function([month,dates]){
-    const total=Object.values(dates).reduce(function(s,arr){return s+arr.length;},0);
-    const datesHtml=Object.entries(dates).map(function([date,items]){
-      const itemsHtml=items.map(function(a){
-        return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 6px 4px 12px;border-bottom:1px solid rgba(255,255,255,0.04)">'
-          +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
-          +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
-          +(a.printDate?'<span style="color:'+dotColor+';font-size:10px">🖨️ '+a.printDate+'</span>':'')
-          +'</div>';
-      }).join('');
-      return '<div style="margin-bottom:4px">'
-        +'<div style="font-size:10px;color:#64748b;padding:5px 6px 3px">📅 '+date+' <span style="color:#475569">('+items.length+')</span></div>'
-        +itemsHtml
-        +'</div>';
-    }).join('');
-    return '<details open style="margin-bottom:10px">'
-      +'<summary style="list-style:none;cursor:pointer;font-size:11px;font-weight:700;color:#7c6fa0;padding:6px 4px;border-bottom:1px solid rgba(124,111,160,0.25)">📆 '+month+' <span style="color:#475569;font-weight:400">'+total+' file</span></summary>'
-      +datesHtml
-      +'</details>';
-  }).join('');
+
+function _buildColLogData(){
+  var loggedRefs=new Set(collectedLog.map(function(e){return e.ref;}));
+  var hist=collectedLog.slice();
+  allApps.forEach(function(a){
+    if(collected[a.ref]&&!loggedRefs.has(a.ref)){
+      hist.push({date:collectedDate[a.ref]||'\u09aa\u09c1\u09b0\u09be\u09a8\u09cb',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
+    }
+  });
+  var months={};
+  hist.forEach(function(e){
+    var parts=(e.date||'').split('-');
+    var mk=parts.length>=3?(parts[1]+'-'+parts[2]):'\u09aa\u09c1\u09b0\u09be\u09a8\u09cb';
+    var pdKey=e.printDate||'(Print date \u09a8\u09c7\u0987)';
+    if(!months[mk])months[mk]={};
+    if(!months[mk][pdKey])months[mk][pdKey]=[];
+    months[mk][pdKey].push(e);
+  });
+  return months;
 }
+
+function _rowItem(name,ref,extra){
+  return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
+    +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+name+'</span>'
+    +'<span style="color:#64748b;font-size:10px">'+ref+'</span>'
+    +(extra||'')
+    +'</div>';
+}
+
+function fwdDateToggle(id){
+  var panel=document.getElementById('fwd-panel-'+id);
+  var chip=document.getElementById('fwd-chip-'+id);
+  if(!panel)return;
+  var open=panel.style.display!=='none';
+  panel.style.display=open?'none':'block';
+  if(chip){chip.style.background=open?'#1e293b':'#1e3a5f';chip.style.color=open?'#94a3b8':'#e2e8f0';}
+}
+function colPdToggle(id){
+  var panel=document.getElementById('col-panel-'+id);
+  var chip=document.getElementById('col-chip-'+id);
+  if(!panel)return;
+  var open=panel.style.display!=='none';
+  panel.style.display=open?'none':'block';
+  if(chip){chip.style.background=open?'#052e16':'#14532d';chip.style.color=open?'#4ade80':'#bbf7d0';}
+}
+
+function _renderFwdHistory(months){
+  var keys=Object.keys(months);
+  if(!keys.length)return '';
+  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
+    +'\uD83D\uDCE4 Forwarded \u0987\u09A4\u09BF\u09B9\u09BE\u09B8</div>';
+  keys.forEach(function(mk,mi){
+    var dates=months[mk];
+    var total=Object.values(dates).reduce(function(s,a){return s+a.length;},0);
+    h+='<div style="margin-bottom:10px">'
+      +'<div style="font-size:11px;font-weight:700;color:#60a5fa;padding:5px 0 6px">'
+      +'\uD83D\uDCC6 '+mk+' <span style="color:#475569;font-weight:400">('+total+')</span></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">';
+    Object.keys(dates).forEach(function(dk,di){
+      var cnt=dates[dk].length;
+      var cid=mi+'_'+di;
+      h+='<button id="fwd-chip-'+cid+'" onclick="fwdDateToggle(\''+cid+'\')" '
+        +'style="font-size:10px;padding:3px 8px;border-radius:12px;border:1px solid #334155;'
+        +'background:#1e293b;color:#94a3b8;cursor:pointer;flex-shrink:0">'
+        +dk+' <span style="color:#60a5fa">'+cnt+'</span></button>';
+    });
+    h+='</div>';
+    Object.keys(dates).forEach(function(dk,di){
+      var items=dates[dk];
+      var cid=mi+'_'+di;
+      var rows=items.map(function(a){
+        return _rowItem(a.name,a.ref,a.printDate?'<span style="color:#60a5fa;font-size:10px">\uD83D\uDDB8\uFE0F '+a.printDate+'</span>':'');
+      }).join('');
+      h+='<div id="fwd-panel-'+cid+'" style="display:none;padding:4px 0 8px">'+rows+'</div>';
+    });
+    h+='</div>';
+  });
+  return h;
+}
+
+function _renderColHistory(months){
+  var keys=Object.keys(months);
+  if(!keys.length)return '';
+  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
+    +'\uD83D\uDCE5 Collected \u0987\u09A4\u09BF\u09B9\u09BE\u09B8</div>';
+  keys.forEach(function(mk,mi){
+    var pds=months[mk];
+    var total=Object.values(pds).reduce(function(s,a){return s+a.length;},0);
+    h+='<div style="margin-bottom:10px">'
+      +'<div style="font-size:11px;font-weight:700;color:#22c55e;padding:5px 0 6px">'
+      +'\uD83D\uDCC6 '+mk+' <span style="color:#475569;font-weight:400">('+total+')</span></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">';
+    Object.keys(pds).forEach(function(pdKey,di){
+      var cnt=pds[pdKey].length;
+      var cid=mi+'_'+di;
+      h+='<button id="col-chip-'+cid+'" onclick="colPdToggle(\''+cid+'\')" '
+        +'style="font-size:10px;padding:3px 8px;border-radius:12px;border:1px solid #14532d;'
+        +'background:#052e16;color:#4ade80;cursor:pointer;flex-shrink:0">'
+        +'\uD83D\uDDB8\uFE0F '+pdKey+' <span style="color:#22c55e">'+cnt+'</span></button>';
+    });
+    h+='</div>';
+    Object.keys(pds).forEach(function(pdKey,di){
+      var items=pds[pdKey];
+      var cid=mi+'_'+di;
+      var rows=items.map(function(a){
+        return _rowItem(a.name,a.ref,'<span style="color:#64748b;font-size:10px">\uD83D\uDCC5 '+a.date+'</span>');
+      }).join('');
+      h+='<div id="col-panel-'+cid+'" style="display:none;padding:4px 0 8px">'+rows+'</div>';
+    });
+    h+='</div>';
+  });
+  return h;
+}
+
 function _pendingFileItem(a,nameColor,pdColor){
-  const pd=getEffectivePrintDate(a.ref);
-  const st=a.status||'';
+  var pd=getEffectivePrintDate(a.ref);
   return '<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06)">'
     +'<span style="color:'+nameColor+';font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
     +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
-    +(st?'<span style="color:#475569;font-size:10px">'+st+'</span>':'')
-    +(pd?'<span style="color:'+pdColor+';font-size:10px">🖨️ '+pd+'</span>':'')
+    +'<span style="color:#475569;font-size:10px">'+a.status+'</span>'
+    +(pd?'<span style="color:'+pdColor+';font-size:10px">\uD83D\uDDB8\uFE0F '+pd+'</span>':'')
     +'</div>';
 }
+
 function openForwardedLogModal(){
-  const el=document.getElementById('fwd-log-content');
+  var el=document.getElementById('fwd-log-content');
   if(!el)return;
-  // Current waiting files: 2/10 important not yet forwarded
-  const waiting=getDisplayApps().filter(function(a){
-    const n=parseInt((a.status||'').split('/')[0])||0;
+  var waiting=getDisplayApps().filter(function(a){
+    var n=parseInt((a.status||'').split('/')[0])||0;
     return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];
   });
-  let html='';
+  var html='';
   if(waiting.length){
     html+='<div style="margin-bottom:14px">'
-      +'<div style="font-size:10px;color:#f59e0b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">⏳ অপেক্ষমান ফাইল ('+waiting.length+')</div>'
+      +'<div style="font-size:10px;color:#f59e0b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">'
+      +'\u23F3 \u0985\u09AA\u09C7\u0995\u09CD\u09B7\u09AE\u09BE\u09A8 \u09AB\u09BE\u0987\u09B2 ('+waiting.length+')</div>'
       +waiting.map(function(a){return _pendingFileItem(a,'#fcd34d','#60a5fa');}).join('')
       +'</div>';
   }
-  // History: new log + legacy forwarded{}
-  const loggedRefs=new Set(forwardedLog.map(function(e){return e.ref;}));
-  const hist=[...forwardedLog];
-  allApps.forEach(function(a){
-    if(forwarded[a.ref]&&!loggedRefs.has(a.ref)){
-      hist.push({date:'পুরানো',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
-    }
-  });
-  if(hist.length){
-    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 0 2px">📤 Forwarded ইতিহাস ('+hist.length+')</div>';
-    html+=_renderGroupedLog(hist,'#60a5fa');
-  }
-  if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
+  html+=_renderFwdHistory(_buildFwdLogData());
+  if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">\u0995\u09CB\u09A8\u09CB \u09B0\u09C7\u0995\u09B0\u09CD\u09A1 \u09A8\u09C7\u0987</div>';
   el.innerHTML=html;
   document.getElementById('fwd-log-modal').classList.add('open');
 }
 function closeFwdLogModal(){document.getElementById('fwd-log-modal').classList.remove('open');}
 
 function openCollectedLogModal(){
-  const el=document.getElementById('col-log-content');
+  var el=document.getElementById('col-log-content');
   if(!el)return;
-  // Current collect-ready: 9/10 starred not yet collected
-  const ready=getDisplayApps().filter(function(a){
-    const n=parseInt((a.status||'').split('/')[0])||0;
+  var ready=getDisplayApps().filter(function(a){
+    var n=parseInt((a.status||'').split('/')[0])||0;
     return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
   });
-  let html='';
+  var html='';
   if(ready.length){
     html+='<div style="margin-bottom:14px">'
-      +'<div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">📦 Collect-ready ফাইল ('+ready.length+')</div>'
+      +'<div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">'
+      +'\uD83D\uDCE6 Collect-ready \u09AB\u09BE\u0987\u09B2 ('+ready.length+')</div>'
       +ready.map(function(a){return _pendingFileItem(a,'#4ade80','#22c55e');}).join('')
       +'</div>';
   }
-  // History: new log + legacy collectedDate{}
-  const loggedRefs=new Set(collectedLog.map(function(e){return e.ref;}));
-  const hist=[...collectedLog];
-  allApps.forEach(function(a){
-    if(collected[a.ref]&&!loggedRefs.has(a.ref)){
-      hist.push({date:collectedDate[a.ref]||'পুরানো',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
-    }
-  });
-  if(hist.length){
-    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 0 2px">📥 Collected ইতিহাস ('+hist.length+')</div>';
-    html+=_renderGroupedLog(hist,'#22c55e');
-  }
-  if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
+  html+=_renderColHistory(_buildColLogData());
+  if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">\u0995\u09CB\u09A8\u09CB \u09B0\u09C7\u0995\u09B0\u09CD\u09A1 \u09A8\u09C7\u0987</div>';
   el.innerHTML=html;
   document.getElementById('col-log-modal').classList.add('open');
 }

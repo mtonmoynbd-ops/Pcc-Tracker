@@ -973,7 +973,7 @@ if('serviceWorker' in navigator){
 <div class="modal" id="fwd-log-modal" style="z-index:180">
   <div class="modal-box" style="max-width:400px">
     <div class="modal-title">
-      <span>⏳ Waiting / Forwarded রেকর্ড</span>
+      <span>Waiting</span>
       <button class="modal-close" onclick="closeFwdLogModal()">✕</button>
     </div>
     <div id="fwd-log-content" style="max-height:65vh;overflow-y:auto;padding:4px 0"></div>
@@ -983,7 +983,7 @@ if('serviceWorker' in navigator){
 <div class="modal" id="col-log-modal" style="z-index:180">
   <div class="modal-box" style="max-width:400px">
     <div class="modal-title">
-      <span>📥 Collect / Collected রেকর্ড</span>
+      <span>Collect</span>
       <button class="modal-close" onclick="closeColLogModal()">✕</button>
     </div>
     <div id="col-log-content" style="max-height:65vh;overflow-y:auto;padding:4px 0"></div>
@@ -2417,38 +2417,27 @@ function buildTicker(){
 
   // CSS animation: seamless RTL scroll
   // We set initial left offset so content enters from right edge
+  // Pure JS RAF scroll — no CSS animation, no freeze
+  if(window._tickerRaf){cancelAnimationFrame(window._tickerRaf);window._tickerRaf=null;}
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
       const area=document.getElementById('ticker-scroll-area');
       const areaW=area?area.offsetWidth:300;
       const halfW=track.scrollWidth/2;
-      const dur=Math.max(10,Math.round(halfW/speed));
-      // Start position: shift track right by areaW so it enters from right
-      // Animation handles the loop: each iteration moves one copy width
-      track.style.transform='translateY(-50%) translateX('+areaW+'px)';
+      if(halfW<=0)return;
       track.style.animation='none';
-      void track.offsetWidth;
-      // Custom animation: from current right position to -halfW
       track.style.transition='none';
-      // Use JS-driven first entry, then CSS loop
-      let startX=areaW;
-      const speed=28;
+      let x=areaW; // start from right edge
       let last=null;
-      let raf=null;
-      function enterStep(ts){
+      function step(ts){
         if(last===null)last=ts;
         const dt=Math.min(ts-last,50);last=ts;
-        startX-=speed*(dt/1000);
-        if(startX<=0){
-          // Handoff to CSS animation
-          track.style.transform='translateY(-50%) translateX(0%)';
-          track.style.animation='ticker-rtl '+dur+'s linear infinite';
-          return;
-        }
-        track.style.transform='translateY(-50%) translateX('+Math.round(startX)+'px)';
-        raf=requestAnimationFrame(enterStep);
+        x-=speed*(dt/1000);
+        if(x<=-halfW)x+=halfW; // seamless loop: reset by one copy width
+        track.style.transform='translateY(-50%) translateX('+Math.round(x)+'px)';
+        window._tickerRaf=requestAnimationFrame(step);
       }
-      raf=requestAnimationFrame(enterStep);
+      window._tickerRaf=requestAnimationFrame(step);
     });
   });
 }
@@ -2536,19 +2525,38 @@ let _filterPressTimer=null;
 
 // ── Waiting / Collect Log Modals ─────────────────────────
 
+// Parse date string like "17-May-26" → {m:"May",y:"26",d:"17",mk:"May-26"}
+function _parseDateKey(dateStr){
+  var p=(dateStr||'').split('-');
+  if(p.length>=3)return {d:p[0],m:p[1],y:p[2],mk:p[1]+'-'+p[2]};
+  // fallback: try to extract month from whatever is there
+  return {d:'',m:dateStr,y:'',mk:dateStr};
+}
+// Format chip label: "17May:N"
+function _chipLabel(dateStr,cnt){
+  var p=_parseDateKey(dateStr);
+  var label=p.d?p.d+p.m:dateStr;
+  return label+':'+cnt;
+}
+
 function _buildFwdLogData(){
   var loggedRefs=new Set(forwardedLog.map(function(e){return e.ref;}));
   var hist=forwardedLog.slice();
   allApps.forEach(function(a){
     if(forwarded[a.ref]&&!loggedRefs.has(a.ref)){
-      hist.push({date:'\u09aa\u09c1\u09b0\u09be\u09a8\u09cb',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
+      // use history to get forwarded date if possible
+      var fwdDate='';
+      var ah=history[a.ref];
+      if(ah){for(var i=0;i<ah.length;i++){if(ah[i].forwarded){fwdDate=ah[i].date||'';break;}}}
+      hist.push({date:fwdDate,ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
     }
   });
+  // group by monthKey → dateKey → entries
   var months={};
   hist.forEach(function(e){
-    var parts=(e.date||'').split('-');
-    var mk=parts.length>=3?(parts[1]+'-'+parts[2]):'\u09aa\u09c1\u09b0\u09be\u09a8\u09cb';
-    if(!months[mk])months[mk]={};
+    var pk=_parseDateKey(e.date);
+    var mk=pk.mk||'?';
+    if(!months[mk])months[mk]={_order:Object.keys(months).length};
     if(!months[mk][e.date])months[mk][e.date]=[];
     months[mk][e.date].push(e);
   });
@@ -2560,14 +2568,15 @@ function _buildColLogData(){
   var hist=collectedLog.slice();
   allApps.forEach(function(a){
     if(collected[a.ref]&&!loggedRefs.has(a.ref)){
-      hist.push({date:collectedDate[a.ref]||'\u09aa\u09c1\u09b0\u09be\u09a8\u09cb',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
+      hist.push({date:collectedDate[a.ref]||'',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
     }
   });
+  // group by monthKey → printDate → entries
   var months={};
   hist.forEach(function(e){
-    var parts=(e.date||'').split('-');
-    var mk=parts.length>=3?(parts[1]+'-'+parts[2]):'\u09aa\u09c1\u09b0\u09be\u09a8\u09cb';
-    var pdKey=e.printDate||'(Print date \u09a8\u09c7\u0987)';
+    var colPk=_parseDateKey(e.date);
+    var mk=colPk.mk||'?';
+    var pdKey=e.printDate||'';
     if(!months[mk])months[mk]={};
     if(!months[mk][pdKey])months[mk][pdKey]=[];
     months[mk][pdKey].push(e);
@@ -2579,8 +2588,7 @@ function _rowItem(name,ref,extra){
   return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
     +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+name+'</span>'
     +'<span style="color:#64748b;font-size:10px">'+ref+'</span>'
-    +(extra||'')
-    +'</div>';
+    +(extra||'')+'</div>';
 }
 
 function fwdDateToggle(id){
@@ -2589,7 +2597,7 @@ function fwdDateToggle(id){
   if(!panel)return;
   var open=panel.style.display!=='none';
   panel.style.display=open?'none':'block';
-  if(chip){chip.style.background=open?'#1e293b':'#1e3a5f';chip.style.color=open?'#94a3b8':'#e2e8f0';}
+  if(chip){chip.style.background=open?'rgba(30,58,95,0.4)':'#1e3a5f';chip.style.color=open?'#60a5fa':'#e2e8f0';}
 }
 function colPdToggle(id){
   var panel=document.getElementById('col-panel-'+id);
@@ -2597,37 +2605,42 @@ function colPdToggle(id){
   if(!panel)return;
   var open=panel.style.display!=='none';
   panel.style.display=open?'none':'block';
-  if(chip){chip.style.background=open?'#052e16':'#14532d';chip.style.color=open?'#4ade80':'#bbf7d0';}
+  if(chip){chip.style.background=open?'rgba(5,46,22,0.4)':'#14532d';chip.style.color=open?'#4ade80':'#bbf7d0';}
 }
 
 function _renderFwdHistory(months){
-  var keys=Object.keys(months);
+  var keys=Object.keys(months).filter(function(k){return k!=='_order';});
   if(!keys.length)return '';
-  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
-    +'\uD83D\uDCE4 Forwarded \u0987\u09A4\u09BF\u09B9\u09BE\u09B8</div>';
+  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 8px">'
+    +'\u27A1\uFE0F Forwarded:</div>';
   keys.forEach(function(mk,mi){
-    var dates=months[mk];
-    var total=Object.values(dates).reduce(function(s,a){return s+a.length;},0);
-    h+='<div style="margin-bottom:10px">'
-      +'<div style="font-size:11px;font-weight:700;color:#60a5fa;padding:5px 0 6px">'
-      +'\uD83D\uDCC6 '+mk+' <span style="color:#475569;font-weight:400">('+total+')</span></div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">';
-    Object.keys(dates).forEach(function(dk,di){
-      var cnt=dates[dk].length;
+    var dateMap=months[mk];
+    var dateKeys=Object.keys(dateMap).filter(function(k){return k!=='_order';});
+    var total=dateKeys.reduce(function(s,dk){return s+(dateMap[dk]?dateMap[dk].length:0);},0);
+    h+='<div style="margin-bottom:12px">'
+      // blank calendar emoji + month name
+      +'<div style="font-size:13px;font-weight:700;color:#60a5fa;padding:4px 0 6px">'
+      +'\uD83D\uDDD3\uFE0F '+mk+' <span style="color:#475569;font-weight:400;font-size:11px">('+total+')</span></div>'
+      // chips row — compact "17May:1" style
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:2px">';
+    dateKeys.forEach(function(dk,di){
+      var cnt=dateMap[dk]?dateMap[dk].length:0;
       var cid=mi+'_'+di;
+      var lbl=_chipLabel(dk,cnt);
       h+='<button id="fwd-chip-'+cid+'" onclick="fwdDateToggle(\''+cid+'\')" '
-        +'style="font-size:10px;padding:3px 8px;border-radius:12px;border:1px solid #334155;'
-        +'background:#1e293b;color:#94a3b8;cursor:pointer;flex-shrink:0">'
-        +dk+' <span style="color:#60a5fa">'+cnt+'</span></button>';
+        +'style="font-size:10px;padding:2px 7px;border-radius:10px;border:1px solid rgba(96,165,250,0.35);'
+        +'background:rgba(30,58,95,0.4);color:#60a5fa;cursor:pointer;flex-shrink:0;font-weight:600">'
+        +lbl+'</button>';
     });
     h+='</div>';
-    Object.keys(dates).forEach(function(dk,di){
-      var items=dates[dk];
+    // panels
+    dateKeys.forEach(function(dk,di){
+      var items=dateMap[dk]||[];
       var cid=mi+'_'+di;
       var rows=items.map(function(a){
         return _rowItem(a.name,a.ref,a.printDate?'<span style="color:#60a5fa;font-size:10px">\uD83D\uDDB8\uFE0F '+a.printDate+'</span>':'');
       }).join('');
-      h+='<div id="fwd-panel-'+cid+'" style="display:none;padding:4px 0 8px">'+rows+'</div>';
+      h+='<div id="fwd-panel-'+cid+'" style="display:none;padding:4px 0 6px">'+rows+'</div>';
     });
     h+='</div>';
   });
@@ -2637,31 +2650,33 @@ function _renderFwdHistory(months){
 function _renderColHistory(months){
   var keys=Object.keys(months);
   if(!keys.length)return '';
-  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
-    +'\uD83D\uDCE5 Collected \u0987\u09A4\u09BF\u09B9\u09BE\u09B8</div>';
+  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 8px">'
+    +'\uD83D\uDCE6 Collected:</div>';
   keys.forEach(function(mk,mi){
-    var pds=months[mk];
-    var total=Object.values(pds).reduce(function(s,a){return s+a.length;},0);
-    h+='<div style="margin-bottom:10px">'
-      +'<div style="font-size:11px;font-weight:700;color:#22c55e;padding:5px 0 6px">'
-      +'\uD83D\uDCC6 '+mk+' <span style="color:#475569;font-weight:400">('+total+')</span></div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">';
-    Object.keys(pds).forEach(function(pdKey,di){
-      var cnt=pds[pdKey].length;
+    var pdMap=months[mk];
+    var pdKeys=Object.keys(pdMap);
+    var total=pdKeys.reduce(function(s,pk){return s+(pdMap[pk]?pdMap[pk].length:0);},0);
+    h+='<div style="margin-bottom:12px">'
+      +'<div style="font-size:13px;font-weight:700;color:#22c55e;padding:4px 0 6px">'
+      +'\uD83D\uDDD3\uFE0F '+mk+' <span style="color:#475569;font-weight:400;font-size:11px">('+total+')</span></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:2px">';
+    pdKeys.forEach(function(pdKey,di){
+      var cnt=pdMap[pdKey]?pdMap[pdKey].length:0;
       var cid=mi+'_'+di;
+      var lbl=_chipLabel(pdKey,cnt);
       h+='<button id="col-chip-'+cid+'" onclick="colPdToggle(\''+cid+'\')" '
-        +'style="font-size:10px;padding:3px 8px;border-radius:12px;border:1px solid #14532d;'
-        +'background:#052e16;color:#4ade80;cursor:pointer;flex-shrink:0">'
-        +'\uD83D\uDDB8\uFE0F '+pdKey+' <span style="color:#22c55e">'+cnt+'</span></button>';
+        +'style="font-size:10px;padding:2px 7px;border-radius:10px;border:1px solid rgba(34,197,94,0.35);'
+        +'background:rgba(5,46,22,0.4);color:#4ade80;cursor:pointer;flex-shrink:0;font-weight:600">'
+        +lbl+'</button>';
     });
     h+='</div>';
-    Object.keys(pds).forEach(function(pdKey,di){
-      var items=pds[pdKey];
+    pdKeys.forEach(function(pdKey,di){
+      var items=pdMap[pdKey]||[];
       var cid=mi+'_'+di;
       var rows=items.map(function(a){
         return _rowItem(a.name,a.ref,'<span style="color:#64748b;font-size:10px">\uD83D\uDCC5 '+a.date+'</span>');
       }).join('');
-      h+='<div id="col-panel-'+cid+'" style="display:none;padding:4px 0 8px">'+rows+'</div>';
+      h+='<div id="col-panel-'+cid+'" style="display:none;padding:4px 0 6px">'+rows+'</div>';
     });
     h+='</div>';
   });

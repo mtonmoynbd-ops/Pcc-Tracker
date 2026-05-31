@@ -971,20 +971,20 @@ if('serviceWorker' in navigator){
 
 <!-- ── Forwarded Log Modal ─────────────────────── -->
 <div class="modal" id="fwd-log-modal" style="z-index:180">
-  <div class="modal-box" style="max-width:400px">
+  <div class="modal-box" style="max-width:100%">
     <div class="modal-title">
       <span>Waiting</span>
-      <button class="modal-close" onclick="closeFwdLogModal()">✕</button>
+      <button class="modal-close" onclick="closeFwdLogModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
     </div>
     <div id="fwd-log-content" style="max-height:65vh;overflow-y:auto;padding:4px 0"></div>
   </div>
 </div>
 <!-- ── Collected Log Modal ──────────────────────── -->
 <div class="modal" id="col-log-modal" style="z-index:180">
-  <div class="modal-box" style="max-width:400px">
+  <div class="modal-box" style="max-width:100%">
     <div class="modal-title">
       <span>Collect</span>
-      <button class="modal-close" onclick="closeColLogModal()">✕</button>
+      <button class="modal-close" onclick="closeColLogModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
     </div>
     <div id="col-log-content" style="max-height:65vh;overflow-y:auto;padding:4px 0"></div>
   </div>
@@ -2431,24 +2431,21 @@ function buildTicker(){
   // 2 copies — CSS animation moves 0% to -50% = seamless loop
   track.innerHTML=oneBlock+oneBlock;
 
-  // Reset to measure, then animate
   track.style.animation='none';
   track.style.transition='none';
   track.style.transform='translateY(-50%) translateX(0px)';
-  track.style.visibility='hidden';
   requestAnimationFrame(function(){requestAnimationFrame(function(){
     var area=document.getElementById('ticker-scroll-area');
     var areaW=area?area.offsetWidth:300;
-    var sw=track.scrollWidth;
-    // fallback: use offsetWidth if scrollWidth broken
-    if(sw<=10)sw=track.offsetWidth;
-    var halfW=sw/2;
+    // Measure by temporarily removing overflow:hidden
+    if(area){area.style.overflow='visible';}
+    var halfW=track.offsetWidth/2;
+    if(area){area.style.overflow='hidden';}
+    // Final fallback: estimate from content length
     if(halfW<=10){
-      // still broken — force visible and try once more after paint
-      track.style.visibility='visible';
-      return;
+      var textLen=track.textContent.length;
+      halfW=Math.max(200, textLen*7);
     }
-    track.style.visibility='visible';
     var x=areaW;
     var last=null;
     function step(ts){
@@ -2694,7 +2691,7 @@ function _renderFwdHistory(months){
       +'</div>'
       // date chips + panels — hidden by default
       +'<div id="fwd-dates-'+mi+'" style="display:none;padding:6px 4px 2px">'
-      +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px">';
+      +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:4px">';
     dateKeys.forEach(function(dk,di){
       var cnt=dateMap[dk]?dateMap[dk].length:0;
       var cid=mi+'_'+di;
@@ -2734,7 +2731,7 @@ function _renderColHistory(months){
       +'<span style="color:#475569;font-size:10px">('+total+')</span>'
       +'</div>'
       +'<div id="col-dates-'+mi+'" style="display:none;padding:6px 4px 2px">'
-      +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px">';
+      +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:4px">';
     pdKeys.forEach(function(pdKey,di){
       var cnt=pdMap[pdKey]?pdMap[pdKey].length:0;
       var cid=mi+'_'+di;

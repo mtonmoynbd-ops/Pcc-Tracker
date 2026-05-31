@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!-- saved from url=(0052)file:///C:/Users/ADMIN/Downloads/pcc_tracker_10.html -->
 <html lang="bn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -797,8 +798,8 @@ if('serviceWorker' in navigator){
   <button class="filter-btn" id="draft-btn" onclick="toggleFilter(&#39;draft&#39;,this)">Draft</button>
   <button class="filter-btn" id="f15-btn" onclick="toggleFilter(&#39;1-5&#39;,this)">1-5</button>
   <button class="filter-btn" id="f68-btn" onclick="toggleFilter(&#39;6-8&#39;,this)">6-8</button>
-  <button class="filter-btn" id="waiting-btn" onclick="toggleFilter(&#39;waiting&#39;,this)" oncontextmenu="return false" ontouchstart="filterPressStart(event,'waiting')" ontouchend="filterPressEnd('waiting')" ontouchcancel="filterPressEnd('waiting')">⏳</button>
-  <button class="filter-btn" id="collect-btn" onclick="toggleFilter(&#39;collected&#39;,this)" oncontextmenu="return false" ontouchstart="filterPressStart(event,'collected')" ontouchend="filterPressEnd('collected')" ontouchcancel="filterPressEnd('collected')">📥</button>
+  <button class="filter-btn" id="waiting-btn" onclick="openForwardedLogModal()" oncontextmenu="return false" ontouchstart="filterPressStart(event,'waiting')" ontouchend="filterPressEnd('waiting')" ontouchcancel="filterPressEnd('waiting')">⏳</button>
+  <button class="filter-btn" id="collect-btn" onclick="openCollectedLogModal()" oncontextmenu="return false" ontouchstart="filterPressStart(event,'collected')" ontouchend="filterPressEnd('collected')" ontouchcancel="filterPressEnd('collected')">📥</button>
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
   </button>
@@ -966,6 +967,28 @@ if('serviceWorker' in navigator){
       <button class="note-modal-clear" onclick="document.getElementById(&#39;note-modal-textarea&#39;).value=&#39;&#39;">মুছুন</button>
     </div>
     <div id="note-modal-docs" style="margin-top:10px;display:none;gap:6px;flex-wrap:wrap"></div>
+  </div>
+</div>
+
+<!-- ── Forwarded Log Modal ─────────────────────────────── -->
+<div class="modal" id="fwd-log-modal" style="z-index:180">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-title">
+      <span>⏳ Forwarded রেকর্ড</span>
+      <button class="modal-close" onclick="closeFwdLogModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
+    </div>
+    <div id="fwd-log-content" style="max-height:60vh;overflow-y:auto;padding:4px 0"></div>
+  </div>
+</div>
+
+<!-- ── Collected Log Modal ─────────────────────────────── -->
+<div class="modal" id="col-log-modal" style="z-index:180">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-title">
+      <span>📥 Collected রেকর্ড</span>
+      <button class="modal-close" onclick="closeColLogModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
+    </div>
+    <div id="col-log-content" style="max-height:60vh;overflow-y:auto;padding:4px 0"></div>
   </div>
 </div>
 
@@ -1176,7 +1199,9 @@ let deletedRefs=new Set(JSON.parse(localStorage.getItem('pcc_deleted_refs')||'[]
 let deletedAppsStore=JSON.parse(localStorage.getItem('pcc_deleted_apps')||'[]');
 let deliveredArchive=JSON.parse(localStorage.getItem('pcc_delivered_archive')||'[]');
 let editingDeu={};
-let customLimits=JSON.parse(localStorage.getItem('pcc_custom_limits')||'{}');
+let customLimits=JSON.parse(localStorage.getItem('pcc_custom_limits')||'{}')
+let forwardedLog=JSON.parse(localStorage.getItem('pcc_forwarded_log')||'[]'); // [{date,ref,name,printDate}]
+let collectedLog=JSON.parse(localStorage.getItem('pcc_collected_log')||'[]'); // [{date,ref,name,printDate}];
 let showRemaining=JSON.parse(localStorage.getItem('pcc_show_remaining')||'false');
 let resetConfirm=false,resetTimer=null;
 let modalType=null,activeFilter='all',activePoliceFilter=null;
@@ -1315,6 +1340,8 @@ function saveLocal(){
   localStorage.setItem('pcc_delivered_archive',JSON.stringify(deliveredArchive));
   localStorage.setItem('pcc_custom_limits',JSON.stringify(customLimits));
   localStorage.setItem('pcc_show_remaining',JSON.stringify(showRemaining));
+  localStorage.setItem('pcc_forwarded_log',JSON.stringify(forwardedLog));
+  localStorage.setItem('pcc_collected_log',JSON.stringify(collectedLog));
 }
 function save(){saveLocal();scheduleBackup();}
 
@@ -1323,7 +1350,7 @@ function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=s
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
   try{
-    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,clientPhones,clientNotes,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes};
+    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,clientPhones,clientNotes,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes,forwardedLog,collectedLog};
     const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
     let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
@@ -1348,6 +1375,7 @@ async function syncFromCloud(){
     if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;if(d.collectedDate)collectedDate=d.collectedDate;if(d.clientPhones)clientPhones=d.clientPhones;if(d.clientNotes)clientNotes=d.clientNotes;
     if(d.manualPrintDates)manualPrintDates=d.manualPrintDates;
     if(d.resetArchive)resetArchive=d.resetArchive;if(d.calNotes)calNotes=d.calNotes;
+    if(d.forwardedLog)forwardedLog=d.forwardedLog;if(d.collectedLog)collectedLog=d.collectedLog;
     saveLocal();
   }catch(e){}
 }
@@ -1622,6 +1650,9 @@ function stagePressStart(e,ref){
       // important/urgent → confirm before forwarding
       if(s>0){const ok=await showConfirm('Forwarded করবেন?');if(!ok)return;}
       forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];
+      // Log forwarding
+      const _fwdApp=allApps.find(a=>a.ref===ref);
+      if(_fwdApp){forwardedLog.push({date:todayStr(),ref:_fwdApp.ref,name:_fwdApp.name,printDate:getEffectivePrintDate(_fwdApp.ref)||''});}
       // Send to register WhatsApp if set
       const app=allApps.find(a=>a.ref===ref);
       if(_registerPhone&&app){
@@ -1635,7 +1666,8 @@ function stagePressStart(e,ref){
       if(s>0){const ok=await showConfirm('Collected করবেন?');if(!ok)return;}
       const app=allApps.find(a=>a.ref===ref);
       collected[ref]=true;
-      if(app){collectedDay[ref]=daysSince(app.apply_date,ref)||0;collectedDate[ref]=todayStr();}
+      if(app){collectedDay[ref]=daysSince(app.apply_date,ref)||0;collectedDate[ref]=todayStr();
+        collectedLog.push({date:todayStr(),ref:app.ref,name:app.name,printDate:getEffectivePrintDate(app.ref)||''});}
       save();render();showToast('✅ Collected');
     }
     else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];delete collectedDate[ref];save();render();showToast('↺ Reset');}
@@ -2014,6 +2046,30 @@ function renderArchiveContent(){
           <span class="arch-badge total">Total ${allItems.length}</span>
         </div>
         <div class="arch-list">${(r.urgentItems||[]).map(a=>archItemHTML(a,'🔴')).join('')}${(r.importantItems||[]).map(a=>archItemHTML(a,'⭐')).join('')}</div>
+        ${(r.forwardedLog&&r.forwardedLog.length)?`<div style="margin-top:10px">
+          <div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 0 6px">📤 Forwarded রেকর্ড (${r.forwardedLog.length} file)</div>
+          ${Object.entries(r.forwardedLog.reduce((acc,e)=>{(acc[e.date]=acc[e.date]||[]).push(e);return acc;},{})).map(([date,items])=>`
+            <div style="margin-bottom:8px">
+              <div style="font-size:10px;color:#64748b;padding-bottom:3px">📅 ${date}  <span style="color:#475569">${items.length} file</span></div>
+              ${items.map(a=>`<div style="display:flex;gap:6px;align-items:baseline;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+                <span style="color:#e2e8f0;font-size:11px;font-weight:600;flex:1">${a.name}</span>
+                <span style="color:#64748b;font-size:10px">${a.ref}</span>
+                ${a.printDate?`<span style="color:#60a5fa;font-size:10px">🖨️ ${a.printDate}</span>`:''}
+              </div>`).join('')}
+            </div>`).join('')}
+        </div>`:''}
+        ${(r.collectedLog&&r.collectedLog.length)?`<div style="margin-top:8px">
+          <div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 0 6px">📥 Collected রেকর্ড (${r.collectedLog.length} file)</div>
+          ${Object.entries(r.collectedLog.reduce((acc,e)=>{(acc[e.date]=acc[e.date]||[]).push(e);return acc;},{})).map(([date,items])=>`
+            <div style="margin-bottom:8px">
+              <div style="font-size:10px;color:#64748b;padding-bottom:3px">📅 ${date}  <span style="color:#475569">${items.length} file</span></div>
+              ${items.map(a=>`<div style="display:flex;gap:6px;align-items:baseline;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+                <span style="color:#e2e8f0;font-size:11px;font-weight:600;flex:1">${a.name}</span>
+                <span style="color:#64748b;font-size:10px">${a.ref}</span>
+                ${a.printDate?`<span style="color:#22c55e;font-size:10px">🖨️ ${a.printDate}</span>`:''}
+              </div>`).join('')}
+            </div>`).join('')}
+        </div>`:''}
       </div>`;
     }).join('');
   } else {
@@ -2223,7 +2279,9 @@ async function resetCounts(){
     if(urgentItems.length||importantItems.length){
       const allItems=[...urgentItems,...importantItems];const dates=allItems.map(a=>a.applyDate).filter(Boolean);let fromDate='';
       if(dates.length){const parsed=dates.map(d=>toInputDate(d)).filter(Boolean).sort();if(parsed.length)fromDate=fromInputDate(parsed[0]);}
-      resetArchive.unshift({id:Date.now(),resetDate:todayStr(),fromDate,urgentItems,importantItems,urgentCount:displayUrgent,importantCount:displayImportant});
+      // Save forwarded and collected logs into this reset entry, then clear them
+      resetArchive.unshift({id:Date.now(),resetDate:todayStr(),fromDate,urgentItems,importantItems,urgentCount:displayUrgent,importantCount:displayImportant,forwardedLog:[...forwardedLog],collectedLog:[...collectedLog]});
+      forwardedLog=[];collectedLog=[];
       localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
     }
     // Reset stars for starred files
@@ -2328,12 +2386,23 @@ function buildTicker(){
   if(grp.applied.length)       parts.push('<span class="ticker-item">📋 <span style="color:#94a3b8">Applied '+grp.applied.length+'</span>: '+nameSpans(grp.applied)+'</span>');
   if(grp.draft.length)         parts.push('<span class="ticker-item">✏️ <span style="color:#f59e0b">Draft '+grp.draft.length+'</span>: '+nameSpans(grp.draft)+'</span>');
   if(grp.status_update.length){
-    const suSpans=grp.status_update.map(a=>{
-      const r=a.ref.replace(/['"<>]/g,'');
-      const st=a._tickerSt?(' <span style="color:#60a5fa;font-size:10px">['+a._tickerSt+']</span>'):'';
-      return '<span style="cursor:pointer;color:#e2e8f0" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+st+'</span>';
-    }).join('<span style="color:#475569">, </span>');
-    parts.push('<span class="ticker-item">🔄 <span style="color:#94a3b8">Status Update '+grp.status_update.length+'</span>: '+suSpans+'</span>');
+    // Group by status: same-status files show as "Status Update 3 (6/10): name1, name2"
+    const stGrps={};
+    grp.status_update.forEach(function(a){
+      const st=a._tickerSt||'?';
+      if(!stGrps[st])stGrps[st]=[];
+      stGrps[st].push(a);
+    });
+    Object.entries(stGrps).forEach(function([st,apps]){
+      const names=apps.map(function(a){
+        const r=a.ref.replace(/['"<>]/g,'');
+        return '<span style="cursor:pointer;color:#e2e8f0;font-weight:600" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';
+      }).join('<span style="color:#475569">, </span>');
+      const lbl=apps.length>1
+        ?'<span style="color:#94a3b8">Status Update '+apps.length+' ('+st+')</span>: '+names
+        :'<span style="color:#94a3b8">Status Update ('+st+')</span>: '+names;
+      parts.push('<span class="ticker-item">🔄 '+lbl+'</span>');
+    });
   }
 
   if(!parts.length){
@@ -2362,7 +2431,7 @@ function buildTicker(){
       track.style.transition='none';
       // Use JS-driven first entry, then CSS loop
       let startX=areaW;
-      const speed=45;
+      const speed=28;
       let last=null;
       let raf=null;
       function enterStep(ts){
@@ -2393,16 +2462,25 @@ function todayDateStr(){
   const t=new Date();
   return `${String(t.getDate()).padStart(2,'0')}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getFullYear()).slice(-2)}`;
 }
+function _blinkCard(el,times){
+  // Blink card `times` times with glow
+  if(!el||times<=0)return;
+  el.style.transition='box-shadow 0.15s,transform 0.15s';
+  var count=0;
+  function step(){
+    if(count>=times*2){el.style.boxShadow='';el.style.transform='';el.style.transition='';return;}
+    if(count%2===0){el.style.transform='scale(1.015)';el.style.boxShadow='0 0 0 3px #60a5fa, 0 0 24px rgba(96,165,250,0.6)';}
+    else{el.style.transform='';el.style.boxShadow='';}
+    count++;
+    setTimeout(step,count%2===0?180:220);
+  }
+  step();
+}
 function tickerClick(ref){
   var el=document.getElementById('card-'+ref);
   if(el){
     el.scrollIntoView({behavior:'smooth',block:'center'});
-    // Strong flash: bright border + scale + glow
-    el.style.transition='box-shadow 0.1s,transform 0.1s';
-    el.style.transform='scale(1.015)';
-    el.style.boxShadow='0 0 0 3px #60a5fa, 0 0 24px rgba(96,165,250,0.6)';
-    setTimeout(function(){el.style.transform='';el.style.boxShadow='0 0 0 2px #60a5fa';},300);
-    setTimeout(function(){el.style.boxShadow='';el.style.transition='';},2200);
+    setTimeout(function(){_blinkCard(el,3);},320);
   } else {
     if(typeof activeFilter!=='undefined'&&activeFilter!=='all'){
       activeFilter='all';
@@ -2412,9 +2490,7 @@ function tickerClick(ref){
     setTimeout(function(){
       var el2=document.getElementById('card-'+ref);
       if(el2){el2.scrollIntoView({behavior:'smooth',block:'center'});
-        el2.style.transition='box-shadow 0.1s';
-        el2.style.boxShadow='0 0 0 3px #60a5fa, 0 0 24px rgba(96,165,250,0.6)';
-        setTimeout(function(){el2.style.boxShadow='';},2200);}
+        setTimeout(function(){_blinkCard(el2,3);},320);}
     },150);
   }
 }
@@ -2457,11 +2533,135 @@ function saveRegister(){
   showToast('✅ রেজিস্টার সেভ হয়েছে');
 }
 let _filterPressTimer=null;
+
+// ── Forwarded Log Modal ───────────────────────────────────
+function _renderLogModal(logArr,contentId,labelPrefix,emptyMsg){
+  const el=document.getElementById(contentId);
+  if(!el)return;
+  if(!logArr.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">'+emptyMsg+'</div>';return;}
+  // Group by date
+  const groups={};
+  [...logArr].reverse().forEach(function(entry){
+    const d=entry.date||'?';
+    if(!groups[d])groups[d]=[];
+    groups[d].push(entry);
+  });
+  el.innerHTML=Object.entries(groups).map(function([date,items]){
+    const itemsHtml=items.map(function(a){
+      const pd=a.printDate?(' <span style="color:#60a5fa;font-size:10px">🖨️ '+a.printDate+'</span>'):'';
+      return '<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">'
+        +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
+        +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
+        +pd+'</div>';
+    }).join('');
+    return '<div style="margin-bottom:12px">'
+      +'<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'+labelPrefix+' '+date+'  <span style="color:#475569;font-weight:400">'+items.length+' file</span></div>'
+      +itemsHtml+'</div>';
+  }).join('');
+}
+function openForwardedLogModal(){
+  const el=document.getElementById('fwd-log-content');
+  if(!el)return;
+  // Current waiting files (2/10 important, not yet forwarded)
+  const waiting=getDisplayApps().filter(function(a){
+    const n=parseInt((a.status||'').split('/')[0])||0;
+    return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];
+  });
+  let html='';
+  if(waiting.length){
+    html+='<div style="margin-bottom:14px">'
+      +'<div style="font-size:10px;color:#f59e0b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">⏳ অপেক্ষমান ফাইল ('+waiting.length+')</div>'
+      +waiting.map(function(a){
+        const pd=getEffectivePrintDate(a.ref);
+        return '<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">'
+          +'<span style="color:#fcd34d;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
+          +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
+          +(pd?'<span style="color:#60a5fa;font-size:10px">🖨️ '+pd+'</span>':'')
+          +'</div>';
+      }).join('')
+      +'</div>';
+  }
+  if(forwardedLog.length){
+    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">📤 Forwarded ইতিহাস</div>';
+    const groups={};
+    [...forwardedLog].reverse().forEach(function(entry){
+      const d=entry.date||'?';
+      if(!groups[d])groups[d]=[];
+      groups[d].push(entry);
+    });
+    html+=Object.entries(groups).map(function([date,items]){
+      return '<div style="margin-bottom:12px">'
+        +'<div style="font-size:10px;color:#64748b;padding:4px 0 3px">📅 '+date+'  <span style="color:#475569">'+items.length+' file</span></div>'
+        +items.map(function(a){
+          return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
+            +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
+            +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
+            +(a.printDate?'<span style="color:#60a5fa;font-size:10px">🖨️ '+a.printDate+'</span>':'')
+            +'</div>';
+        }).join('')
+        +'</div>';
+    }).join('');
+  }
+  if(!html)html='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো রেকর্ড নেই</div>';
+  el.innerHTML=html;
+  document.getElementById('fwd-log-modal').classList.add('open');
+}
+function closeFwdLogModal(){document.getElementById('fwd-log-modal').classList.remove('open');}
+
+function openCollectedLogModal(){
+  const el=document.getElementById('col-log-content');
+  if(!el)return;
+  // Current collect-ready files (9/10 starred, not yet collected)
+  const ready=getDisplayApps().filter(function(a){
+    const n=parseInt((a.status||'').split('/')[0])||0;
+    return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
+  });
+  let html='';
+  if(ready.length){
+    html+='<div style="margin-bottom:14px">'
+      +'<div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">📦 Collect-ready ফাইল ('+ready.length+')</div>'
+      +ready.map(function(a){
+        const pd=getEffectivePrintDate(a.ref);
+        return '<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">'
+          +'<span style="color:#4ade80;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
+          +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
+          +(pd?'<span style="color:#22c55e;font-size:10px">🖨️ '+pd+'</span>':'')
+          +'</div>';
+      }).join('')
+      +'</div>';
+  }
+  if(collectedLog.length){
+    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">📥 Collected ইতিহাস</div>';
+    const groups={};
+    [...collectedLog].reverse().forEach(function(entry){
+      const d=entry.date||'?';
+      if(!groups[d])groups[d]=[];
+      groups[d].push(entry);
+    });
+    html+=Object.entries(groups).map(function([date,items]){
+      return '<div style="margin-bottom:12px">'
+        +'<div style="font-size:10px;color:#64748b;padding:4px 0 3px">📅 '+date+'  <span style="color:#475569">'+items.length+' file</span></div>'
+        +items.map(function(a){
+          return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
+            +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
+            +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
+            +(a.printDate?'<span style="color:#22c55e;font-size:10px">🖨️ '+a.printDate+'</span>':'')
+            +'</div>';
+        }).join('')
+        +'</div>';
+    }).join('');
+  }
+  if(!html)html='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো রেকর্ড নেই</div>';
+  el.innerHTML=html;
+  document.getElementById('col-log-modal').classList.add('open');
+}
+function closeColLogModal(){document.getElementById('col-log-modal').classList.remove('open');}
+
 function filterPressStart(e,type){
   _filterPressTimer=setTimeout(async function(){
     _filterPressTimer=null;
     if(type==='waiting'){
-      // Copy all 2/10 important files
+      // Long press: copy 2/10 important files to clipboard + WhatsApp
       const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];});
       if(!files.length){showToast('⏳ কোনো ফাইল নেই');return;}
       const text=files.map(a=>a.name+' — '+a.ref).join('\n');
@@ -2470,15 +2670,14 @@ function filterPressStart(e,type){
         files.forEach(a=>{blinkStopped[a.ref]=true;});
         save();render();
         showToast('✅ '+files.length+'টি ফাইল কপি হয়েছে');
-        // If register phone set, open WhatsApp
         if(_registerPhone){
           const waNum='88'+_registerPhone.replace(/[^0-9]/g,'');
           const waMsg=encodeURIComponent(text);
           setTimeout(()=>window.open('https://wa.me/'+waNum+'?text='+waMsg,'_blank'),800);
         }
-      }
-      catch(e){showToast('❌ কপি ব্যর্থ');}
+      }catch(e){showToast('❌ কপি ব্যর্থ');}
     } else if(type==='collected'){
+      // Long press: bulk collect all 9/10 starred uncollected files
       const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
       if(!files.length){showToast('📥 কোনো ফাইল নেই');return;}
       const ok=await showConfirm(files.length+'টি ফাইল একসাথে Collected করবেন?');
@@ -2488,7 +2687,8 @@ function filterPressStart(e,type){
         collected[a.ref]=true;
         collectedDay[a.ref]=daysSince(a.apply_date,a.ref)||0;
         collectedDate[a.ref]=today;
-        forwarded[a.ref]=true; // mark forwarded too if not already
+        forwarded[a.ref]=true;
+        collectedLog.push({date:today,ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
       });
       save();render();showToast('✅ '+files.length+'টি ফাইল Collected');
     }
@@ -2737,7 +2937,7 @@ function render(){
   const waitingBtn=document.getElementById('waiting-btn');
   if(waitingBtn){
     waitingBtn.textContent=waitingCount>0?'⏳ '+waitingCount:'⏳';
-    waitingBtn.style.display=waitingCount>0||activeFilter==='waiting'?'':'none';
+    waitingBtn.style.display=''; // always visible
     if(waitingCount>0&&activeFilter!=='waiting'){waitingBtn.style.animation='blink-col 1.2s ease-in-out infinite';waitingBtn.style.borderColor='#f59e0b';waitingBtn.style.color='#f59e0b';}
     else{waitingBtn.style.animation='';waitingBtn.style.borderColor='';waitingBtn.style.color='';}
   }
@@ -2745,7 +2945,7 @@ function render(){
   const collectBtn=document.getElementById('collect-btn');
   if(collectBtn){
     collectBtn.textContent=collectCount>0?'📥 '+collectCount:'📥';
-    collectBtn.style.display=collectCount>0||activeFilter==='collected'?'':'none';
+    collectBtn.style.display=''; // always visible
     if(hasUncollected&&activeFilter!=='collected'){collectBtn.classList.add('collected-blink');collectBtn.classList.remove('collected-active');}
     else if(activeFilter==='collected'){collectBtn.classList.remove('collected-blink');collectBtn.classList.add('collected-active');}
     else{collectBtn.classList.remove('collected-blink','collected-active');}

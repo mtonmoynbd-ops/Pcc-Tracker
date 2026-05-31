@@ -745,6 +745,18 @@
 </style>
 </head>
 <body>
+<div class="modal" id="fwd-log-modal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-title">📤 Forwarded রেকর্ড<button class="modal-close" onclick="document.getElementById('fwd-log-modal').classList.remove('open')">✕</button></div>
+    <div id="fwd-log-content"></div>
+  </div>
+</div>
+<div class="modal" id="col-log-modal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-title">📥 Collected রেকর্ড<button class="modal-close" onclick="document.getElementById('col-log-modal').classList.remove('open')">✕</button></div>
+    <div id="col-log-content"></div>
+  </div>
+</div>
 <script>(function(){var t=localStorage.getItem('pcc_theme');if(t==='light'||t==='amoled'||t==='glass'||t==='glass-light'||t==='dusk')document.body.className=t;}())</script>
 <script>
 if('serviceWorker' in navigator){
@@ -798,8 +810,8 @@ if('serviceWorker' in navigator){
   <button class="filter-btn" id="draft-btn" onclick="toggleFilter(&#39;draft&#39;,this)">Draft</button>
   <button class="filter-btn" id="f15-btn" onclick="toggleFilter(&#39;1-5&#39;,this)">1-5</button>
   <button class="filter-btn" id="f68-btn" onclick="toggleFilter(&#39;6-8&#39;,this)">6-8</button>
-  <button class="filter-btn" id="waiting-btn" onclick="openForwardedLogModal()" oncontextmenu="return false" ontouchstart="filterPressStart(event,'waiting')" ontouchend="filterPressEnd('waiting')" ontouchcancel="filterPressEnd('waiting')">⏳</button>
-  <button class="filter-btn" id="collect-btn" onclick="openCollectedLogModal()" oncontextmenu="return false" ontouchstart="filterPressStart(event,'collected')" ontouchend="filterPressEnd('collected')" ontouchcancel="filterPressEnd('collected')">📥</button>
+  <button class="filter-btn" id="waiting-btn" onclick="openForwardedLog()" oncontextmenu="return false" ontouchstart="filterPressStart(event,'waiting')" ontouchend="filterPressEnd('waiting')" ontouchcancel="filterPressEnd('waiting')">⏳</button>
+  <button class="filter-btn" id="collect-btn" onclick="openCollectedLog()" oncontextmenu="return false" ontouchstart="filterPressStart(event,'collected')" ontouchend="filterPressEnd('collected')" ontouchcancel="filterPressEnd('collected')">📥</button>
   <button class="icon-filter-btn police" id="police-filter-btn" onclick="openPoliceFilterModal()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
   </button>
@@ -826,7 +838,7 @@ if('serviceWorker' in navigator){
   <!-- Row 1: Mark as -->
   <div style="display:flex;gap:6px;width:100%;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #1e3a5f">
     <span style="font-size:10px;color:#475569;align-self:center;flex-shrink:0;text-transform:uppercase;letter-spacing:0.5px">Mark:</span>
-    <button onclick="markSelected(2)" style="flex:1;background:#7f1d1d;border:1px solid #ef4444;color:#fca5a5;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">🔴 Urgent</button>
+    <button onclick="markSelected(2)" style="flex:1;background:#991b1b;border:1px solid #ef4444;color:#fff;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:700">🔴 Urgent</button>
     <button onclick="markSelected(1)" style="flex:1;background:#451a03;border:1px solid #f59e0b;color:#fcd34d;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">⭐ Important</button>
     <button onclick="markSelected(0)" style="flex:1;background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">☆ Normal</button>
   </div>
@@ -967,28 +979,6 @@ if('serviceWorker' in navigator){
       <button class="note-modal-clear" onclick="document.getElementById(&#39;note-modal-textarea&#39;).value=&#39;&#39;">মুছুন</button>
     </div>
     <div id="note-modal-docs" style="margin-top:10px;display:none;gap:6px;flex-wrap:wrap"></div>
-  </div>
-</div>
-
-<!-- ── Forwarded Log Modal ─────────────────────────────── -->
-<div class="modal" id="fwd-log-modal" style="z-index:180">
-  <div class="modal-box" style="max-width:400px">
-    <div class="modal-title">
-      <span>⏳ Forwarded রেকর্ড</span>
-      <button class="modal-close" onclick="closeFwdLogModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
-    </div>
-    <div id="fwd-log-content" style="max-height:60vh;overflow-y:auto;padding:4px 0"></div>
-  </div>
-</div>
-
-<!-- ── Collected Log Modal ─────────────────────────────── -->
-<div class="modal" id="col-log-modal" style="z-index:180">
-  <div class="modal-box" style="max-width:400px">
-    <div class="modal-title">
-      <span>📥 Collected রেকর্ড</span>
-      <button class="modal-close" onclick="closeColLogModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></button>
-    </div>
-    <div id="col-log-content" style="max-height:60vh;overflow-y:auto;padding:4px 0"></div>
   </div>
 </div>
 
@@ -1186,6 +1176,7 @@ let clientNames=JSON.parse(localStorage.getItem('pcc_client_names')||'[]');
 let counts=JSON.parse(localStorage.getItem('pcc_counts')||'{"urgent":0,"important":0}');
 let history=JSON.parse(localStorage.getItem('pcc_history')||'{"urgent":[],"important":[]}');
 let forwarded=JSON.parse(localStorage.getItem('pcc_forwarded')||'{}');
+let forwardedLog=JSON.parse(localStorage.getItem('pcc_forwarded_log')||'[]'); // [{ref,name,date,applyDate,printDate}]
 let collected=JSON.parse(localStorage.getItem('pcc_collected')||'{}');
 let collectedDay=JSON.parse(localStorage.getItem('pcc_collected_day')||'{}');
 let collectedDate=JSON.parse(localStorage.getItem('pcc_collected_date')||'{}');
@@ -1199,9 +1190,7 @@ let deletedRefs=new Set(JSON.parse(localStorage.getItem('pcc_deleted_refs')||'[]
 let deletedAppsStore=JSON.parse(localStorage.getItem('pcc_deleted_apps')||'[]');
 let deliveredArchive=JSON.parse(localStorage.getItem('pcc_delivered_archive')||'[]');
 let editingDeu={};
-let customLimits=JSON.parse(localStorage.getItem('pcc_custom_limits')||'{}')
-let forwardedLog=JSON.parse(localStorage.getItem('pcc_forwarded_log')||'[]'); // [{date,ref,name,printDate}]
-let collectedLog=JSON.parse(localStorage.getItem('pcc_collected_log')||'[]'); // [{date,ref,name,printDate}];
+let customLimits=JSON.parse(localStorage.getItem('pcc_custom_limits')||'{}');
 let showRemaining=JSON.parse(localStorage.getItem('pcc_show_remaining')||'false');
 let resetConfirm=false,resetTimer=null;
 let modalType=null,activeFilter='all',activePoliceFilter=null;
@@ -1326,6 +1315,7 @@ function saveLocal(){
   localStorage.setItem('pcc_counts',JSON.stringify(counts));
   localStorage.setItem('pcc_history',JSON.stringify(history));
   localStorage.setItem('pcc_forwarded',JSON.stringify(forwarded));
+  localStorage.setItem('pcc_forwarded_log',JSON.stringify(forwardedLog));
   localStorage.setItem('pcc_collected',JSON.stringify(collected));
   localStorage.setItem('pcc_collected_day',JSON.stringify(collectedDay));
   localStorage.setItem('pcc_collected_date',JSON.stringify(collectedDate));
@@ -1340,8 +1330,6 @@ function saveLocal(){
   localStorage.setItem('pcc_delivered_archive',JSON.stringify(deliveredArchive));
   localStorage.setItem('pcc_custom_limits',JSON.stringify(customLimits));
   localStorage.setItem('pcc_show_remaining',JSON.stringify(showRemaining));
-  localStorage.setItem('pcc_forwarded_log',JSON.stringify(forwardedLog));
-  localStorage.setItem('pcc_collected_log',JSON.stringify(collectedLog));
 }
 function save(){saveLocal();scheduleBackup();}
 
@@ -1350,7 +1338,7 @@ function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=s
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
   try{
-    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,clientPhones,clientNotes,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes,forwardedLog,collectedLog};
+    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,clientPhones,clientNotes,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes};
     const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
     let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
@@ -1375,7 +1363,6 @@ async function syncFromCloud(){
     if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;if(d.collectedDate)collectedDate=d.collectedDate;if(d.clientPhones)clientPhones=d.clientPhones;if(d.clientNotes)clientNotes=d.clientNotes;
     if(d.manualPrintDates)manualPrintDates=d.manualPrintDates;
     if(d.resetArchive)resetArchive=d.resetArchive;if(d.calNotes)calNotes=d.calNotes;
-    if(d.forwardedLog)forwardedLog=d.forwardedLog;if(d.collectedLog)collectedLog=d.collectedLog;
     saveLocal();
   }catch(e){}
 }
@@ -1650,9 +1637,11 @@ function stagePressStart(e,ref){
       // important/urgent → confirm before forwarding
       if(s>0){const ok=await showConfirm('Forwarded করবেন?');if(!ok)return;}
       forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];
-      // Log forwarding
+      // Log forwarded date
       const _fwdApp=allApps.find(a=>a.ref===ref);
-      if(_fwdApp){forwardedLog.push({date:todayStr(),ref:_fwdApp.ref,name:_fwdApp.name,printDate:getEffectivePrintDate(_fwdApp.ref)||''});}
+      if(_fwdApp&&!forwardedLog.some(function(x){return x.ref===ref&&x.date===todayStr();})){
+        forwardedLog.push({ref:ref,name:_fwdApp.name,date:todayStr(),applyDate:_fwdApp.apply_date,printDate:printDates[ref]||manualPrintDates[ref]||''});
+      }
       // Send to register WhatsApp if set
       const app=allApps.find(a=>a.ref===ref);
       if(_registerPhone&&app){
@@ -1666,8 +1655,7 @@ function stagePressStart(e,ref){
       if(s>0){const ok=await showConfirm('Collected করবেন?');if(!ok)return;}
       const app=allApps.find(a=>a.ref===ref);
       collected[ref]=true;
-      if(app){collectedDay[ref]=daysSince(app.apply_date,ref)||0;collectedDate[ref]=todayStr();
-        collectedLog.push({date:todayStr(),ref:app.ref,name:app.name,printDate:getEffectivePrintDate(app.ref)||''});}
+      if(app){collectedDay[ref]=daysSince(app.apply_date,ref)||0;collectedDate[ref]=todayStr();}
       save();render();showToast('✅ Collected');
     }
     else{forwarded[ref]=false;collected[ref]=false;delete collectedDay[ref];delete collectedDate[ref];save();render();showToast('↺ Reset');}
@@ -2046,30 +2034,6 @@ function renderArchiveContent(){
           <span class="arch-badge total">Total ${allItems.length}</span>
         </div>
         <div class="arch-list">${(r.urgentItems||[]).map(a=>archItemHTML(a,'🔴')).join('')}${(r.importantItems||[]).map(a=>archItemHTML(a,'⭐')).join('')}</div>
-        ${(r.forwardedLog&&r.forwardedLog.length)?`<div style="margin-top:10px">
-          <div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 0 6px">📤 Forwarded রেকর্ড (${r.forwardedLog.length} file)</div>
-          ${Object.entries(r.forwardedLog.reduce((acc,e)=>{(acc[e.date]=acc[e.date]||[]).push(e);return acc;},{})).map(([date,items])=>`
-            <div style="margin-bottom:8px">
-              <div style="font-size:10px;color:#64748b;padding-bottom:3px">📅 ${date}  <span style="color:#475569">${items.length} file</span></div>
-              ${items.map(a=>`<div style="display:flex;gap:6px;align-items:baseline;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-                <span style="color:#e2e8f0;font-size:11px;font-weight:600;flex:1">${a.name}</span>
-                <span style="color:#64748b;font-size:10px">${a.ref}</span>
-                ${a.printDate?`<span style="color:#60a5fa;font-size:10px">🖨️ ${a.printDate}</span>`:''}
-              </div>`).join('')}
-            </div>`).join('')}
-        </div>`:''}
-        ${(r.collectedLog&&r.collectedLog.length)?`<div style="margin-top:8px">
-          <div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 0 6px">📥 Collected রেকর্ড (${r.collectedLog.length} file)</div>
-          ${Object.entries(r.collectedLog.reduce((acc,e)=>{(acc[e.date]=acc[e.date]||[]).push(e);return acc;},{})).map(([date,items])=>`
-            <div style="margin-bottom:8px">
-              <div style="font-size:10px;color:#64748b;padding-bottom:3px">📅 ${date}  <span style="color:#475569">${items.length} file</span></div>
-              ${items.map(a=>`<div style="display:flex;gap:6px;align-items:baseline;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
-                <span style="color:#e2e8f0;font-size:11px;font-weight:600;flex:1">${a.name}</span>
-                <span style="color:#64748b;font-size:10px">${a.ref}</span>
-                ${a.printDate?`<span style="color:#22c55e;font-size:10px">🖨️ ${a.printDate}</span>`:''}
-              </div>`).join('')}
-            </div>`).join('')}
-        </div>`:''}
       </div>`;
     }).join('');
   } else {
@@ -2279,9 +2243,8 @@ async function resetCounts(){
     if(urgentItems.length||importantItems.length){
       const allItems=[...urgentItems,...importantItems];const dates=allItems.map(a=>a.applyDate).filter(Boolean);let fromDate='';
       if(dates.length){const parsed=dates.map(d=>toInputDate(d)).filter(Boolean).sort();if(parsed.length)fromDate=fromInputDate(parsed[0]);}
-      // Save forwarded and collected logs into this reset entry, then clear them
-      resetArchive.unshift({id:Date.now(),resetDate:todayStr(),fromDate,urgentItems,importantItems,urgentCount:displayUrgent,importantCount:displayImportant,forwardedLog:[...forwardedLog],collectedLog:[...collectedLog]});
-      forwardedLog=[];collectedLog=[];
+      resetArchive.unshift({id:Date.now(),resetDate:todayStr(),fromDate,urgentItems,importantItems,urgentCount:displayUrgent,importantCount:displayImportant,forwardedLog:[...forwardedLog]});
+      forwardedLog=[];localStorage.setItem('pcc_forwarded_log',JSON.stringify(forwardedLog));
       localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
     }
     // Reset stars for starred files
@@ -2386,22 +2349,20 @@ function buildTicker(){
   if(grp.applied.length)       parts.push('<span class="ticker-item">📋 <span style="color:#94a3b8">Applied '+grp.applied.length+'</span>: '+nameSpans(grp.applied)+'</span>');
   if(grp.draft.length)         parts.push('<span class="ticker-item">✏️ <span style="color:#f59e0b">Draft '+grp.draft.length+'</span>: '+nameSpans(grp.draft)+'</span>');
   if(grp.status_update.length){
-    // Group by status: same-status files show as "Status Update 3 (6/10): name1, name2"
-    const stGrps={};
+    // Group by status number
+    const byStatus={};
     grp.status_update.forEach(function(a){
-      const st=a._tickerSt||'?';
-      if(!stGrps[st])stGrps[st]=[];
-      stGrps[st].push(a);
+      const key=a._tickerSt||'?';
+      if(!byStatus[key])byStatus[key]=[];
+      byStatus[key].push(a);
     });
-    Object.entries(stGrps).forEach(function([st,apps]){
+    Object.keys(byStatus).forEach(function(st){
+      const apps=byStatus[st];
       const names=apps.map(function(a){
         const r=a.ref.replace(/['"<>]/g,'');
-        return '<span style="cursor:pointer;color:#e2e8f0;font-weight:600" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';
+        return '<span style="cursor:pointer;color:#e2e8f0" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';
       }).join('<span style="color:#475569">, </span>');
-      const lbl=apps.length>1
-        ?'<span style="color:#94a3b8">Status Update '+apps.length+' ('+st+')</span>: '+names
-        :'<span style="color:#94a3b8">Status Update ('+st+')</span>: '+names;
-      parts.push('<span class="ticker-item">🔄 '+lbl+'</span>');
+      parts.push('<span class="ticker-item">🔄 <span style="color:#94a3b8">Status Update '+apps.length+' ('+st+')</span>: '+names+'</span>');
     });
   }
 
@@ -2431,7 +2392,7 @@ function buildTicker(){
       track.style.transition='none';
       // Use JS-driven first entry, then CSS loop
       let startX=areaW;
-      const speed=28;
+      const speed=38;
       let last=null;
       let raf=null;
       function enterStep(ts){
@@ -2462,25 +2423,21 @@ function todayDateStr(){
   const t=new Date();
   return `${String(t.getDate()).padStart(2,'0')}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getFullYear()).slice(-2)}`;
 }
-function _blinkCard(el,times){
-  // Blink card `times` times with glow
-  if(!el||times<=0)return;
-  el.style.transition='box-shadow 0.15s,transform 0.15s';
-  var count=0;
-  function step(){
-    if(count>=times*2){el.style.boxShadow='';el.style.transform='';el.style.transition='';return;}
-    if(count%2===0){el.style.transform='scale(1.015)';el.style.boxShadow='0 0 0 3px #60a5fa, 0 0 24px rgba(96,165,250,0.6)';}
-    else{el.style.transform='';el.style.boxShadow='';}
-    count++;
-    setTimeout(step,count%2===0?180:220);
-  }
-  step();
-}
 function tickerClick(ref){
   var el=document.getElementById('card-'+ref);
   if(el){
     el.scrollIntoView({behavior:'smooth',block:'center'});
-    setTimeout(function(){_blinkCard(el,3);},320);
+    // Strong flash: bright border + scale + glow
+    // 3 blinks
+    el.style.transition='box-shadow 0.15s';
+    var blinkCount=0;
+    function doBlink(){
+      if(blinkCount>=3){el.style.boxShadow='';el.style.transition='';return;}
+      el.style.boxShadow='0 0 0 3px #60a5fa, 0 0 20px rgba(96,165,250,0.7)';
+      setTimeout(function(){el.style.boxShadow='none';blinkCount++;setTimeout(doBlink,180);},280);
+    }
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(doBlink,300);
   } else {
     if(typeof activeFilter!=='undefined'&&activeFilter!=='all'){
       activeFilter='all';
@@ -2490,7 +2447,8 @@ function tickerClick(ref){
     setTimeout(function(){
       var el2=document.getElementById('card-'+ref);
       if(el2){el2.scrollIntoView({behavior:'smooth',block:'center'});
-        setTimeout(function(){_blinkCard(el2,3);},320);}
+        el2.style.transition='box-shadow 0.15s';
+        var bc2=0;function b2(){if(bc2>=3){el2.style.boxShadow='';return;}el2.style.boxShadow='0 0 0 3px #60a5fa, 0 0 20px rgba(96,165,250,0.7)';setTimeout(function(){el2.style.boxShadow='none';bc2++;setTimeout(b2,180);},280);}b2();}
     },150);
   }
 }
@@ -2525,6 +2483,84 @@ function toggleSearch(){
 }
 
 
+function openForwardedLog(){
+  // Group forwardedLog by month-date
+  const groups={};
+  forwardedLog.forEach(function(e){
+    const d=e.date||''; if(!d)return;
+    const p=d.split('-');if(p.length!==3)return;
+    const mo=MONTHS_UP.indexOf(p[1]?p[1].toUpperCase():'');
+    const yr=2000+parseInt(p[2]);
+    const key=yr+'-'+String(mo>=0?mo:0).padStart(2,'0');
+    const lbl=(mo>=0?MONTHS_SHORT[mo]:p[1])+' '+yr;
+    if(!groups[key])groups[key]={lbl:lbl,byDate:{}};
+    if(!groups[key].byDate[d])groups[key].byDate[d]=[];
+    groups[key].byDate[d].push(e);
+  });
+  const sorted=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0]));
+  let html='';
+  if(!sorted.length){html='<div style="color:#475569;text-align:center;padding:16px;font-size:12px">কোনো রেকর্ড নেই</div>';}
+  sorted.forEach(function([,g]){
+    html+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#60a5fa;margin-bottom:6px;text-transform:uppercase">'+g.lbl+'</div>';
+    const dates=Object.keys(g.byDate).sort((a,b)=>b.localeCompare(a));
+    dates.forEach(function(d){
+      const items=g.byDate[d];
+      html+='<div style="border-left:2px solid #1e3a5f;padding:4px 8px;margin-bottom:4px">';
+      html+='<div style="font-size:10px;color:#475569;margin-bottom:3px">'+d+'</div>';
+      items.forEach(function(e){
+        html+='<div style="font-size:12px;color:#e2e8f0;padding:2px 0">📤 '+e.name
+          +(e.printDate?'<span style="color:#475569;font-size:10px;margin-left:6px">Print: '+e.printDate+'</span>':'')+'</div>';
+      });
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('fwd-log-content').innerHTML=html;
+  document.getElementById('fwd-log-modal').classList.add('open');
+}
+function openCollectedLog(){
+  // Group collected apps by print date → collected date
+  const items=[];
+  allApps.forEach(function(a){
+    if(collected[a.ref]&&collectedDate[a.ref]){
+      const pd=printDates[a.ref]||manualPrintDates[a.ref]||'';
+      items.push({name:a.name,ref:a.ref,collectedDate:collectedDate[a.ref],printDate:pd});
+    }
+  });
+  // Group by collectedDate month
+  const groups={};
+  items.forEach(function(e){
+    const d=e.collectedDate||'';if(!d)return;
+    const p=d.split('-');if(p.length!==3)return;
+    const mo=MONTHS_UP.indexOf(p[1]?p[1].toUpperCase():'');
+    const yr=2000+parseInt(p[2]);
+    const key=yr+'-'+String(mo>=0?mo:0).padStart(2,'0');
+    const lbl=(mo>=0?MONTHS_SHORT[mo]:p[1])+' '+yr;
+    if(!groups[key])groups[key]={lbl:lbl,byDate:{}};
+    if(!groups[key].byDate[d])groups[key].byDate[d]=[];
+    groups[key].byDate[d].push(e);
+  });
+  const sorted=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0]));
+  let html='';
+  if(!sorted.length){html='<div style="color:#475569;text-align:center;padding:16px;font-size:12px">কোনো রেকর্ড নেই</div>';}
+  sorted.forEach(function([,g]){
+    html+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#22c55e;margin-bottom:6px;text-transform:uppercase">'+g.lbl+'</div>';
+    const dates=Object.keys(g.byDate).sort((a,b)=>b.localeCompare(a));
+    dates.forEach(function(d){
+      const apps=g.byDate[d];
+      html+='<div style="border-left:2px solid #14291a;padding:4px 8px;margin-bottom:4px">';
+      html+='<div style="font-size:10px;color:#475569;margin-bottom:3px">Collected: '+d+'</div>';
+      apps.forEach(function(e){
+        html+='<div style="font-size:12px;color:#e2e8f0;padding:2px 0">📦 '+e.name
+          +(e.printDate?'<span style="color:#475569;font-size:10px;margin-left:6px">Print: '+e.printDate+'</span>':'')+'</div>';
+      });
+      html+='</div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('col-log-content').innerHTML=html;
+  document.getElementById('col-log-modal').classList.add('open');
+}
 function saveRegister(){
   _registerName=document.getElementById('reg-name-input').value.trim();
   _registerPhone=document.getElementById('reg-phone-input').value.trim();
@@ -2533,156 +2569,11 @@ function saveRegister(){
   showToast('✅ রেজিস্টার সেভ হয়েছে');
 }
 let _filterPressTimer=null;
-
-// ── Forwarded Log Modal ───────────────────────────────────
-function _renderLogModal(logArr,contentId,labelPrefix,emptyMsg){
-  const el=document.getElementById(contentId);
-  if(!el)return;
-  if(!logArr.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">'+emptyMsg+'</div>';return;}
-  // Group by date
-  const groups={};
-  [...logArr].reverse().forEach(function(entry){
-    const d=entry.date||'?';
-    if(!groups[d])groups[d]=[];
-    groups[d].push(entry);
-  });
-  el.innerHTML=Object.entries(groups).map(function([date,items]){
-    const itemsHtml=items.map(function(a){
-      const pd=a.printDate?(' <span style="color:#60a5fa;font-size:10px">🖨️ '+a.printDate+'</span>'):'';
-      return '<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">'
-        +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
-        +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
-        +pd+'</div>';
-    }).join('');
-    return '<div style="margin-bottom:12px">'
-      +'<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'+labelPrefix+' '+date+'  <span style="color:#475569;font-weight:400">'+items.length+' file</span></div>'
-      +itemsHtml+'</div>';
-  }).join('');
-}
-function _buildFwdHistory(){
-  // Merge forwardedLog[] (new) + legacy forwarded{} data from allApps
-  const combined=[...forwardedLog];
-  const loggedRefs=new Set(forwardedLog.map(function(e){return e.ref;}));
-  // Add legacy entries: any app that is forwarded but not in forwardedLog
-  allApps.forEach(function(a){
-    if(forwarded[a.ref]&&!loggedRefs.has(a.ref)){
-      combined.push({date:'(পুরানো)',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
-    }
-  });
-  return combined;
-}
-function _buildColHistory(){
-  // Merge collectedLog[] (new) + legacy collectedDate{} data
-  const combined=[...collectedLog];
-  const loggedRefs=new Set(collectedLog.map(function(e){return e.ref;}));
-  allApps.forEach(function(a){
-    if(collected[a.ref]&&!loggedRefs.has(a.ref)){
-      combined.push({date:collectedDate[a.ref]||'(পুরানো)',ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
-    }
-  });
-  // Also include delivered archive items that were collected
-  deliveredArchive.forEach(function(a){
-    if(a.ref&&!loggedRefs.has(a.ref)&&a.deliveredDate){
-      // Only if not already in combined
-      if(!combined.some(function(e){return e.ref===a.ref;})){
-        combined.push({date:a.deliveredDate,ref:a.ref,name:a.name||'',printDate:a.printDate||''});
-      }
-    }
-  });
-  return combined;
-}
-function _renderLogGroups(entries){
-  if(!entries.length)return '';
-  const groups={};
-  [...entries].reverse().forEach(function(entry){
-    const d=entry.date||'?';
-    if(!groups[d])groups[d]=[];
-    groups[d].push(entry);
-  });
-  return Object.entries(groups).map(function([date,items]){
-    return '<div style="margin-bottom:12px">'
-      +'<div style="font-size:10px;color:#64748b;padding:4px 0 3px">📅 '+date+'  <span style="color:#475569">'+items.length+' file</span></div>'
-      +items.map(function(a){
-        return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
-          +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
-          +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
-          +(a.printDate?'<span style="color:#60a5fa;font-size:10px">🖨️ '+a.printDate+'</span>':'')
-          +'</div>';
-      }).join('')
-      +'</div>';
-  }).join('');
-}
-function openForwardedLogModal(){
-  const el=document.getElementById('fwd-log-content');
-  if(!el)return;
-  // Current waiting files (2/10 important, not yet forwarded)
-  const waiting=getDisplayApps().filter(function(a){
-    const n=parseInt((a.status||'').split('/')[0])||0;
-    return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];
-  });
-  let html='';
-  if(waiting.length){
-    html+='<div style="margin-bottom:14px">'
-      +'<div style="font-size:10px;color:#f59e0b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">⏳ অপেক্ষমান ফাইল ('+waiting.length+')</div>'
-      +waiting.map(function(a){
-        const pd=getEffectivePrintDate(a.ref);
-        return '<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">'
-          +'<span style="color:#fcd34d;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
-          +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
-          +(pd?'<span style="color:#60a5fa;font-size:10px">🖨️ '+pd+'</span>':'')
-          +'</div>';
-      }).join('')
-      +'</div>';
-  }
-  const hist=_buildFwdHistory();
-  if(hist.length){
-    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">📤 Forwarded ইতিহাস ('+hist.length+')</div>';
-    html+=_renderLogGroups(hist);
-  }
-  if(!html)html='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো রেকর্ড নেই</div>';
-  el.innerHTML=html;
-  document.getElementById('fwd-log-modal').classList.add('open');
-}
-function closeFwdLogModal(){document.getElementById('fwd-log-modal').classList.remove('open');}
-
-function openCollectedLogModal(){
-  const el=document.getElementById('col-log-content');
-  if(!el)return;
-  // Current collect-ready files (9/10 starred, not yet collected)
-  const ready=getDisplayApps().filter(function(a){
-    const n=parseInt((a.status||'').split('/')[0])||0;
-    return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
-  });
-  let html='';
-  if(ready.length){
-    html+='<div style="margin-bottom:14px">'
-      +'<div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">📦 Collect-ready ফাইল ('+ready.length+')</div>'
-      +ready.map(function(a){
-        const pd=getEffectivePrintDate(a.ref);
-        return '<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">'
-          +'<span style="color:#4ade80;font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
-          +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
-          +(pd?'<span style="color:#22c55e;font-size:10px">🖨️ '+pd+'</span>':'')
-          +'</div>';
-      }).join('')
-      +'</div>';
-  }
-  const hist=_buildColHistory();
-  if(hist.length){
-    html+='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">📥 Collected ইতিহাস ('+hist.length+')</div>';
-    html+=_renderLogGroups(hist);
-  }
-  if(!html)html='<div style="color:#475569;text-align:center;padding:20px;font-size:12px">কোনো রেকর্ড নেই</div>';
-  el.innerHTML=html;
-  document.getElementById('col-log-modal').classList.add('open');
-}
-function closeColLogModal(){document.getElementById('col-log-modal').classList.remove('open');}
-
 function filterPressStart(e,type){
   _filterPressTimer=setTimeout(async function(){
     _filterPressTimer=null;
     if(type==='waiting'){
-      // Long press: copy 2/10 important files to clipboard + WhatsApp
+      // Copy all 2/10 important files
       const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];});
       if(!files.length){showToast('⏳ কোনো ফাইল নেই');return;}
       const text=files.map(a=>a.name+' — '+a.ref).join('\n');
@@ -2691,14 +2582,15 @@ function filterPressStart(e,type){
         files.forEach(a=>{blinkStopped[a.ref]=true;});
         save();render();
         showToast('✅ '+files.length+'টি ফাইল কপি হয়েছে');
+        // If register phone set, open WhatsApp
         if(_registerPhone){
           const waNum='88'+_registerPhone.replace(/[^0-9]/g,'');
           const waMsg=encodeURIComponent(text);
           setTimeout(()=>window.open('https://wa.me/'+waNum+'?text='+waMsg,'_blank'),800);
         }
-      }catch(e){showToast('❌ কপি ব্যর্থ');}
+      }
+      catch(e){showToast('❌ কপি ব্যর্থ');}
     } else if(type==='collected'){
-      // Long press: bulk collect all 9/10 starred uncollected files
       const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
       if(!files.length){showToast('📥 কোনো ফাইল নেই');return;}
       const ok=await showConfirm(files.length+'টি ফাইল একসাথে Collected করবেন?');
@@ -2708,8 +2600,7 @@ function filterPressStart(e,type){
         collected[a.ref]=true;
         collectedDay[a.ref]=daysSince(a.apply_date,a.ref)||0;
         collectedDate[a.ref]=today;
-        forwarded[a.ref]=true;
-        collectedLog.push({date:today,ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
+        forwarded[a.ref]=true; // mark forwarded too if not already
       });
       save();render();showToast('✅ '+files.length+'টি ফাইল Collected');
     }
@@ -2915,15 +2806,13 @@ function render(){
   const collectedCount=getDisplayApps().filter(function(a){return collected[a.ref]&&!delivered[a.ref];}).length;
   const readyChip=collectedCount>0?`<span class="ready-chip" onclick="toggleFilter('ready',this)">📦 Ready ${collectedCount}</span>`:'';
   function secRow(title,count,titleCls,countCls){
-    const dc=!dateShown?dateChip:'' ;if(!dateShown&&dateChip)dateShown=true;
+    const dc=!dateShown?`${dateChip}${readyChip}`:'' ;if(!dateShown&&(dateChip||readyChip))dateShown=true;
     return `<div class="section-row">
       <div class="section-title ${titleCls||''}">${title}</div>
       ${dc}
       ${count!==null?`<div class="section-count ${countCls||''}">${count} file</div>`:''}
     </div>`;
   }
-  // Always render readyChip at top if collected files exist
-  if(readyChip)html+=`<div style="padding:0 0 4px 0">${readyChip}</div>`;
   if(star2.length){html+=secRow('🔴 Urgent',star2.length,'urgent-title','urgent-count');star2.forEach(a=>html+=cardHTML(a));}
   if(star1.length){html+=secRow('⭐ Important',star1.length,'important-title','important-count');star1.forEach(a=>html+=cardHTML(a));}
   if(normal.length){html+=secRow('Normal',normal.length,'normal-title','normal-count');normal.forEach(a=>html+=cardHTML(a));}

@@ -161,6 +161,12 @@
   body.light .search-bar { background: #ffffff; border-color: #cbd5e1; color: #1e293b; }
   body.light .search-bar::placeholder { color: #94a3b8; }
   body.light .search-bar { caret-color: #1d4ed8; }
+  body.light #fwd-log-content button, body.light #col-log-content button { background:rgba(219,234,254,0.8)!important;border-color:#93c5fd!important;color:#1d4ed8!important; }
+  body.light #fwd-log-content span[style*="color:#e2e8f0"], body.light #col-log-content span[style*="color:#e2e8f0"] { color:#1e293b!important; }
+  body.light #fwd-log-content span[style*="color:#64748b"], body.light #col-log-content span[style*="color:#64748b"] { color:#475569!important; }
+  body.light #fwd-log-content div[style*="border-bottom"], body.light #col-log-content div[style*="border-bottom"] { border-bottom-color:rgba(0,0,0,0.1)!important; }
+  body.light #fwd-log-content div[style*="color:#7c6fa0"], body.light #col-log-content div[style*="color:#7c6fa0"] { color:#6d28d9!important; }
+  body.light #fwd-log-content div[style*="color:#60a5fa"], body.light #col-log-content div[style*="color:#22c55e"] { color:#1d4ed8!important; }
   body.light .filter-btn { background: #ffffff; border-color: #cbd5e1; color: #64748b; }
   body.light .filter-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
   body.light .icon-filter-btn { background: #dbeafe; border-color: #93c5fd; }
@@ -641,15 +647,15 @@
   /* ── Glass Theme ──────────────────────────────────── */
   body.glass { background: #0d1117; }
   body.glass .app-bar { background:rgba(15,31,61,0.55);backdrop-filter:blur(16px);border-bottom:1px solid rgba(96,165,250,0.15); }
-  body.glass .card { background:rgba(15,30,60,0.65);backdrop-filter:blur(16px);border-color:rgba(96,165,250,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.3),0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.06);transform:translateZ(0); }
+  body.glass .card { background:rgba(15,30,60,0.65);border-color:rgba(96,165,250,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.3),0 2px 8px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.06);transform:translateZ(0); }
   body.glass .card.star2 { border-color:rgba(239,68,68,0.9)!important;border-width:2px!important;background:#0a1628!important;box-shadow:0 8px 32px rgba(239,68,68,0.2),inset 0 1px 0 rgba(255,255,255,0.04)!important; }
   body.glass .card.star1 { border-color:rgba(245,158,11,0.85)!important;background:#0a1628!important;box-shadow:0 8px 32px rgba(245,158,11,0.15),inset 0 1px 0 rgba(255,255,255,0.04)!important; }
   body.glass .card.collected-card { background:rgba(34,197,94,0.06)!important;border-color:rgba(34,197,94,0.5)!important; }
-  body.glass .filter-btn { background:rgba(30,41,59,0.45);backdrop-filter:blur(8px);border-color:rgba(100,116,139,0.35); }
+  body.glass .filter-btn { background:rgba(30,41,59,0.45);border-color:rgba(100,116,139,0.35); }
   body.glass .filter-btn.active { background:rgba(37,99,235,0.4);border-color:rgba(96,165,250,0.55); }
-  body.glass .search-bar { background:rgba(30,41,59,0.4);backdrop-filter:blur(8px);border-color:rgba(100,116,139,0.25); }
+  body.glass .search-bar { background:rgba(30,41,59,0.4);border-color:rgba(100,116,139,0.25); }
   body.glass .modal-box, body.glass .confirm-box { background:rgba(8,18,38,0.82);backdrop-filter:blur(28px);border-color:rgba(96,165,250,0.18);box-shadow:0 32px 80px rgba(0,0,0,0.6),0 8px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1); }
-  body.glass .icon-filter-btn { background:rgba(30,41,59,0.45);backdrop-filter:blur(8px); }
+  body.glass .icon-filter-btn { background:rgba(30,41,59,0.45); }
   body.glass .modal { background:rgba(0,0,0,0.55);backdrop-filter:blur(4px); }
   body.glass .theme-opt { background:rgba(30,41,59,0.45);border-color:rgba(100,116,139,0.35); }
   body.glass .theme-opt.active { background:rgba(37,99,235,0.4);border-color:#60a5fa;color:#60a5fa; }
@@ -2083,7 +2089,7 @@ function openPoliceFilterModal(){
   var chipActiveBg=isLight?'#1e3a5f':'#1e3a5f';
   var chipActiveColor=isLight?'#ffffff':'#60a5fa';
   let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%">';
-  html+='<span class="police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)" style="grid-column:1/-1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #334155;background:'+(activePoliceFilter?'#1e293b':'#1e3a5f')+';color:'+(activePoliceFilter?'#94a3b8':'#60a5fa')+'">সব ফাইল</span>';
+  html+='<button class="police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)" style="grid-column:1/-1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #334155;background:'+(activePoliceFilter?'#1e293b':'#1e3a5f')+';color:'+(activePoliceFilter?'#94a3b8':'#60a5fa')+'">সব ফাইল</button>';
   clientNames.forEach(function(n,idx){
     const nSafe=n.replace(/'/g,"\'");
     const col=chipColors[idx%chipColors.length];
@@ -2093,7 +2099,7 @@ function openPoliceFilterModal(){
     var bg=isActive?chipActiveBg:chipBg;
     var border=isActive?chipActiveColor:chipBorder;
     var color=isActive?chipActiveColor:chipColor;
-    html+='<span onclick="setPoliceFilter(\''+nSafe+'\') " style="padding:7px 8px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border:1px solid '+border+';background:'+bg+';color:'+color+';transition:all 0.15s"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n+'</span>'+badge+'</span>';
+    html+='<button onclick="setPoliceFilter(\''+nSafe+'\') " style="padding:7px 8px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border:1px solid '+border+';background:'+bg+';color:'+color+';transition:all 0.15s"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n+'</span>'+badge+'</button>';
   });
   html+='</div>';
   if(!clientNames.length)html='<div style="color:#475569;font-size:12px;margin-top:8px">Add Clients বাটনে নাম যোগ করুন</div>';

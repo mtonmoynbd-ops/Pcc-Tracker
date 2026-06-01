@@ -958,7 +958,6 @@ if('serviceWorker' in navigator){
       <button class="theme-opt" id="theme-dark" onclick="setTheme(&#39;dark&#39;)">🌙 Dark</button>
       <button class="theme-opt" id="theme-amoled" onclick="setTheme(&#39;amoled&#39;)">⚫ AMOLED</button>
       <button class="theme-opt" id="theme-glass" onclick="setTheme(&#39;glass&#39;)">🪟 Glass</button>
-      <button class="theme-opt" id="theme-dusk" onclick="setTheme(&#39;dusk&#39;)">🌆 Dusk</button>
     </div>
     <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-bottom:4px">
       <div class="settings-info">GitHub PAT দিলে data auto-backup ও workflow trigger হবে। Token-এ <b>repo</b> ও <b>workflow</b> permission থাকতে হবে।</div>
@@ -2243,6 +2242,75 @@ let _searchActive=false;
 let _registerName=localStorage.getItem('pcc_register_name')||'';
 let _registerPhone=localStorage.getItem('pcc_register_phone')||'';
 
+
+function _buildTickerParts(){
+  var grp={applied:[],draft:[],printed:[],collect_ready:[],box_ready:[],status_update:[]};
+
+  allApps.filter(a=>isToday(a.apply_date)&&!(a.status||'').toLowerCase().includes('draft'))
+    .forEach(a=>grp.applied.push(a));
+  allApps.filter(a=>(a.status||'').toLowerCase().includes('draft')&&isToday(a.apply_date))
+    .forEach(a=>grp.draft.push(a));
+
+  allApps.forEach(a=>{
+    const hist=statusHistory[a.ref]||[];
+    const todayH=hist.filter(h=>isToday((h.date||'').replace(/\//g,'-')));
+    if(!todayH.length)return;
+    const lastSt=todayH[todayH.length-1].status||a.status||'';
+    const n=parseInt(lastSt.split('/')[0])||0;
+    const add=(g,st)=>{if(!grp[g].some(x=>x.ref===a.ref))grp[g].push({...a,_tickerSt:st});};
+    if(n===5) add('printed',lastSt);
+    else if(n===9&&collected[a.ref]&&(stars[a.ref]||0)>0) add('box_ready',lastSt);
+    else if(n===9&&(stars[a.ref]||0)>0) add('collect_ready',lastSt);
+    else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref)){
+      // Only show status_update for urgent/important (stars>0) or rejected/draft
+      const isRejected=(lastSt||'').toLowerCase().includes('reject');
+      if((stars[a.ref]||0)>0||isRejected) add('status_update',lastSt);
+    }
+  });
+
+  // Collected today
+  allApps.filter(a=>collectedDate[a.ref]&&isToday(collectedDate[a.ref])&&collected[a.ref])
+    .forEach(a=>{if(!grp.box_ready.some(x=>x.ref===a.ref))grp.box_ready.push(a);});
+
+  function nameSpans(apps){
+    return apps.map(a=>{
+      const r=a.ref.replace(/['"<>]/g,'');
+      return '<span class="t-name" style="cursor:pointer;color:#e2e8f0" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';
+    }).join('<span style="color:#475569">, </span>');
+  }
+
+  var sep='<span style="color:#334155;padding:0 14px;flex-shrink:0">⬥</span>';
+  const parts=[];
+  if(grp.printed.length)       parts.push('<span class="ticker-item">🖨️ <span style="color:#34d399">Printed '+grp.printed.length+'</span>: '+nameSpans(grp.printed)+'</span>');
+  if(grp.collect_ready.length) parts.push('<span class="ticker-item">📥 <span style="color:#22c55e">Collect '+grp.collect_ready.length+'</span>: '+nameSpans(grp.collect_ready)+'</span>');
+  if(grp.box_ready.length)     parts.push('<span class="ticker-item">📦 <span style="color:#4ade80">Ready '+grp.box_ready.length+'</span>: '+nameSpans(grp.box_ready)+'</span>');
+  if(grp.applied.length)       parts.push('<span class="ticker-item">📋 <span style="color:#94a3b8">Applied '+grp.applied.length+'</span>: '+nameSpans(grp.applied)+'</span>');
+  if(grp.status_update.length){
+    const stGrps={};
+    grp.status_update.forEach(function(a){
+      const st=a._tickerSt||'?';
+      if(!stGrps[st])stGrps[st]=[];
+      stGrps[st].push(a);
+    });
+    Object.entries(stGrps).forEach(function([st,apps]){
+      const names=apps.map(function(a){
+        const r=a.ref.replace(/['"<>]/g,'');
+        return '<span style="cursor:pointer;color:#e2e8f0;font-weight:600" data-tref="'+r+'" onclick="tickerClick(this.dataset.tref)">'+a.name+'</span>';
+      }).join('<span style="color:#475569">, </span>');
+      const lbl=apps.length>1
+        ?'<span style="color:#94a3b8">Status Update '+apps.length+' ('+st+')</span>: '+names
+        :'<span style="color:#94a3b8">Status Update ('+st+')</span>: '+names;
+      parts.push('<span class="ticker-item">🔄 '+lbl+'</span>');
+    });
+  }
+
+  if(!parts.length){
+    parts.push('<span class="ticker-item" style="color:#475569">📭 আজ কোনো আপডেট নেই</span>');
+  }
+
+  const spacer='<span style="display:inline-block;width:80px;flex-shrink:0"></span>';
+  return parts.join(sep);
+}
 function buildTicker(){
   if(window._tickerRaf){cancelAnimationFrame(window._tickerRaf);window._tickerRaf=null;}
   const track=document.getElementById('ticker-track');
@@ -2362,10 +2430,21 @@ function buildTicker(){
           x+=halfW;
           _loopCount++;
           if(_loopCount>=_maxLoops){
-            // rebuild ticker (picks up any new updates)
-            window._tickerRaf=null;
-            buildTicker();
-            return;
+            _loopCount=0;
+            // Silently refresh content without restarting position
+            var newParts=_buildTickerParts();
+            if(newParts){
+              var sep='<span style="color:#1e3a5f;padding:0 8px">·</span>';
+              var spacer='<span style="display:inline-block;width:'+areaW+'px"></span>';
+              var oneBlock=newParts+sep+spacer;
+              track.innerHTML=oneBlock+oneBlock;
+              // recalculate halfW
+              track.style.transform='translateY(-50%) translateX(0px)';
+              void track.offsetWidth;
+              var newHalfW=track.scrollWidth/2;
+              if(newHalfW>=50){halfW=newHalfW;}
+              track.style.transform='translateY(-50%) translateX('+Math.round(x)+'px)';
+            }
           }
         }
         track.style.transform='translateY(-50%) translateX('+Math.round(x)+'px)';
@@ -2620,7 +2699,7 @@ function _renderFwdHistory(months){
       var cid=mi+'_'+di;
       var rows=items.map(function(a){
         var applyDate=a.applyDate||'';
-        return _rowItem(a.name,a.ref,applyDate?'<span style="color:#94a3b8;font-size:10px">'+applyDate+'</span>':'');
+        return _rowItem(a.name,a.ref,applyDate?'<span style="color:#94a3b8;font-size:10px;display:inline-flex;align-items:center;gap:2px">'+calSVG+' '+applyDate+'</span>':'');
       }).join('');
       h+='<div id="fwd-panel-'+cid+'" style="display:none;padding:2px 0 6px">'+rows+'</div>';
     });
@@ -2870,7 +2949,11 @@ function cardHTML(app){
   // Collected card → no Day/Rem, show Aged separately
   let daysDisplay=null;
   if(isRejectedCard){
-    var rjDays=daysSince(app.apply_date,app.ref);
+    // Count days from when status became rejected
+    var _rjDate=app.apply_date;
+    var _sh=statusHistory[app.ref]||[];
+    for(var _si=0;_si<_sh.length;_si++){if((_sh[_si].status||'').toLowerCase().includes('reject')&&_sh[_si].date){_rjDate=_sh[_si].date;break;}}
+    var rjDays=daysSince(_rjDate,app.ref);
     if(rjDays!==null) daysDisplay='Rjct:'+String(rjDays).padStart(2,'0');
   } else if(isDraftOrPending){
     var wDays=daysSince(app.apply_date,app.ref);
@@ -2904,7 +2987,10 @@ function cardHTML(app){
   const notePreview=(!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()">${noteSVG}${noteVal}</div>`:'';
   const nameClick=`openNoteModal('${app.ref}');event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
-  const daySpan=daysDisplay!==null?`<span class="${dayClass}" onclick="openDayPopup('${app.ref}',${days||0},${s});event.stopPropagation()" style="cursor:pointer">${daysDisplay}</span>`:'';
+  var _noClick=isRejectedCard||isDraftOrPending;
+  var _dayStyle=isRejectedCard?'color:#ef4444;font-weight:700':isDraftOrPending?'color:#94a3b8':'';
+  const daySpan=daysDisplay!==null?('<span class="'+dayClass+'"'+(_dayStyle?' style="'+_dayStyle+'"':'')+((!_noClick)?' onclick="openDayPopup(\''+app.ref+'\',\''+String(days||0)+'\',\''+String(s)+'\');event.stopPropagation()" style="cursor:pointer"':'')+'>' +daysDisplay+'</span>'):'';  
+
   const colDaySpan=daysCol!==null?'<span class="day-collected">Aged:'+String(daysCol).padStart(2,'0')+'</span>':'';
   const phoneTag=policeTags[app.ref]||'';
   const clientPhone=phoneTag&&clientPhones[phoneTag]?clientPhones[phoneTag]:'';

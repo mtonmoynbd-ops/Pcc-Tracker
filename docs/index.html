@@ -392,6 +392,11 @@
   .ticker-sep { color:#334155;padding:0 12px;flex-shrink:0; }
   .ticker-search-icon { font-size:14px;flex-shrink:0;cursor:pointer; }
   body.light .ticker-wrap { background:#ffffff;border-color:#cbd5e1; }
+  body.light .app-bar { background:rgba(255,255,255,0.75);backdrop-filter:blur(16px);border-bottom:1px solid rgba(203,213,225,0.8); }
+  body.light .card { background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);border:1px solid rgba(148,163,184,0.4);box-shadow:0 4px 16px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.9); }
+  body.light .modal-box, body.light .confirm-box { background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);border:1px solid rgba(203,213,225,0.6);box-shadow:0 24px 64px rgba(0,0,0,0.15); }
+  body.light .filter-btn { backdrop-filter:blur(6px); }
+  body.light .search-bar { background:rgba(255,255,255,0.6);backdrop-filter:blur(8px); }
   body.light .ticker-today-label { color:#1d4ed8; }
   body.light .ticker-item { color:#64748b; }
   body.light .ticker-item .t-name { color:#0f172a; }
@@ -399,8 +404,6 @@
   body.dusk .ticker-wrap { background:#211c2e;border-color:rgba(139,92,246,0.25); }
   body.dusk .ticker-today-label { color:#a78bfa; }
   body.glass .ticker-wrap { background:#0f1f3d;border-color:#1e3a5f; }
-  body.glass-light .ticker-wrap { background:#0f1f3d;border-color:#1e3a5f; }
-  body.glass-light .ticker-today-label { color:#1d4ed8; }
   .filter-row { display: flex; gap: 6px; margin-bottom: 6px; overflow-x: auto; padding-bottom: 2px; align-items: center; }
   .filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #1e3a5f; background: #0f1f3d; color: #64748b; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
   .filter-btn.active { background: #1e3a5f; color: #60a5fa; border-color: #60a5fa; }
@@ -655,59 +658,6 @@
   body.glass .theme-opt.active { background:rgba(37,99,235,0.4);border-color:#60a5fa;color:#60a5fa; }
   body.glass .note-modal-textarea, body.glass .modal-add-input, body.glass .client-add-input { background:rgba(30,41,59,0.5);backdrop-filter:blur(8px); }
   /* ── Glass Light Theme ─────────────────────────────────── */
-  body.glass-light { background: #dde8f0; color: #1e293b; }
-  body.glass-light .app-bar { background:rgba(255,255,255,0.7);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.08); }
-  body.glass-light .card { background:rgba(255,255,255,0.6);backdrop-filter:blur(14px);border:1px solid rgba(148,163,184,0.3);box-shadow:0 4px 20px rgba(0,0,0,0.07),inset 0 1px 0 rgba(255,255,255,0.9);color:#1e293b; }
-  body.glass-light .card.star2 { border-color:rgba(220,38,38,0.55)!important;background:rgba(255,240,240,0.65)!important;box-shadow:0 4px 20px rgba(220,38,38,0.1),inset 0 1px 0 rgba(255,255,255,0.9)!important; }
-  body.glass-light .card.star1 { border-color:rgba(217,119,6,0.5)!important;background:rgba(255,251,235,0.65)!important;box-shadow:0 4px 20px rgba(217,119,6,0.08),inset 0 1px 0 rgba(255,255,255,0.9)!important; }
-  body.glass-light .card.collected-card { background:rgba(220,252,231,0.65)!important;border-color:rgba(22,163,74,0.4)!important; }
-  body.glass-light .name { color: #0f172a; }
-  body.glass-light .info { color: #475569; }
-  body.glass-light .section-title { color: #64748b; }
-  body.glass-light .section-title.urgent-title { color: #dc2626; }
-  body.glass-light .section-title.important-title { color: #d97706; }
-  body.glass-light .section-count { color: #64748b; }
-  body.glass-light .filter-btn { padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid #cbd5e1;background:rgba(255,255,255,0.6);backdrop-filter:blur(8px);color:#374151;cursor:pointer; }
-  body.glass-light .filter-btn.active { background:rgba(219,234,254,0.8);border-color:#2563eb;color:#1d4ed8;font-weight:700; }
-  body.glass-light .search-bar { background:rgba(255,255,255,0.65);backdrop-filter:blur(8px);border:1px solid #cbd5e1;color:#1e293b; }
-  body.glass-light .icon-filter-btn { background:rgba(255,255,255,0.6);backdrop-filter:blur(8px);border-color:#93c5fd; }
-  body.glass-light .icon-filter-btn svg { stroke: #2563eb; }
-  body.glass-light .icon-filter-btn.archive-btn { border-color: #93c5fd; }
-  body.glass-light .icon-filter-btn.archive-btn svg { stroke: #2563eb; }
-  body.glass-light .modal { background:rgba(0,0,0,0.15);backdrop-filter:blur(4px); }
-  body.glass-light .modal-box, body.glass-light .confirm-box { background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);border:1px solid #cbd5e1;color:#1e293b;box-shadow:0 20px 60px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,1); }
-  body.glass-light .modal-title { color:#0f172a; }
-  body.glass-light .modal-close { color:#64748b; }
-  body.glass-light .modal-list-item { color:#475569;border-color:#e2e8f0;background:rgba(248,250,252,0.8); }
-  body.glass-light .modal-list-item span { color:#1e293b; }
-  body.glass-light .adj-btn { background:#f1f5f9;border-color:#cbd5e1;color:#1e293b; }
-  body.glass-light .adj-num { color:#1e293b; }
-  body.glass-light .modal-add-input { background:rgba(255,255,255,0.8);border-color:#cbd5e1;color:#1e293b; }
-  body.glass-light .confirm-msg { color:#1e293b; }
-  body.glass-light .confirm-cancel { background:#f1f5f9;border-color:#cbd5e1;color:#475569; }
-  body.glass-light .confirm-ok { background:#2563eb;color:#fff; }
-  body.glass-light .note-modal-textarea { background:rgba(255,255,255,0.8);border-color:#cbd5e1;color:#1e293b; }
-  body.glass-light .note-modal-save { background:#2563eb;color:#fff; }
-  body.glass-light .note-modal-clear { background:#f1f5f9;border-color:#cbd5e1;color:#64748b; }
-  body.glass-light .note-tpl-btn { background:rgba(255,255,255,0.7);border-color:#cbd5e1;color:#374151; }
-  body.glass-light .police-inline-tag { color:#d97706;background:rgba(255,251,235,0.8);border-color:rgba(217,119,6,0.4); }
-  body.glass-light .police-filter-pill { background:rgba(237,233,254,0.8);border-color:#c4b5fd;color:#5b21b6; }
-  body.glass-light .police-filter-pill.active { background:rgba(109,40,217,0.15);color:#4c1d95; }
-  body.glass-light .ready-chip { background:rgba(220,252,231,0.8);color:#15803d;border:1px solid rgba(22,163,74,0.4); }
-  body.glass-light .arch-tab { background:rgba(255,255,255,0.6);color:#374151;border-color:#cbd5e1; }
-  body.glass-light .arch-tab.active { background:rgba(219,234,254,0.8);color:#1d4ed8;border-color:#2563eb; }
-  body.glass-light .theme-opt { background:rgba(255,255,255,0.6);border-color:#cbd5e1;color:#374151; }
-  body.glass-light .theme-opt.active { background:rgba(219,234,254,0.8);border-color:#2563eb;color:#1d4ed8; }
-  body.glass-light .client-note-btn { background:#dbeafe;border-color:#93c5fd;color:#1d4ed8; }
-  body.glass-light .cert-btn { background:#dbeafe;border-color:#93c5fd;color:#1d4ed8; }
-  body.glass-light #note-modal-docs button[style*="#1e2a3a"]{ background:#f1f5f9!important;border-color:#94a3b8!important;color:#334155!important; }
-  body.glass-light #note-modal-docs button[style*="#1a2a1a"]{ background:#dcfce7!important;border-color:#22c55e!important;color:#15803d!important; }
-  body.glass-light #note-modal-docs button[style*="#1e1a3a"]{ background:#ede9fe!important;border-color:#7c3aed!important;color:#5b21b6!important; }
-  body.glass-light .dm-name { color:#0f172a; }
-  body.glass-light .dm-info { color:#64748b; }
-  body.glass-light .date-modal-item { border-bottom-color:#e2e8f0; }
-  body.glass-light .date-modal-date-line { color:#1d4ed8; }
-  body.glass-light .reset-btn { background:rgba(241,245,249,0.8);border-color:#cbd5e1;color:#64748b;opacity:0.7; }
   /* Collected filter blink */
   @keyframes blink-col { 0%,100%{opacity:1} 50%{opacity:0.3} }
   .filter-btn.collected-blink { animation: blink-col 1.2s ease-in-out infinite; border-color:#22c55e; color:#22c55e; }
@@ -744,7 +694,7 @@
 </style>
 </head>
 <body>
-<script>(function(){var t=localStorage.getItem('pcc_theme');if(t==='light'||t==='amoled'||t==='glass'||t==='glass-light'||t==='dusk')document.body.className=t;}())</script>
+<script>(function(){var t=localStorage.getItem('pcc_theme');if(t==='light'||t==='amoled'||t==='glass'||t==='dusk')document.body.className=t;}())</script>
 <script>
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/Pcc-Tracker/sw.js').catch(function(e){console.log('SW:',e);});
@@ -825,7 +775,7 @@ if('serviceWorker' in navigator){
   <!-- Row 1: Mark as -->
   <div style="display:flex;gap:6px;width:100%;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #1e3a5f">
     <span style="font-size:10px;color:#475569;align-self:center;flex-shrink:0;text-transform:uppercase;letter-spacing:0.5px">Mark:</span>
-    <button onclick="markSelected(2)" style="flex:1;background:#7f1d1d;border:1px solid #ef4444;color:#fca5a5;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;opacity:1">🔴 Urgent</button>
+    <button onclick="markSelected(2)" style="flex:1;background:#b91c1c;border:2px solid #ef4444;color:#ffffff;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,0.5)">🔴 Urgent</button>
     <button onclick="markSelected(1)" style="flex:1;background:#451a03;border:1px solid #f59e0b;color:#fcd34d;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">⭐ Important</button>
     <button onclick="markSelected(0)" style="flex:1;background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:8px 4px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">☆ Normal</button>
   </div>
@@ -1064,7 +1014,6 @@ if('serviceWorker' in navigator){
       <button class="theme-opt" id="theme-dark" onclick="setTheme(&#39;dark&#39;)">🌙 Dark</button>
       <button class="theme-opt" id="theme-amoled" onclick="setTheme(&#39;amoled&#39;)">⚫ AMOLED</button>
       <button class="theme-opt" id="theme-glass" onclick="setTheme(&#39;glass&#39;)">🪟 Glass</button>
-      <button class="theme-opt" id="theme-glass-light" onclick="setTheme(&#39;glass-light&#39;)">🔆 Glass Light</button>
       <button class="theme-opt" id="theme-dusk" onclick="setTheme(&#39;dusk&#39;)">🌆 Dusk</button>
     </div>
     <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-bottom:4px">
@@ -1616,9 +1565,8 @@ function _applyTheme(){
   document.body.classList.toggle('light',themeMode==='light');
   document.body.classList.toggle('amoled',themeMode==='amoled');
   document.body.classList.toggle('glass',themeMode==='glass');
-  document.body.classList.toggle('glass-light',themeMode==='glass-light');
   document.body.classList.toggle('dusk',themeMode==='dusk');
-  ['light','dark','amoled','glass','glass-light','dusk'].forEach(function(m){
+  ['light','dark','amoled','glass','dusk'].forEach(function(m){
     const el=document.getElementById('theme-'+m.replace('-','-'));
     if(el)el.classList.toggle('active',m===themeMode);
   });
@@ -2130,13 +2078,16 @@ function searchInArchive(q){
 // ── Police ────────────────────────────────────────────────
 function openPoliceFilterModal(){
   const list=document.getElementById('police-filter-list');
-  let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">';
-  html+='<span class="police-filter-pill police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)" style="grid-column:1/-1;text-align:center">সব ফাইল</span>';
-  clientNames.forEach(function(n){
-    const nSafe=n.replace(/'/g,"\\'");
+  const chipColors=['#7c3aed','#0891b2','#059669','#d97706','#dc2626','#0284c7','#7e22ce','#b45309'];
+  let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%">';
+  html+='<span class="police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)" style="grid-column:1/-1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #334155;background:'+(activePoliceFilter?'#1e293b':'#1e3a5f')+';color:'+(activePoliceFilter?'#94a3b8':'#60a5fa')+'">সব ফাইল</span>';
+  clientNames.forEach(function(n,idx){
+    const nSafe=n.replace(/'/g,"\'");
+    const col=chipColors[idx%chipColors.length];
+    const isActive=activePoliceFilter===n;
     const activeCount=getDisplayApps().filter(a=>policeTags[a.ref]===n&&!delivered[a.ref]).length;
-    const countBadge=activeCount?'<span style="background:#7c3aed;color:#fff;border-radius:10px;padding:0 5px;font-size:9px;margin-left:4px">'+activeCount+'</span>':'';
-    html+='<span class="police-filter-pill '+(activePoliceFilter===n?'active':'')+'" onclick="setPoliceFilter(\''+nSafe+'\')" style="display:flex;align-items:center;justify-content:space-between;gap:4px"><span>'+n+'</span>'+countBadge+'</span>';
+    const badge=activeCount?'<span style="background:rgba(255,255,255,0.2);color:#fff;border-radius:8px;padding:0 5px;font-size:9px;margin-left:3px">'+activeCount+'</span>':'';
+    html+='<span onclick="setPoliceFilter(\''+nSafe+'\') " style="padding:7px 8px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border:1px solid '+col+';background:'+(isActive?col:'rgba(0,0,0,0.2)')+';color:'+(isActive?'#fff':col)+';transition:all 0.15s"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n+'</span>'+badge+'</span>';
   });
   html+='</div>';
   if(!clientNames.length)html='<div style="color:#475569;font-size:12px;margin-top:8px">Add Clients বাটনে নাম যোগ করুন</div>';
@@ -2772,16 +2723,14 @@ function openForwardedLogModal(){
     var n=parseInt((a.status||'').split('/')[0])||0;
     return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];
   });
+  var histHtml=_renderFwdHistory(_buildFwdLogData());
   var html='';
   if(waiting.length){
-    html+='<div style="margin-bottom:14px">'
-      +'<div style="font-size:10px;color:#f59e0b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">'
-      +'\u23F3 \u0985\u09AA\u09C7\u0995\u09CD\u09B7\u09AE\u09BE\u09A8 \u09AB\u09BE\u0987\u09B2 ('+waiting.length+')</div>'
-      +waiting.map(function(a){return _pendingFileItem(a,'#fcd34d','#60a5fa');}).join('')
-      +'</div>';
+    var waitRows=waiting.map(function(a){return _pendingFileItem(a,'#fcd34d','#60a5fa');}).join('');
+    html+='<details style="margin-bottom:10px"><summary style="list-style:none;cursor:pointer;font-size:10px;color:#f59e0b;font-weight:700;text-transform:uppercase;padding:6px 0">⏳ অপেক্ষমান ফাইল ('+waiting.length+')</summary><div style="padding-top:4px">'+waitRows+'</div></details>';
   }
-  html+=_renderFwdHistory(_buildFwdLogData());
-  if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">\u0995\u09CB\u09A8\u09CB \u09B0\u09C7\u0995\u09B0\u09CD\u09A1 \u09A8\u09C7\u0987</div>';
+  html+=histHtml;
+  if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
   el.innerHTML=html;
   document.getElementById('fwd-log-modal').classList.add('open');
 }
@@ -2794,16 +2743,14 @@ function openCollectedLogModal(){
     var n=parseInt((a.status||'').split('/')[0])||0;
     return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
   });
+  var histColHtml=_renderColHistory(_buildColLogData());
   var html='';
   if(ready.length){
-    html+='<div style="margin-bottom:14px">'
-      +'<div style="font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 6px">'
-      +'\uD83D\uDCE6 Collect-ready \u09AB\u09BE\u0987\u09B2 ('+ready.length+')</div>'
-      +ready.map(function(a){return _pendingFileItem(a,'#4ade80','#22c55e');}).join('')
-      +'</div>';
+    var readyRows=ready.map(function(a){return _pendingFileItem(a,'#4ade80','#22c55e');}).join('');
+    html+='<details style="margin-bottom:10px"><summary style="list-style:none;cursor:pointer;font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;padding:6px 0">📦 Collect-ready ফাইল ('+ready.length+')</summary><div style="padding-top:4px">'+readyRows+'</div></details>';
   }
-  html+=_renderColHistory(_buildColLogData());
-  if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">\u0995\u09CB\u09A8\u09CB \u09B0\u09C7\u0995\u09B0\u09CD\u09A1 \u09A8\u09C7\u0987</div>';
+  html+=histColHtml;
+  if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
   el.innerHTML=html;
   document.getElementById('col-log-modal').classList.add('open');
 }

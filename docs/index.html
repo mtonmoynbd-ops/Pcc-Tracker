@@ -606,6 +606,7 @@
   /* Stage btn — icon only, no circle, same size as star btn */
   .stage-btn { width: 16px; height: 16px; background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; font-size: 12px; line-height: 1; padding: 0; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
   .stage-btn.fwd { color: #eab308; }
+  .stage-btn.rejected { background:#450a0a;border-color:#ef4444;color:#ef4444; }
   .stage-btn.col { color: #22c55e; }
   .stage-btn.del { color: #34d399; font-size: 12px; }
   .stage-btn.pressing { transform: scale(0.85); opacity: 0.6; }
@@ -1599,7 +1600,7 @@ function stagePressStart(e,ref){
       if(s>0){const ok=await showConfirm('Forwarded করবেন?');if(!ok)return;}
       forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];
       const _fwdApp=allApps.find(a=>a.ref===ref);
-      if(_fwdApp){forwardedLog.push({date:todayStr(),ref:_fwdApp.ref,name:_fwdApp.name,printDate:getEffectivePrintDate(_fwdApp.ref)||''});}
+      if(_fwdApp){forwardedLog.push({date:todayStr(),ref:_fwdApp.ref,name:_fwdApp.name,printDate:getEffectivePrintDate(_fwdApp.ref)||'',applyDate:_fwdApp.apply_date||''});}
       // Send to register WhatsApp if set
       const app=allApps.find(a=>a.ref===ref);
       if(_registerPhone&&app){
@@ -2554,7 +2555,7 @@ function _buildFwdLogData(){
   allApps.forEach(function(a){
     if(forwarded[a.ref]&&!loggedRefs.has(a.ref)){
       var fwdDate=_getFwdDateFromHistory(a.ref);
-      if(fwdDate) hist.push({date:fwdDate,ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
+      if(fwdDate) hist.push({date:fwdDate,ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||'',applyDate:a.apply_date||''});
     }
   });
   // group: monthKey → dateKey → entries
@@ -2644,16 +2645,15 @@ function _renderFwdHistory(months){
     var dateMap=months[mk];
     var dateKeys=Object.keys(dateMap);
     var total=dateKeys.reduce(function(s,dk){return s+(dateMap[dk]?dateMap[dk].length:0);},0);
+    var fwdOpen=(typeof window._fwdExpand!=='undefined')?window._fwdExpand:true;
     h+='<div style="margin-bottom:8px">'
-      // month row — clickable, collapsed by default
-      +'<div style="display:flex;align-items:center;gap:6px;padding:5px 4px;border-radius:6px;background:rgba(96,165,250,0.06)">'
-      +''
-      +'<span style="font-size:13px">\uD83D\uDDD3\uFE0F</span>'
+      +'<div onclick="_fwdToggleMonth(this)" style="display:flex;align-items:center;gap:6px;padding:5px 4px;border-radius:6px;background:rgba(96,165,250,0.06);cursor:pointer">'
+      +'<span class="fwd-arr" style="color:#60a5fa;font-size:10px;width:10px">'+(fwdOpen?'▼':'▶')+'</span>'
+      +'<span style="font-size:13px">\u{1F5D3}\uFE0F</span>'
       +'<span style="font-size:12px;font-weight:700;color:#60a5fa">'+mk+'</span>'
       +'<span style="color:#475569;font-size:10px">('+total+')</span>'
       +'</div>'
-      // date chips + panels — hidden by default
-      +'<div style="padding:6px 4px 2px">'
+      +'<div style="display:'+(fwdOpen?'block':'none')+';padding:6px 4px 2px">'
       +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     dateKeys.forEach(function(dk,di){
       var cnt=dateMap[dk]?dateMap[dk].length:0;
@@ -2668,7 +2668,8 @@ function _renderFwdHistory(months){
       var items=dateMap[dk]||[];
       var cid=mi+'_'+di;
       var rows=items.map(function(a){
-        return _rowItem(a.name,a.ref,a.printDate?'<span style="color:#60a5fa;font-size:10px">\uD83D\uDDB8\uFE0F '+a.printDate+'</span>':'');
+        var applyDate=a.applyDate||'';
+        return _rowItem(a.name,a.ref,applyDate?'<span style="color:#94a3b8;font-size:10px">'+applyDate+'</span>':'');
       }).join('');
       h+='<div id="fwd-panel-'+cid+'" style="display:none;padding:2px 0 6px">'+rows+'</div>';
     });
@@ -2685,14 +2686,15 @@ function _renderColHistory(months){
   keys.forEach(function(mk,mi){
     var pdMap=months[mk];
     var pdKeys=Object.keys(pdMap);
-    var total=pdKeys.reduce(function(s,pk){return s+(pdMap[pk]?pdMap[pk].length:0);},0);
+    var colOpen=(typeof window._colExpand!=='undefined')?window._colExpand:true;
     h+='<div style="margin-bottom:8px">'
-      +'<div style="display:flex;align-items:center;gap:6px;padding:5px 4px;border-radius:6px;background:rgba(34,197,94,0.06)">'
-      +''
-      +'<span style="font-size:13px">\uD83D\uDDD3\uFE0F</span>'
+      +'<div onclick="_colToggleMonth(this)" style="display:flex;align-items:center;gap:6px;padding:5px 4px;border-radius:6px;background:rgba(34,197,94,0.06);cursor:pointer">'
+      +'<span class="col-arr" style="color:#22c55e;font-size:10px;width:10px">'+(colOpen?'▼':'▶')+'</span>'
+      +'<span style="font-size:13px">\u{1F5D3}\uFE0F</span>'
       +'<span style="font-size:12px;font-weight:700;color:#22c55e">'+mk+'</span>'
       +'<span style="color:#475569;font-size:10px">('+total+')</span>'
       +'</div>'
+      +'<div style="display:'+(colOpen?'block':'none')+';padding:6px 4px 2px">'
       +'<div style="padding:6px 4px 2px">'
       +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     pdKeys.forEach(function(pdKey,di){
@@ -2734,6 +2736,7 @@ function openForwardedLogModal(){
     var n=parseInt((a.status||'').split('/')[0])||0;
     return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];
   });
+  window._fwdExpand=!waiting.length; // expand if no pending files
   var histHtml=_renderFwdHistory(_buildFwdLogData());
   var html='';
   if(waiting.length){
@@ -2754,6 +2757,7 @@ function openCollectedLogModal(){
     var n=parseInt((a.status||'').split('/')[0])||0;
     return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
   });
+  window._colExpand=!ready.length; // expand if no ready files
   var histColHtml=_renderColHistory(_buildColLogData());
   var html='';
   if(ready.length){
@@ -2767,6 +2771,47 @@ function openCollectedLogModal(){
 }
 function closeColLogModal(){document.getElementById('col-log-modal').classList.remove('open');}
 
+
+function _fwdToggleMonth(hdr){
+  var arr=hdr.querySelector('.fwd-arr');
+  var panel=hdr.nextElementSibling;
+  if(!panel)return;
+  var open=panel.style.display!=='none';
+  panel.style.display=open?'none':'block';
+  if(arr)arr.textContent=open?'▶':'▼';
+}
+function _colToggleMonth(hdr){
+  var arr=hdr.querySelector('.col-arr');
+  var panel=hdr.nextElementSibling;
+  if(!panel)return;
+  var open=panel.style.display!=='none';
+  panel.style.display=open?'none':'block';
+  if(arr)arr.textContent=open?'▶':'▼';
+}
+
+// ── Merge rejected history into re-applications ──────────
+function _mergeRejectedHistory(){
+  // For each app, check if statusHistory has a 'reject' entry
+  // If a newer app exists with same name, copy old history
+  var rejectedRefs={};
+  allApps.forEach(function(a){
+    var sh=statusHistory[a.ref]||[];
+    var hasReject=sh.some(function(h){return (h.status||'').toLowerCase().includes('reject');});
+    if(hasReject) rejectedRefs[a.name.trim().toLowerCase()]={ref:a.ref,history:sh,phone:a.phone,applyDate:a.apply_date};
+  });
+  // Find active apps with same name that DON'T have reject in their own history
+  allApps.forEach(function(a){
+    var key=a.name.trim().toLowerCase();
+    var prev=rejectedRefs[key];
+    if(!prev||prev.ref===a.ref)return;
+    var myHistory=statusHistory[a.ref]||[];
+    var alreadyMerged=myHistory.some(function(h){return h._merged;});
+    if(alreadyMerged)return;
+    // Prepend old history entries marked as merged
+    var mergedEntries=prev.history.map(function(h){return Object.assign({},h,{_merged:true});});
+    statusHistory[a.ref]=mergedEntries.concat(myHistory);
+  });
+}
 function filterPressStart(e,type){
   _filterPressTimer=setTimeout(async function(){
     _filterPressTimer=null;
@@ -2851,7 +2896,10 @@ function cardHTML(app){
   const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded;
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
-  const stage=isDelivered?3:isCol?2:isFwd?1:0;const stageIcon=stage===0?'⏳':stage===1?'📤':stage===2?'📦':'✅';const stageCls=stage===0?'':stage===1?'fwd':stage===2?'col':'del';
+  const isRejectedCard=(app.status||'').toLowerCase().includes('reject');
+  const stage=isDelivered?3:isCol?2:isFwd?1:0;
+  const stageIcon=isRejectedCard?'🚫':(stage===0?'⏳':stage===1?'📤':stage===2?'📦':'✅');
+  const stageCls=isRejectedCard?'rejected':(stage===0?'':stage===1?'fwd':stage===2?'col':'del');
   const statusNum=parseInt((app.status||'').split('/')[0])||0;
   const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
   const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
@@ -2894,7 +2942,7 @@ function cardHTML(app){
   const phoneTag=policeTags[app.ref]||'';
   const clientPhone=phoneTag&&clientPhones[phoneTag]?clientPhones[phoneTag]:'';
   const hasClientPhone=!!(clientPhone);
-  const phoneBlinkClass=(isCol&&!blinkStopped[app.ref])?'phone-blink':'';
+  const phoneBlinkClass=((isCol||isRejectedCard)&&!blinkStopped[app.ref])?'phone-blink':'';
   const phoneHTML=(showDetails&&app.phone)?`<a class="phone-link ${phoneBlinkClass}" onclick="blinkStopped['${app.ref}']=true;save();render();openPhonePopup('${app.ref}','${app.phone}');event.stopPropagation()">📞 ${app.phone}</a>`:'';
   const expandToggle=(s===0&&!isDelivered)?`<div class="expand-toggle ${isExpanded?'open':''}" onclick="toggleExpandNormal('${app.ref}');event.stopPropagation()"></div>`:'';
   // Ref clickable; police tag shown after apply_date before day count
@@ -2925,7 +2973,7 @@ function cardHTML(app){
           &nbsp;${daySpan}${colDaySpan?'&nbsp;'+colDaySpan:''}${policeTagHTML?'&nbsp;'+policeTagHTML:''}
         </div>
         <div class="bottom-row">
-          <span class="status ${scls}${(shouldBlink||shouldBlink910)?' status-blink':''}" onclick="${statusClick}">${trimStatus(app.status)}</span>
+          <span class="status ${scls}${(shouldBlink||shouldBlink910)?' status-blink':''}" onclick="${statusClick}" style="${isRejectedCard?'color:#ef4444;font-weight:700;':''}">${trimStatus(app.status)}</span>
           ${printBadge}${phoneHTML}
         </div>
         ${deuHTML?`<div class="bottom-row" style="margin-top:4px">${deuHTML}</div>`:''}
@@ -3034,6 +3082,8 @@ function render(){
   if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
   if(!_searchActive)buildTicker();
+  // Merge rejected history into re-applications
+  _mergeRejectedHistory();
   document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
   document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
   const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));

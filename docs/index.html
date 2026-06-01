@@ -1111,8 +1111,8 @@ let historyStore=JSON.parse(localStorage.getItem('pcc_history_store')||'{}');
 function mergeIntoHistory(apps){
   let changed=false;
   apps.forEach(function(a){
-    if(!historyStore[a.ref]){historyStore[a.ref]={ref:a.ref,name:a.name,apply_date:a.apply_date,phone:a.phone,status:a.status};changed=true;}
-    else{Object.assign(historyStore[a.ref],{status:a.status,name:a.name,phone:a.phone});}
+    if(!historyStore[a.ref]){historyStore[a.ref]={ref:a.ref,name:a.name,apply_date:a.apply_date,phone:a.phone,status:a.status,cert_file:a.cert_file||null};changed=true;}
+    else{Object.assign(historyStore[a.ref],{status:a.status,name:a.name,phone:a.phone,cert_file:a.cert_file||null});}
   });
   if(changed){
     try{localStorage.setItem('pcc_history_store',JSON.stringify(historyStore));}
@@ -2341,8 +2341,8 @@ function buildTicker(){
     const n=parseInt(lastSt.split('/')[0])||0;
     const add=(g,st)=>{if(!grp[g].some(x=>x.ref===a.ref))grp[g].push({...a,_tickerSt:st});};
     if(n===5) add('printed',lastSt);
-    else if(n===9&&collected[a.ref]) add('box_ready',lastSt);
-    else if(n===9) add('collect_ready',lastSt);
+    else if(n===9&&collected[a.ref]&&(stars[a.ref]||0)>0) add('box_ready',lastSt);
+    else if(n===9&&(stars[a.ref]||0)>0) add('collect_ready',lastSt);
     else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref)){
       // Only show status_update for urgent/important (stars>0) or rejected/draft
       const isRejected=(lastSt||'').toLowerCase().includes('reject');

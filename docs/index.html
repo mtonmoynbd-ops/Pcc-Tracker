@@ -2722,11 +2722,15 @@ function _renderColHistory(months){
 
 function _pendingFileItem(a,nameColor,pdColor){
   var pd=getEffectivePrintDate(a.ref);
-  return '<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06)">'
-    +'<span style="color:'+nameColor+';font-size:12px;font-weight:600;flex:1">'+a.name+'</span>'
-    +'<span style="color:#64748b;font-size:10px">'+a.ref+'</span>'
-    +'<span style="color:#475569;font-size:10px">'+a.status+'</span>'
-    +(pd?'<span style="color:'+pdColor+';font-size:10px">\uD83D\uDDB8\uFE0F '+pd+'</span>':'')
+  var s=stars[a.ref]||0;
+  var starIcon=s===2?'<span style="font-size:11px;margin-right:2px">🔴</span>':s===1?'<span style="font-size:11px;margin-right:2px">⭐</span>':'';
+  var nc=document.body.classList.contains('light')?'#334155':'#cbd5e1';
+  return '<div style="display:flex;align-items:center;gap:5px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06)">'
+    +'<span style="display:flex;align-items:center;flex:1;min-width:0">'+starIcon
+    +'<span style="color:'+nc+';font-size:12px;font-weight:600">'+a.name+'</span></span>'
+    +'<span style="color:#64748b;font-size:10px;flex-shrink:0">'+a.ref+'</span>'
+    +'<span style="color:#475569;font-size:10px;flex-shrink:0">'+a.status+'</span>'
+    +(pd?'<span style="color:'+pdColor+';font-size:10px;flex-shrink:0">\uD83D\uDDB8\uFE0F '+pd+'</span>':'')
     +'</div>';
 }
 
@@ -2737,12 +2741,12 @@ function openForwardedLogModal(){
     var n=parseInt((a.status||'').split('/')[0])||0;
     return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];
   });
-  window._fwdExpand=!waiting.length; // expand if no pending files
+  window._fwdExpand=waiting.length>0?false:true; // Forwarded collapsed if files exist, expanded if no files
   var histHtml=_renderFwdHistory(_buildFwdLogData());
   var html='';
   if(waiting.length){
     var waitRows=waiting.map(function(a){return _pendingFileItem(a,'#fcd34d','#60a5fa');}).join('');
-    html+='<details style="margin-bottom:10px"><summary style="list-style:none;cursor:pointer;font-size:10px;color:#f59e0b;font-weight:700;text-transform:uppercase;padding:6px 0">⏳ অপেক্ষমান ফাইল ('+waiting.length+')</summary><div style="padding-top:4px">'+waitRows+'</div></details>';
+    html+='<details open style="margin-bottom:14px"><summary style="list-style:none;cursor:pointer;font-size:14px;color:#60a5fa;font-weight:700;padding:8px 4px;display:flex;align-items:center;gap:6px"><span>⏳</span>Go Forward: '+waiting.length+'</summary><div style="padding-top:6px">'+waitRows+'</div></details>';
   }
   html+=histHtml;
   if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
@@ -2758,12 +2762,12 @@ function openCollectedLogModal(){
     var n=parseInt((a.status||'').split('/')[0])||0;
     return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
   });
-  window._colExpand=!ready.length; // expand if no ready files
+  window._colExpand=ready.length>0?false:true; // Collected collapsed if files exist, expanded if no files
   var histColHtml=_renderColHistory(_buildColLogData());
   var html='';
   if(ready.length){
     var readyRows=ready.map(function(a){return _pendingFileItem(a,'#4ade80','#22c55e');}).join('');
-    html+='<details style="margin-bottom:10px"><summary style="list-style:none;cursor:pointer;font-size:10px;color:#22c55e;font-weight:700;text-transform:uppercase;padding:6px 0">📦 Collect-ready ফাইল ('+ready.length+')</summary><div style="padding-top:4px">'+readyRows+'</div></details>';
+    html+='<details open style="margin-bottom:14px"><summary style="list-style:none;cursor:pointer;font-size:14px;color:#22c55e;font-weight:700;padding:8px 4px;display:flex;align-items:center;gap:6px"><span>📥</span>Go Collect: '+ready.length+'</summary><div style="padding-top:6px">'+readyRows+'</div></details>';
   }
   html+=histColHtml;
   if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';

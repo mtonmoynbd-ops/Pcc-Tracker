@@ -2092,7 +2092,6 @@ function openPoliceFilterModal(){
   html+='<button class="police-filter-all '+(activePoliceFilter?'':'active')+'" onclick="setPoliceFilter(null)" style="grid-column:1/-1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #334155;background:'+(activePoliceFilter?'#1e293b':'#1e3a5f')+';color:'+(activePoliceFilter?'#94a3b8':'#60a5fa')+'">সব ফাইল</button>';
   clientNames.forEach(function(n,idx){
     const nSafe=n.replace(/'/g,"\'");
-    const col=chipColors[idx%chipColors.length];
     const isActive=activePoliceFilter===n;
     const activeCount=getDisplayApps().filter(a=>policeTags[a.ref]===n&&!delivered[a.ref]).length;
     const badge=activeCount?'<span style="background:rgba(0,0,0,0.2);color:#fff;border-radius:8px;padding:0 5px;font-size:9px;margin-left:3px">'+activeCount+'</span>':'';

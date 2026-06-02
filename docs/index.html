@@ -2313,6 +2313,7 @@ function _buildTickerParts(){
 }
 function buildTicker(){
   if(window._tickerRaf){cancelAnimationFrame(window._tickerRaf);window._tickerRaf=null;}
+  if(window._tickerRefreshTimer){clearInterval(window._tickerRefreshTimer);window._tickerRefreshTimer=null;}
   const track=document.getElementById('ticker-track');
   if(!track)return;
   const tds=todayDateStr();
@@ -2422,41 +2423,28 @@ function buildTicker(){
       var x=areaW; // start offscreen right
       var spd=45;
       var last=null;
-      var _loopCount=0;
-      var _maxLoops=30; // scroll 30 full loops then content refresh
+      // Simple infinite loop — x resets by exactly halfW when it passes -halfW
       function loop(ts){
         if(last===null)last=ts;
         var dt=Math.min(ts-last,50);last=ts;
         x-=spd*(dt/1000);
-        if(x<=-halfW){
-          x+=halfW;
-          _loopCount++;
-          if(_loopCount>=_maxLoops){
-            _loopCount=0;
-            // Silently refresh content without restarting position
-            var newParts=_buildTickerParts();
-            if(newParts){
-              var sep='<span style="color:#1e3a5f;padding:0 8px">·</span>';
-              var spacer='<span style="display:inline-block;width:'+areaW+'px"></span>';
-              var oneBlock=newParts+sep+spacer;
-              track.innerHTML=oneBlock+oneBlock;
-              // recalculate halfW
-              track.style.transform='translateY(-50%) translateX(0px)';
-              void track.offsetWidth;
-              var newHalfW=track.scrollWidth/2;
-              if(newHalfW>=50){
-                // Adjust x to stay in same relative position in new content
-                if(halfW>0) x=x*(newHalfW/halfW);
-                halfW=newHalfW;
-              }
-              track.style.transform='translateY(-50%) translateX('+Math.round(x)+'px)';
-            }
-          }
-        }
+        if(x<=-halfW) x+=halfW;
         track.style.transform='translateY(-50%) translateX('+Math.round(x)+'px)';
         window._tickerRaf=requestAnimationFrame(loop);
       }
       window._tickerRaf=requestAnimationFrame(loop);
+      // Refresh content every 5 minutes without interrupting scroll
+      window._tickerRefreshTimer=setInterval(function(){
+        var newParts=_buildTickerParts();
+        if(!newParts)return;
+        var sep='<span style="color:#1e3a5f;padding:0 8px">·</span>';
+        var spacer='<span style="display:inline-block;width:'+areaW+'px"></span>';
+        var oneBlock=newParts+sep+spacer;
+        track.innerHTML=oneBlock+oneBlock;
+        void track.offsetWidth;
+        var newHalfW=track.scrollWidth/2;
+        if(newHalfW>=50) halfW=newHalfW;
+      },300000);
     });
   });
 }

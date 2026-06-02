@@ -3136,6 +3136,8 @@ function pressEnd(ref){clearTimeout(pressTimer[ref]);}
 function handleTap(ref){if(selectMode)toggleSelect(ref);}
 
 // ── Render ────────────────────────────────────────────────
+function _sortByDate(arr){return arr.slice().sort(function(a,b){var da=a.apply_date||'';var db=b.apply_date||'';
+return db.localeCompare(da);});}
 function render(){
   const q=(document.getElementById('search-bar').value||'').toLowerCase().trim();
   const displayApps=getDisplayApps().filter(a=>{
@@ -3145,10 +3147,6 @@ function render(){
     return true;
   });
   if(!q)displayApps.forEach(function(a){a._hl='';});
-  function _sortByDate(arr){return arr.sort(function(a,b){
-    var da=a.apply_date||'';var db=b.apply_date||'';
-    return db.localeCompare(da);
-  });}
   const star2=_sortByDate(displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===2));
   const star1=_sortByDate(displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===1));
   const normal=_sortByDate(displayApps.filter(a=>!delivered[a.ref]&&(stars[a.ref]||0)===0));

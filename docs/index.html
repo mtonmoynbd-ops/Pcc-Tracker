@@ -2415,13 +2415,15 @@ function buildTicker(){
       var halfW=track.scrollWidth/2;
       // fallback if measurement fails
       if(halfW<50) halfW=Math.max(300, track.textContent.length*7);
+      // Ensure halfW >= areaW so each "loop" = at least one full screen pass
+      if(halfW<areaW) halfW=Math.max(halfW,areaW);
 
       // Pure JS infinite scroll — x pixel-exact, no CSS animation
       var x=areaW; // start offscreen right
       var spd=45;
       var last=null;
       var _loopCount=0;
-      var _maxLoops=20; // scroll 20 full loops then rebuild
+      var _maxLoops=30; // scroll 30 full loops then content refresh
       function loop(ts){
         if(last===null)last=ts;
         var dt=Math.min(ts-last,50);last=ts;
@@ -2442,7 +2444,11 @@ function buildTicker(){
               track.style.transform='translateY(-50%) translateX(0px)';
               void track.offsetWidth;
               var newHalfW=track.scrollWidth/2;
-              if(newHalfW>=50){halfW=newHalfW;}
+              if(newHalfW>=50){
+                // Adjust x to stay in same relative position in new content
+                if(halfW>0) x=x*(newHalfW/halfW);
+                halfW=newHalfW;
+              }
               track.style.transform='translateY(-50%) translateX('+Math.round(x)+'px)';
             }
           }
@@ -2627,10 +2633,11 @@ function _buildColLogData(){
 }
 
 function _rowItem(name,ref,extra){
-  return '<div style="display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
-    +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1">'+name+'</span>'
-    +'<span style="color:#64748b;font-size:10px">'+ref+'</span>'
-    +(extra||'')+'</div>';
+  return '<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04)">'
+    +'<span style="color:#e2e8f0;font-size:12px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</span>'
+    +'<span style="color:#64748b;font-size:10px;flex-shrink:0">'+ref+'</span>'
+    +(extra?'<span style="display:inline-flex;align-items:center;gap:3px;flex-shrink:0">'+extra+'</span>':'')
+    +'</div>';
 }
 
 function fwdMonthToggle(mid){
@@ -2739,9 +2746,9 @@ function _renderColHistory(months){
     pdKeys.forEach(function(pdKey,di){
       var items=pdMap[pdKey]||[];
       var cid=mi+'_'+di;
-      var rows=items.map(function(a){
-        return _rowItem(a.name,a.ref,'<span style="color:#64748b;font-size:10px">\uD83D\uDCC5 '+a.date+'</span>');
-      }).join('');
+        var rows=items.map(function(a){
+          return _rowItem(a.name,a.ref,'<span style="color:#22c55e;font-size:10px">📦 '+a.date+'</span>');
+        }).join('');
       h+='<div id="col-panel-'+cid+'" style="display:none;padding:2px 0 6px">'+rows+'</div>';
     });
     h+='</div></div>';
@@ -2933,7 +2940,7 @@ function cardHTML(app){
   const si=s===2?'🔴':s===1?'⭐':'☆';
   const cls=isDelivered?'delivered':s===2?'star2':s===1?'star1':'';
   const num=parseInt((app.status||'').split('/')[0])||0;const scls='s'+Math.min(num,10);
-  const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded;
+  const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded||isRejectedCard;
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
   const isRejectedCard=(app.status||'').toLowerCase().includes('reject');
@@ -2942,7 +2949,7 @@ function cardHTML(app){
   const stageCls=isRejectedCard?'rejected':(stage===0?'':stage===1?'fwd':stage===2?'col':'del');
   const statusNum=parseInt((app.status||'').split('/')[0])||0;
   const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
-  const days=(!isDelivered&&showDetails&&!isDraftOrPending&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
+  const days=(!isDelivered&&showDetails&&!isDraftOrPending&&!isRejectedCard&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
   const _defLim=s===2?7:s===1?14:24;
   const _lim=(customLimits&&customLimits[app.ref])||_defLim;
   const _rem=days!==null?(_lim-days):null;

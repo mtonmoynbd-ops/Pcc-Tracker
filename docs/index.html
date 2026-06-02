@@ -2280,7 +2280,7 @@ function _buildTickerParts(){
   }
 
   var sep='<span style="color:#334155;padding:0 14px;flex-shrink:0">⬥</span>';
-  const parts=[];
+  var parts=[];
   if(grp.printed.length)       parts.push('<span class="ticker-item">🖨️ <span style="color:#34d399">Printed '+grp.printed.length+'</span>: '+nameSpans(grp.printed)+'</span>');
   if(grp.collect_ready.length) parts.push('<span class="ticker-item">📥 <span style="color:#22c55e">Collect '+grp.collect_ready.length+'</span>: '+nameSpans(grp.collect_ready)+'</span>');
   if(grp.box_ready.length)     parts.push('<span class="ticker-item">📦 <span style="color:#4ade80">Ready '+grp.box_ready.length+'</span>: '+nameSpans(grp.box_ready)+'</span>');
@@ -2308,7 +2308,7 @@ function _buildTickerParts(){
     parts.push('<span class="ticker-item" style="color:#475569">📭 আজ কোনো আপডেট নেই</span>');
   }
 
-  const spacer='<span style="display:inline-block;width:80px;flex-shrink:0"></span>';
+  var spacer='<span style="display:inline-block;width:80px;flex-shrink:0"></span>';
   return parts.join(sep);
 }
 function buildTicker(){
@@ -3142,8 +3142,6 @@ function render(){
   if(!html)html='<div class="loading" style="padding:30px">কোনো ফলাফল নেই</div>';
   document.getElementById('list').innerHTML=html;
   if(!_searchActive)buildTicker();
-  // Merge rejected history into re-applications
-  _mergeRejectedHistory();
   document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
   document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
   const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));
@@ -3179,9 +3177,10 @@ async function load(){
     allApps=d.applications;
     try{mergeIntoHistory(allApps);}catch(he){console.warn('History store error:',he);}
     try{const ur=await fetch('userdata.json',{cache:'no-store'});if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
+    try{_mergeRejectedHistory();}catch(me){}
     render();
   }catch(e){
-    if(allApps.length>0){render();}
+    if(allApps.length>0){try{_mergeRejectedHistory();}catch(me){}render();}
     else{
       // Try cache explicitly when network fails
       try{

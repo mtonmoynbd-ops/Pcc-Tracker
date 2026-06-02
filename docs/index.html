@@ -2940,10 +2940,10 @@ function cardHTML(app){
   const si=s===2?'🔴':s===1?'⭐':'☆';
   const cls=isDelivered?'delivered':s===2?'star2':s===1?'star1':'';
   const num=parseInt((app.status||'').split('/')[0])||0;const scls='s'+Math.min(num,10);
+  const isRejectedCard=(app.status||'').toLowerCase().includes('reject');
   const isExpanded=s===0&&expandedNormal.has(app.ref);const showDetails=s>0||isExpanded||isRejectedCard;
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
-  const isRejectedCard=(app.status||'').toLowerCase().includes('reject');
   const stage=isDelivered?3:isCol?2:isFwd?1:0;
   const stageIcon=isRejectedCard?'🚫':(stage===0?'⏳':stage===1?'📤':stage===2?'📦':'✅');
   const stageCls=isRejectedCard?'rejected':(stage===0?'':stage===1?'fwd':stage===2?'col':'del');

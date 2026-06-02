@@ -2401,7 +2401,7 @@ function buildTicker(){
   const spacer='<span style="display:inline-block;width:80px;flex-shrink:0"></span>';
   const oneBlock=parts.join(sep)+sep+spacer;
   // 2 copies — CSS animation moves 0% to -50% = seamless loop
-  track.innerHTML=oneBlock+oneBlock;
+  track.innerHTML=oneBlock+oneBlock+oneBlock;
 
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
@@ -2413,11 +2413,9 @@ function buildTicker(){
       track.style.transition='none';
       void track.offsetWidth; // force reflow so scrollWidth is accurate
 
-      var halfW=track.scrollWidth/2;
-      // fallback if measurement fails
+      // halfW = 1 copy width (track has 3 copies, total = 3*copyW)
+      var halfW=track.scrollWidth/3;
       if(halfW<50) halfW=Math.max(300, track.textContent.length*7);
-      // Ensure halfW >= areaW so each "loop" = at least one full screen pass
-      if(halfW<areaW) halfW=Math.max(halfW,areaW);
 
       // Pure JS infinite scroll — x pixel-exact, no CSS animation
       var x=areaW; // start offscreen right
@@ -2428,7 +2426,7 @@ function buildTicker(){
         if(last===null)last=ts;
         var dt=Math.min(ts-last,50);last=ts;
         x-=spd*(dt/1000);
-        if(x<=-halfW) x+=halfW;
+        if(x<=-halfW) x+=halfW; // reset by 1 copy width
         track.style.transform='translateY(-50%) translateX('+Math.round(x)+'px)';
         window._tickerRaf=requestAnimationFrame(loop);
       }
@@ -2440,9 +2438,9 @@ function buildTicker(){
         var sep='<span style="color:#1e3a5f;padding:0 8px">·</span>';
         var spacer='<span style="display:inline-block;width:'+areaW+'px"></span>';
         var oneBlock=newParts+sep+spacer;
-        track.innerHTML=oneBlock+oneBlock;
+        track.innerHTML=oneBlock+oneBlock+oneBlock;
         void track.offsetWidth;
-        var newHalfW=track.scrollWidth/2;
+        var newHalfW=track.scrollWidth/3;
         if(newHalfW>=50) halfW=newHalfW;
       },300000);
     });
@@ -2982,9 +2980,11 @@ function cardHTML(app){
   const notePreview=(!isDelivered&&noteVal)?`<div class="note-preview" onclick="openNoteModal('${app.ref}');event.stopPropagation()">${noteSVG}${noteVal}</div>`:'';
   const nameClick=`openNoteModal('${app.ref}');event.stopPropagation()`;
   const statusClick=showDetails?`openTimelineModal('${app.ref}');event.stopPropagation()`:'event.stopPropagation()';
-  var _noClick=isRejectedCard||isDraftOrPending;
-  var _dayStyle=isRejectedCard?'color:#ef4444;font-weight:700':isDraftOrPending?'color:#94a3b8':'';
-  const daySpan=daysDisplay!==null?('<span class="'+dayClass+'"'+(_dayStyle?' style="'+_dayStyle+'"':'')+((!_noClick)?' onclick="openDayPopup(\''+app.ref+'\',\''+String(days||0)+'\',\''+String(s)+'\');event.stopPropagation()" style="cursor:pointer"':'')+'>' +daysDisplay+'</span>'):'';  
+  var _rjStyle='color:#ef4444;font-weight:700';
+  var _waitStyle='color:#eab308;font-weight:600';
+  var _dayStyle2=isRejectedCard?_rjStyle:isDraftOrPending?_waitStyle:'';
+  var _dayClick2=(!isRejectedCard&&!isDraftOrPending)?'onclick="openDayPopup(this.dataset.ref,this.dataset.days,this.dataset.s);event.stopPropagation()" style="cursor:pointer"':'';
+  const daySpan=daysDisplay!==null?('<span class="'+dayClass+'"'+(_dayStyle2?' style="'+_dayStyle2+'"':'')+' data-ref="'+app.ref+'" data-days="'+String(days||0)+'" data-s="'+String(s)+'" '+_dayClick2+'>'+daysDisplay+'</span>'):'';  
 
   const colDaySpan=daysCol!==null?'<span class="day-collected">Aged:'+String(daysCol).padStart(2,'0')+'</span>':'';
   const phoneTag=policeTags[app.ref]||'';

@@ -3012,7 +3012,6 @@ function cardHTML(app){
     if(days===0) daysDisplay='Today';
     else if(showRemaining&&s>0){
       daysDisplay=_rem>0?'Rem:'+String(_rem).padStart(2,'0'):'Over:'+String(Math.abs(_rem)).padStart(2,'0');
-      if(_rem>0&&_rem<=2)dayClass='day-warn-amber';
     } else {
       daysDisplay='Day:'+String(days).padStart(2,'0');
     }
@@ -3226,14 +3225,7 @@ async function load(){
     try{mergeIntoHistory(allApps);}catch(he){console.warn('History store error:',he);}
     try{const ur=await fetch('userdata.json',{cache:'no-store'});if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
     try{_mergeRejectedHistory();}catch(me){}
-    try{
-      render();
-    }catch(err){
-      document.getElementById('list').innerHTML=
-        '<div style="background:#7f1d1d;color:#fca5a5;padding:16px;border-radius:8px;font-size:11px;word-break:break-all">'
-        +'<b>⚠️ Runtime Error:</b><br>'+err.message+'<br><br>'+
-        (err.stack||'').split('\n').slice(0,5).join('<br>')+'</div>';
-    }
+    render();
   }catch(e){
     if(allApps.length>0){try{_mergeRejectedHistory();}catch(me){}render();}
     else{

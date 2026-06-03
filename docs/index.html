@@ -3020,7 +3020,6 @@ function cardHTML(app){
     if(days===0) daysDisplay='Today';
     else if(showRemaining&&s>0){
       daysDisplay=_rem>0?'Rem:'+String(_rem).padStart(2,'0'):'Over:'+String(Math.abs(_rem)).padStart(2,'0');
-      if(_rem>0&&_rem<=2&&(s===1||s===2))dayClass='day-warn-amber';
     } else {
       daysDisplay='Day:'+String(days).padStart(2,'0');
     }
@@ -3035,6 +3034,7 @@ function cardHTML(app){
   const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
   let dayClass='day-normal';
   if(days){if(s===2&&days>=5)dayClass='day-warn-urgent';else if(s===1&&days>=12)dayClass='day-warn-important';}
+  if(showRemaining&&s>0&&!isDelivered&&_rem!==undefined&&_rem>0&&_rem<=2&&(s===1||s===2))dayClass='day-warn-amber';
   const statusNum2=parseInt((app.status||'').split('/')[0])||0;
   const alertBlink=(s===1&&statusNum2>=2&&stage===0)?'alert-blink':'';
   const stageBtn=s>0?`<button class="stage-btn ${stageCls} ${alertBlink}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'';

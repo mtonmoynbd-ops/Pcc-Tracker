@@ -2263,9 +2263,9 @@ function _buildTickerParts(){
     else if(n===9&&collected[a.ref]&&(stars[a.ref]||0)>0) add('box_ready',lastSt);
     else if(n===9&&(stars[a.ref]||0)>0) add('collect_ready',lastSt);
     else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref)){
-      // Only show status_update for urgent/important (stars>0) or rejected/draft
-      const isRejected=(lastSt||'').toLowerCase().includes('reject');
-      if((stars[a.ref]||0)>0||isRejected) add('status_update',lastSt);
+      // Only urgent/important/rejected get status_update in ticker
+      const isRej=(lastSt||'').toLowerCase().includes('reject');
+      if((stars[a.ref]||0)>0||isRej) add('status_update',lastSt);
     }
   });
 
@@ -2353,9 +2353,9 @@ function buildTicker(){
     else if(n===9&&collected[a.ref]&&(stars[a.ref]||0)>0) add('box_ready',lastSt);
     else if(n===9&&(stars[a.ref]||0)>0) add('collect_ready',lastSt);
     else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref)){
-      // Only show status_update for urgent/important (stars>0) or rejected/draft
-      const isRejected=(lastSt||'').toLowerCase().includes('reject');
-      if((stars[a.ref]||0)>0||isRejected) add('status_update',lastSt);
+      // Only urgent/important/rejected get status_update in ticker
+      const isRej=(lastSt||'').toLowerCase().includes('reject');
+      if((stars[a.ref]||0)>0||isRej) add('status_update',lastSt);
     }
   });
 
@@ -2994,13 +2994,15 @@ function cardHTML(app){
   if(isRejectedCard){
     // Count days from when status became rejected (use daysSinceDate to bypass collected check)
     var _rjDate=app.apply_date;
-    // Check statusHistory (scraper data)
+    // Check statusHistory for rejected entry date
     var _sh=statusHistory[app.ref]||[];
-    // statusHistory entries: check for reject/rejected status
     for(var _si=0;_si<_sh.length;_si++){
       var _ss=(_sh[_si].status||'').toLowerCase();
-      if((_ss.includes('reject')||_ss.includes('application rejected'))&&_sh[_si].date){
-        _rjDate=_sh[_si].date; break;
+      if(_ss.includes('reject')){
+        // Use date if available, regardless of format
+        var _sd=_sh[_si].date||'';
+        if(_sd) _rjDate=_sd;
+        break;
       }
     }
     var rjDays=daysSinceDate(_normDateStr(_rjDate));

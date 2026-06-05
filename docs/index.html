@@ -1321,7 +1321,7 @@ function _renderDayPopup(){
   var days=window._dayPopupDays;
   var color=star===2?'#ef4444':star===1?'#f59e0b':'#60a5fa';
   var icon=star===2?'🔴':star===1?'⭐':'📄';
-  var defLimit=star===2?7:star===1?14:24;
+  var defLimit=star===2?7:star===1?14:25;
   var limit=customLimits[ref]||defLimit;
   var expDate=addDaysToDate(app.apply_date,limit);
   var remaining=limit-days;
@@ -1335,12 +1335,13 @@ function _renderDayPopup(){
       +'সীমা: <b style="color:'+color+'">'+limit+'d</b> &nbsp;|&nbsp; <span style="color:'+remCol+';font-weight:700">'+remTxt+'</span><br>'
       +'সম্ভাব্য ডেলিভারি: <b style="color:'+color+'">'+expDate+'</b>';
   } else {
-    var callDate=addDaysToDate(app.apply_date,12);
+    var callDate10=addDaysToDate(app.apply_date,10);
+    var callDate12=addDaysToDate(app.apply_date,12);
     var custDel=addDaysToDate(app.apply_date,limit);
-    var daysToCall=12-days; var daysToDel=limit-days;
+    var daysToCall=11-days; var daysToDel=limit-days;
     body='আবেদন: <b style="color:#e2e8f0">'+app.apply_date+'</b><br>'
       +'অতিবাহিত: <b style="color:#e2e8f0">'+days+' দিন</b><br>'
-      +'সম্ভাব্য পুলিশ কল: <b style="color:#a78bfa">'+callDate+'</b> '+(daysToCall>0?'('+daysToCall+'d বাকি)':'(পার)')+'<br>'
+      +'সম্ভাব্য পুলিশ কল: <b style="color:#a78bfa">'+callDate10+' — '+callDate12+'</b> '+(daysToCall>0?'('+daysToCall+'d বাকি)':'(পার)')+'<br>'
       +'সম্ভাব্য ডেলিভারি: <b style="color:#34d399">'+custDel+'</b> '+(daysToDel>0?'('+daysToDel+'d বাকি)':'(পার)');
   }
 
@@ -1366,7 +1367,7 @@ function _renderDayPopup(){
 
 window._dayAdjust=function(delta){
   var ref=window._dayPopupRef;if(!ref)return;
-  var defLimit=window._dayPopupStar===2?7:window._dayPopupStar===1?14:24;
+  var defLimit=window._dayPopupStar===2?7:window._dayPopupStar===1?14:25;
   customLimits[ref]=Math.max(1,(customLimits[ref]||defLimit)+delta);
   localStorage.setItem('pcc_custom_limits',JSON.stringify(customLimits));
   _renderDayPopup();render();
@@ -2627,6 +2628,25 @@ function _rowItem(name,ref,extra){
     +'</div>';
 }
 
+
+function _fwdToggleMonth2(mi){
+  var n=document.querySelectorAll('[id^="fwd-mcontent-"]').length;
+  for(var i=0;i<n;i++){
+    var p=document.getElementById('fwd-mcontent-'+i);
+    var c=document.getElementById('fwd-mchip-'+i);
+    if(p)p.style.display=i==mi?'block':'none';
+    if(c){c.style.background=i==mi?'rgba(96,165,250,0.2)':'rgba(96,165,250,0.07)';c.style.borderColor=i==mi?'#60a5fa':'rgba(96,165,250,0.3)';c.style.color=i==mi?'#e2e8f0':'#60a5fa';}
+  }
+}
+function _colToggleMonth2(mi){
+  var n=document.querySelectorAll('[id^="col-mcontent-"]').length;
+  for(var i=0;i<n;i++){
+    var p=document.getElementById('col-mcontent-'+i);
+    var c=document.getElementById('col-mchip-'+i);
+    if(p)p.style.display=i==mi?'block':'none';
+    if(c){c.style.background=i==mi?'rgba(34,197,94,0.2)':'rgba(34,197,94,0.07)';c.style.borderColor=i==mi?'#22c55e':'rgba(34,197,94,0.3)';c.style.color=i==mi?'#e2e8f0':'#22c55e';}
+  }
+}
 function fwdMonthToggle(mid){
   var d=document.getElementById('fwd-dates-'+mid);
   var arr=document.getElementById('fwd-arr-'+mid);
@@ -2661,84 +2681,74 @@ function colPdToggle(id){
 }
 
 function _renderFwdHistory(months){
-  var keys=Object.keys(months);
+  var keys=Object.keys(months).sort().reverse();
   if(!keys.length)return '';
-  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 8px">'
+  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
     +'\uD83D\uDCE4 Forwarded: <span style="font-weight:400;font-size:9px;color:#475569">(Forward Date wise)</span></div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
+  keys.forEach(function(mk,mi){
+    var total=Object.keys(months[mk]).reduce(function(s,dk){return s+(months[mk][dk]?months[mk][dk].length:0);},0);
+    var isFst=mi===0;
+    h+='<button id="fwd-mchip-'+mi+'" onclick="_fwdToggleMonth2('+mi+')" style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;background:'+(isFst?'rgba(96,165,250,0.2)':'rgba(96,165,250,0.07)')+';border:1px solid '+(isFst?'#60a5fa':'rgba(96,165,250,0.3)')+';color:'+(isFst?'#e2e8f0':'#60a5fa')+'">\uD83D\uDDD3\uFE0F '+mk+' ('+total+')</button>';
+  });
+  h+='</div>';
   keys.forEach(function(mk,mi){
     var dateMap=months[mk];
-    var dateKeys=Object.keys(dateMap);
-    var total=dateKeys.reduce(function(s,dk){return s+(dateMap[dk]?dateMap[dk].length:0);},0);
-    var fwdOpen=(typeof window._fwdExpand!=='undefined')?window._fwdExpand:true;
-    h+='<div style="margin-bottom:8px">'
-      +'<div onclick="_fwdToggleMonth(this)" style="display:flex;align-items:center;gap:6px;padding:5px 4px;border-radius:6px;background:rgba(96,165,250,0.06);cursor:pointer">'
-      +'<span class="fwd-arr" style="color:#60a5fa;font-size:10px;width:10px">'+(fwdOpen?'▼':'▶')+'</span>'
-      +'<span style="font-size:13px">\uD83D\uDDD3\uFE0F</span>'
-      +'<span style="font-size:12px;font-weight:700;color:#60a5fa">'+mk+'</span>'
-      +'<span style="color:#475569;font-size:10px">('+total+')</span>'
-      +'</div>'
-      +'<div style="display:'+(fwdOpen?'block':'none')+';padding:6px 4px 2px">'
-      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
+    var dateKeys=Object.keys(dateMap).sort().reverse();
+    h+='<div id="fwd-mcontent-'+mi+'" style="display:'+(mi===0?'block':'none')+'">';
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     dateKeys.forEach(function(dk,di){
       var cnt=dateMap[dk]?dateMap[dk].length:0;
       var cid=mi+'_'+di;
-      var lbl=_chip2(dk,cnt);
-      h+='<button id="fwd-chip-'+cid+'" onclick="fwdDateToggle(\''+cid+'\')" '
-        +'style="font-size:10px;padding:3px 2px;border-radius:10px;border:1px solid rgba(96,165,250,0.35);'
-        +'background:rgba(30,58,95,0.4);color:#60a5fa;cursor:pointer;font-weight:600;width:100%;text-align:center">'+lbl+'</button>';
+      h+='<button id="fwd-chip-'+cid+'" onclick="fwdDateToggle(\''+cid+'\')" style="font-size:10px;padding:3px 2px;border-radius:10px;border:1px solid rgba(96,165,250,0.35);background:rgba(30,58,95,0.4);color:#60a5fa;cursor:pointer;font-weight:600;width:100%;text-align:center">'+_chip2(dk,cnt)+'</button>';
     });
     h+='</div>';
     dateKeys.forEach(function(dk,di){
       var items=dateMap[dk]||[];
       var cid=mi+'_'+di;
       var rows=items.map(function(a){
-        var applyDate=a.applyDate||'';
-        return _rowItem(a.name,a.ref,applyDate?'<span style="color:#94a3b8;font-size:10px;display:inline-flex;align-items:center;gap:2px">'+calSVG+' '+applyDate+'</span>':'');
+        var ad=a.applyDate||'';
+        return _rowItem(a.name,a.ref,ad?'<span style="color:#94a3b8;font-size:10px;display:inline-flex;align-items:center;gap:2px">'+calSVG+' '+ad+'</span>':'');
       }).join('');
       h+='<div id="fwd-panel-'+cid+'" style="display:none;padding:2px 0 6px">'+rows+'</div>';
     });
-    h+='</div></div>';
+    h+='</div>';
   });
   return h;
 }
 
 function _renderColHistory(months){
-  var keys=Object.keys(months);
+  var keys=Object.keys(months).sort().reverse();
   if(!keys.length)return '';
-  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 8px">'
+  var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
     +'\uD83D\uDCE6 Collected: <span style="font-weight:400;font-size:9px;color:#475569">(Printed Date wise)</span></div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
+  keys.forEach(function(mk,mi){
+    var total=Object.keys(months[mk]).reduce(function(s,pk){return s+(months[mk][pk]?months[mk][pk].length:0);},0);
+    var isFst=mi===0;
+    h+='<button id="col-mchip-'+mi+'" onclick="_colToggleMonth2('+mi+')" style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;background:'+(isFst?'rgba(34,197,94,0.2)':'rgba(34,197,94,0.07)')+';border:1px solid '+(isFst?'#22c55e':'rgba(34,197,94,0.3)')+';color:'+(isFst?'#e2e8f0':'#22c55e')+'">\uD83D\uDDD3\uFE0F '+mk+' ('+total+')</button>';
+  });
+  h+='</div>';
   keys.forEach(function(mk,mi){
     var pdMap=months[mk];
-    var pdKeys=Object.keys(pdMap);
-    var total=pdKeys.reduce(function(s,pk){return s+(pdMap[pk]?pdMap[pk].length:0);},0);
-    var colOpen=(typeof window._colExpand!=='undefined')?window._colExpand:true;
-    h+='<div style="margin-bottom:8px">'
-      +'<div onclick="_colToggleMonth(this)" style="display:flex;align-items:center;gap:6px;padding:5px 4px;border-radius:6px;background:rgba(34,197,94,0.06);cursor:pointer">'
-      +'<span class="col-arr" style="color:#22c55e;font-size:10px;width:10px">'+(colOpen?'▼':'▶')+'</span>'
-      +'<span style="font-size:13px">\uD83D\uDDD3\uFE0F</span>'
-      +'<span style="font-size:12px;font-weight:700;color:#22c55e">'+mk+'</span>'
-      +'<span style="color:#475569;font-size:10px">('+total+')</span>'
-      +'</div>'
-      +'<div style="display:'+(colOpen?'block':'none')+';padding:6px 4px 2px">'
-      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
+    var pdKeys=Object.keys(pdMap).sort().reverse();
+    h+='<div id="col-mcontent-'+mi+'" style="display:'+(mi===0?'block':'none')+'">';
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     pdKeys.forEach(function(pdKey,di){
       var cnt=pdMap[pdKey]?pdMap[pdKey].length:0;
       var cid=mi+'_'+di;
-      var lbl=_chip2(pdKey,cnt);
-      h+='<button id="col-chip-'+cid+'" onclick="colPdToggle(\''+cid+'\')" '
-        +'style="font-size:10px;padding:3px 2px;border-radius:10px;border:1px solid rgba(34,197,94,0.35);'
-        +'background:rgba(5,46,22,0.4);color:#4ade80;cursor:pointer;font-weight:600;width:100%;text-align:center">'+lbl+'</button>';
+      h+='<button id="col-chip-'+cid+'" onclick="colPdToggle(\''+cid+'\')" style="font-size:10px;padding:3px 2px;border-radius:10px;border:1px solid rgba(34,197,94,0.35);background:rgba(5,46,22,0.4);color:#4ade80;cursor:pointer;font-weight:600;width:100%;text-align:center">'+_chip2(pdKey,cnt)+'</button>';
     });
     h+='</div>';
     pdKeys.forEach(function(pdKey,di){
       var items=pdMap[pdKey]||[];
       var cid=mi+'_'+di;
-        var rows=items.map(function(a){
-          return _rowItem(a.name,a.ref,'<span style="color:#22c55e;font-size:10px">📦 '+a.date+'</span>');
-        }).join('');
+      var rows=items.map(function(a){
+        return _rowItem(a.name,a.ref,'<span style="color:#22c55e;font-size:10px">\uD83D\uDCE6 '+a.date+'</span>');
+      }).join('');
       h+='<div id="col-panel-'+cid+'" style="display:none;padding:2px 0 6px">'+rows+'</div>';
     });
-    h+='</div></div>';
+    h+='</div>';
   });
   return h;
 }
@@ -2775,7 +2785,11 @@ function openForwardedLogModal(){
   var html='';
   if(waiting.length){
     var waitRows=waiting.map(function(a){return _pendingFileItem(a,'forward');}).join('');
-    html+='<details open style="margin-bottom:14px"><summary style="list-style:none;font-size:14px;color:#60a5fa;font-weight:700;padding:8px 4px;display:flex;align-items:center;gap:6px"><span style="cursor:pointer;flex:1;display:flex;align-items:center;gap:6px"><span>⏳</span>Go Forward: '+waiting.length+'</span><button onclick="event.preventDefault();doForwardAction()" style="background:rgba(96,165,250,0.15);border:1px solid #60a5fa;border-radius:20px;padding:3px 10px;color:#60a5fa;font-size:12px;cursor:pointer;flex-shrink:0">📤</button></summary><div style="padding-top:6px">'+waitRows+'</div></details>';
+    html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
+      +'<span style="font-size:14px;color:#60a5fa;font-weight:700;flex:1">⏳ Go Forward: '+waiting.length+'</span>'
+      +'<button onclick="doForwardAction()" style="background:rgba(96,165,250,0.15);border:1px solid #60a5fa;border-radius:16px;padding:3px 12px;color:#60a5fa;font-size:12px;cursor:pointer">📤</button>'
+      +'</div>'
+      +'<div style="padding-bottom:8px">'+waitRows+'</div>';
   }
   html+=histHtml;
   if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
@@ -2796,7 +2810,11 @@ function openCollectedLogModal(){
   var html='';
   if(ready.length){
     var readyRows=ready.map(function(a){return _pendingFileItem(a,'collect');}).join('');
-    html+='<details open style="margin-bottom:14px"><summary style="list-style:none;font-size:14px;color:#22c55e;font-weight:700;padding:8px 4px;display:flex;align-items:center;gap:6px"><span style="cursor:pointer;flex:1;display:flex;align-items:center;gap:6px"><span>📥</span>Go Collect: '+ready.length+'</span><button onclick="event.preventDefault();doCollectAction()" style="background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:20px;padding:3px 10px;color:#22c55e;font-size:12px;cursor:pointer;flex-shrink:0">📦</button></summary><div style="padding-top:6px">'+readyRows+'</div></details>';
+    html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
+      +'<span style="font-size:14px;color:#22c55e;font-weight:700;flex:1">📥 Go Collect: '+ready.length+'</span>'
+      +'<button onclick="doCollectAction()" style="background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:16px;padding:3px 12px;color:#22c55e;font-size:12px;cursor:pointer">📦</button>'
+      +'</div>'
+      +'<div style="padding-bottom:8px">'+readyRows+'</div>';
   }
   html+=histColHtml;
   if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
@@ -2892,7 +2910,7 @@ function doCollectAction(){
     });
     save();render();
     save();render();openCollectedLogModal();
-    openCollectedLogModal();
+    save();render();
   });
 }
 function filterPressStart(e,type){
@@ -3200,7 +3218,7 @@ function render(){
   if(!_searchActive)buildTicker();
   document.getElementById('cnt-urgent').textContent=String(counts.urgent).padStart(2,'0');
   document.getElementById('cnt-important').textContent=String(counts.important).padStart(2,'0');
-  const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft'));
+  const hasDraft=getDisplayApps().some(a=>(a.status||'').toLowerCase().includes('draft')||(a.status||'').toLowerCase().includes('reject'));
   const draftBtn=document.getElementById('draft-btn');
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
   // Collect blink: urgent/important uncollected cards exist
@@ -3233,6 +3251,7 @@ async function load(){
     allApps=d.applications;
     try{mergeIntoHistory(allApps);}catch(he){console.warn('History store error:',he);}
     try{const ur=await fetch('userdata.json',{cache:'no-store'});if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
+    render(); // re-render after statusHistory loaded for Rjct counts
     try{_mergeRejectedHistory();}catch(me){}
     render();
   }catch(e){

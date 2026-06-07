@@ -2684,7 +2684,9 @@ function colPdToggle(id){
 }
 
 function _renderFwdHistory(months){
-  var keys=Object.keys(months).sort().reverse();
+  var _MO={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  function _mkNum(mk){var p=mk.split('-');var yr=parseInt(p[1]||0);if(yr>100)yr=yr-2000;return (2000+yr)*100+(_MO[p[0]]||0);}
+  var keys=Object.keys(months).sort(function(a,b){return _mkNum(b)-_mkNum(a);});
   if(!keys.length)return '';
   var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
     +'\uD83D\uDCE4 Forwarded: <span style="font-weight:400;font-size:9px;color:#475569">(Forward Date wise)</span></div>';
@@ -2697,7 +2699,12 @@ function _renderFwdHistory(months){
   h+='</div>';
   keys.forEach(function(mk,mi){
     var dateMap=months[mk];
-    var dateKeys=Object.keys(dateMap).sort().reverse();
+    var dateKeys=Object.keys(dateMap).sort(function(a,b){
+      var pa=a.split('-'),pb=b.split('-');
+      var da=pa.length>=3?(2000+parseInt(pa[2]))*10000+(_MO[pa[1]]||0)*100+parseInt(pa[0]):0;
+      var db=pb.length>=3?(2000+parseInt(pb[2]))*10000+(_MO[pb[1]]||0)*100+parseInt(pb[0]):0;
+      return db-da;
+    });
     h+='<div id="fwd-mcontent-'+mi+'" style="display:'+(mi===0?'block':'none')+'">';
     h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     dateKeys.forEach(function(dk,di){
@@ -2721,7 +2728,9 @@ function _renderFwdHistory(months){
 }
 
 function _renderColHistory(months){
-  var keys=Object.keys(months).sort().reverse();
+  var _MO={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  function _mkNum(mk){var p=mk.split('-');var yr=parseInt(p[1]||0);if(yr>100)yr=yr-2000;return (2000+yr)*100+(_MO[p[0]]||0);}
+  var keys=Object.keys(months).sort(function(a,b){return _mkNum(b)-_mkNum(a);});
   if(!keys.length)return '';
   var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
     +'\uD83D\uDCE6 Collected: <span style="font-weight:400;font-size:9px;color:#475569">(Printed Date wise)</span></div>';
@@ -2734,7 +2743,12 @@ function _renderColHistory(months){
   h+='</div>';
   keys.forEach(function(mk,mi){
     var pdMap=months[mk];
-    var pdKeys=Object.keys(pdMap).sort().reverse();
+    var pdKeys=Object.keys(pdMap).sort(function(a,b){
+      var pa=a.split('-'),pb=b.split('-');
+      var da=pa.length>=3?(2000+parseInt(pa[2]))*10000+(_MO[pa[1]]||0)*100+parseInt(pa[0]):0;
+      var db=pb.length>=3?(2000+parseInt(pb[2]))*10000+(_MO[pb[1]]||0)*100+parseInt(pb[0]):0;
+      return db-da;
+    });
     h+='<div id="col-mcontent-'+mi+'" style="display:'+(mi===0?'block':'none')+'">';
     h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     pdKeys.forEach(function(pdKey,di){

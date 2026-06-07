@@ -2684,9 +2684,7 @@ function colPdToggle(id){
 }
 
 function _renderFwdHistory(months){
-  var _MO={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  function _mkNum(mk){var p=mk.split('-');var yr=parseInt(p[1]||0);if(yr>100)yr=yr-2000;return (2000+yr)*100+(_MO[p[0]]||0);}
-  var keys=Object.keys(months).sort(function(a,b){return _mkNum(b)-_mkNum(a);});
+  var keys=Object.keys(months).sort().reverse();
   if(!keys.length)return '';
   var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
     +'\uD83D\uDCE4 Forwarded: <span style="font-weight:400;font-size:9px;color:#475569">(Forward Date wise)</span></div>';
@@ -2699,12 +2697,7 @@ function _renderFwdHistory(months){
   h+='</div>';
   keys.forEach(function(mk,mi){
     var dateMap=months[mk];
-    var dateKeys=Object.keys(dateMap).sort(function(a,b){
-      var pa=a.split('-'),pb=b.split('-');
-      var da=pa.length>=3?(2000+parseInt(pa[2]))*10000+(MO2[pa[1]]||0)*100+parseInt(pa[0]):0;
-      var db=pb.length>=3?(2000+parseInt(pb[2]))*10000+(MO2[pb[1]]||0)*100+parseInt(pb[0]):0;
-      return db-da;
-    });
+    var dateKeys=Object.keys(dateMap).sort().reverse();
     h+='<div id="fwd-mcontent-'+mi+'" style="display:'+(mi===0?'block':'none')+'">';
     h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     dateKeys.forEach(function(dk,di){
@@ -2728,9 +2721,7 @@ function _renderFwdHistory(months){
 }
 
 function _renderColHistory(months){
-  var _MO={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  function _mkNum(mk){var p=mk.split('-');var yr=parseInt(p[1]||0);if(yr>100)yr=yr-2000;return (2000+yr)*100+(_MO[p[0]]||0);}
-  var keys=Object.keys(months).sort(function(a,b){return _mkNum(b)-_mkNum(a);});
+  var keys=Object.keys(months).sort().reverse();
   if(!keys.length)return '';
   var h='<div style="font-size:10px;color:#7c6fa0;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:6px 0 4px">'
     +'\uD83D\uDCE6 Collected: <span style="font-weight:400;font-size:9px;color:#475569">(Printed Date wise)</span></div>';
@@ -2743,12 +2734,7 @@ function _renderColHistory(months){
   h+='</div>';
   keys.forEach(function(mk,mi){
     var pdMap=months[mk];
-    var pdKeys=Object.keys(pdMap).sort(function(a,b){
-      var pa=a.split('-'),pb=b.split('-');
-      var da=pa.length>=3?(2000+parseInt(pa[2]))*10000+(MO3[pa[1]]||0)*100+parseInt(pa[0]):0;
-      var db=pb.length>=3?(2000+parseInt(pb[2]))*10000+(MO3[pb[1]]||0)*100+parseInt(pb[0]):0;
-      return db-da;
-    });
+    var pdKeys=Object.keys(pdMap).sort().reverse();
     h+='<div id="col-mcontent-'+mi+'" style="display:'+(mi===0?'block':'none')+'">';
     h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';
     pdKeys.forEach(function(pdKey,di){
@@ -2790,7 +2776,7 @@ function _pendingFileItem(a,mode){
     +'</div>';
 }
 
-function openForwardedLogModal(){try{
+function openForwardedLogModal(){
   var el=document.getElementById('fwd-log-content');
   if(!el)return;
   var waiting=getDisplayApps().filter(function(a){
@@ -2812,11 +2798,10 @@ function openForwardedLogModal(){try{
   if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
   el.innerHTML=html;
   document.getElementById('fwd-log-modal').classList.add('open');
-}catch(e){alert('Waiting modal error: '+e.message);}
 }
 function closeFwdLogModal(){document.getElementById('fwd-log-modal').classList.remove('open');}
 
-function openCollectedLogModal(){try{
+function openCollectedLogModal(){
   var el=document.getElementById('col-log-content');
   if(!el)return;
   var ready=getDisplayApps().filter(function(a){
@@ -2838,7 +2823,6 @@ function openCollectedLogModal(){try{
   if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
   el.innerHTML=html;
   document.getElementById('col-log-modal').classList.add('open');
-}catch(e){alert('Collect modal error: '+e.message);}
 }
 function closeColLogModal(){document.getElementById('col-log-modal').classList.remove('open');}
 

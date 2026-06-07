@@ -2790,7 +2790,7 @@ function _pendingFileItem(a,mode){
     +'</div>';
 }
 
-function openForwardedLogModal(){
+function openForwardedLogModal(){try{
   var el=document.getElementById('fwd-log-content');
   if(!el)return;
   var waiting=getDisplayApps().filter(function(a){
@@ -2812,10 +2812,11 @@ function openForwardedLogModal(){
   if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
   el.innerHTML=html;
   document.getElementById('fwd-log-modal').classList.add('open');
+}catch(e){alert('Waiting modal error: '+e.message);}
 }
 function closeFwdLogModal(){document.getElementById('fwd-log-modal').classList.remove('open');}
 
-function openCollectedLogModal(){
+function openCollectedLogModal(){try{
   var el=document.getElementById('col-log-content');
   if(!el)return;
   var ready=getDisplayApps().filter(function(a){
@@ -2837,6 +2838,7 @@ function openCollectedLogModal(){
   if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
   el.innerHTML=html;
   document.getElementById('col-log-modal').classList.add('open');
+}catch(e){alert('Collect modal error: '+e.message);}
 }
 function closeColLogModal(){document.getElementById('col-log-modal').classList.remove('open');}
 

@@ -2581,8 +2581,8 @@ function _buildFwdLogData(){
   // Add all forwarded apps from statusHistory (legacy + current)
   allApps.forEach(function(a){
     if(forwarded[a.ref]&&!loggedRefs.has(a.ref)){
-      var fwdDate=_getFwdDateFromHistory(a.ref);
-      if(fwdDate) hist.push({date:fwdDate,ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||'',applyDate:a.apply_date||''});
+      var fwdDate=_getFwdDateFromHistory(a.ref)||todayStr(); // fallback to today if no history date
+      hist.push({date:fwdDate,ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||'',applyDate:a.apply_date||''});
     }
   });
   // group: monthKey → dateKey → entries

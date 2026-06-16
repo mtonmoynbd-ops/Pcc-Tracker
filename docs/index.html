@@ -2822,16 +2822,50 @@ function openCollectedLogModal(){
     var n=parseInt((a.status||'').split('/')[0])||0;
     return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
   });
-  window._colExpand=ready.length>0?false:true; // Collected collapsed if files exist, expanded if no files
+  window._colExpand=ready.length>0?false:true;
   var histColHtml=_renderColHistory(_buildColLogData());
   var html='';
   if(ready.length){
-    var readyRows=ready.map(function(a){return _pendingFileItem(a,'collect');}).join('');
-    html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
+    // Helper: parse "DD-Mon-YY" to sortable number (descending = bigger first)
+    var _MO2={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    function _pdNum(pd){
+      if(!pd)return 0;
+      var p=pd.split('-');
+      if(p.length<3)return 0;
+      var yr=parseInt(p[2]);if(yr<100)yr+=2000;
+      var mo=_MO2[p[1]]||0;
+      return yr*10000+mo*100+parseInt(p[0]||0);
+    }
+    // Group by print date
+    var pdGroups={};
+    ready.forEach(function(a){
+      var pd=getEffectivePrintDate(a.ref)||'(No Date)';
+      if(!pdGroups[pd])pdGroups[pd]=[];
+      pdGroups[pd].push(a);
+    });
+    // Sort groups: descending by date (newest first)
+    var pdKeys=Object.keys(pdGroups).sort(function(a,b){return _pdNum(b)-_pdNum(a);});
+
+    html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">'
       +'<span style="font-size:14px;color:#22c55e;font-weight:700;flex:1">📥 Go Collect: '+ready.length+'</span>'
-      +'<button onclick="doCollectAction()" style="background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:16px;padding:3px 12px;color:#22c55e;font-size:12px;cursor:pointer">📦</button>'
-      +'</div>'
-      +'<div style="padding-bottom:8px">'+readyRows+'</div>';
+      +'<button onclick="doCollectAction(null)" style="background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:16px;padding:4px 14px;color:#22c55e;font-size:12px;cursor:pointer;font-weight:600">সব 📦</button>'
+      +'</div>';
+
+    pdKeys.forEach(function(pd){
+      var items=pdGroups[pd];
+      var pdEsc=pd.replace(/'/g,"\\'");
+      // Sort items within group: urgent (star2) first, then important (star1)
+      items.sort(function(a,b){return (stars[b.ref]||0)-(stars[a.ref]||0);});
+      var rows=items.map(function(a){return _pendingFileItem(a,'collect');}).join('');
+      html+='<div style="background:rgba(20,83,45,0.18);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:8px 10px;margin-bottom:8px">'
+        +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
+        +'<span style="font-size:12px;color:#22c55e;font-weight:700;flex:1">🖨️ '+pd+' &nbsp;<span style="font-size:10px;color:#4ade80;font-weight:400">('+items.length+'টি)</span></span>'
+        +'<button onclick="doCollectAction(\''+pdEsc+'\')" style="background:#14532d;border:1px solid #22c55e;border-radius:12px;padding:3px 12px;color:#4ade80;font-size:11px;cursor:pointer;font-weight:700">📦 Collect</button>'
+        +'</div>'
+        +rows
+        +'</div>';
+    });
+    html+='<div style="height:4px"></div>';
   }
   html+=histColHtml;
   if(!html)html='<div style="color:#475569;text-align:center;padding:24px;font-size:12px">কোনো রেকর্ড নেই</div>';
@@ -2909,13 +2943,20 @@ function doForwardAction(){
   });
 }
 
-function doCollectAction(){
+function doCollectAction(filterPrintDate){
+  // filterPrintDate: specific print date string OR null = all
   var files=getDisplayApps().filter(function(a){
     var n=parseInt((a.status||'').split('/')[0])||0;
-    return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
+    if(!(n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref]))return false;
+    if(filterPrintDate){
+      var pd=getEffectivePrintDate(a.ref)||'(No Date)';
+      return pd===filterPrintDate;
+    }
+    return true;
   });
   if(!files.length){showToast('📥 কোনো ফাইল নেই');return;}
-  showConfirm(files.length+'টি ফাইল Collected করবেন?').then(function(ok){
+  var label=filterPrintDate?('🖨️ '+filterPrintDate+' এর '):('সকল ');
+  showConfirm(label+files.length+'টি ফাইল Collected করবেন?').then(function(ok){
     if(!ok)return;
     var today=todayStr();
     files.forEach(function(a){
@@ -2925,9 +2966,7 @@ function doCollectAction(){
       forwarded[a.ref]=true;
       collectedLog.push({date:today,ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||''});
     });
-    save();render();
     save();render();openCollectedLogModal();
-    save();render();
   });
 }
 function filterPressStart(e,type){

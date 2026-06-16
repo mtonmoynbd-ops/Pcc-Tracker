@@ -2587,18 +2587,21 @@ function _buildFwdLogData(){
   });
   // group: monthKey -> normalizedDateKey -> entries
   // ALWAYS normalize date so same day = same bucket key
+  // Also dedupe: ref can appear in both forwardedLog AND allApps loop - keep only one
+  var seenRefs={};
   var months={};
   hist.forEach(function(e){
     if(!e.date)return;
     var normD=_normDateStr(e.date); // force "DD-Mon-YY"
     if(!normD)return;
+    // dedupe by ref across ALL dates (one ref = one entry)
+    if(seenRefs[e.ref])return;
+    seenRefs[e.ref]=true;
     var pk=_parseDK(normD);
     var mk=pk.mk; // "Mon-YY"
     if(!months[mk])months[mk]={};
     if(!months[mk][normD])months[mk][normD]=[];
-    // dedupe by ref within same date
-    var already=months[mk][normD].some(function(x){return x.ref===e.ref;});
-    if(!already) months[mk][normD].push(e);
+    months[mk][normD].push(e);
   });
   return months;
 }
@@ -2705,10 +2708,8 @@ function _renderFwdHistory(months){
   keys.forEach(function(mk,mi){
     var dateMap=months[mk];
     var dateKeys=Object.keys(dateMap).sort(function(a,b){
-      var pa=a.split('-'),pb=b.split('-');
-      var da=pa.length>=3?(2000+parseInt(pa[2]))*10000+(_MO[pa[1]]||0)*100+parseInt(pa[0]):0;
-      var db=pb.length>=3?(2000+parseInt(pb[2]))*10000+(_MO[pb[1]]||0)*100+parseInt(pb[0]):0;
-      return db-da;
+      function _dn(s){var p=(s||'').split('-');if(p.length<3)return 0;var yr=parseInt(p[2]);if(yr<100)yr+=2000;return yr*10000+(_MO[p[1]]||0)*100+parseInt(p[0]||0);}
+      return _dn(b)-_dn(a);
     });
     h+='<div id="fwd-mcontent-'+mi+'" style="display:'+(mi===0?'block':'none')+'">';
     h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px">';

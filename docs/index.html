@@ -2581,19 +2581,24 @@ function _buildFwdLogData(){
   // Add all forwarded apps from statusHistory (legacy + current)
   allApps.forEach(function(a){
     if(forwarded[a.ref]&&!loggedRefs.has(a.ref)){
-      var fwdDate=_getFwdDateFromHistory(a.ref)||todayStr(); // fallback to today if no history date
+      var fwdDate=_getFwdDateFromHistory(a.ref)||todayStr();
       hist.push({date:fwdDate,ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||'',applyDate:a.apply_date||''});
     }
   });
-  // group: monthKey → dateKey → entries
+  // group: monthKey -> normalizedDateKey -> entries
+  // ALWAYS normalize date so same day = same bucket key
   var months={};
   hist.forEach(function(e){
-    if(!e.date)return; // skip blank dates
-    var pk=_parseDK(e.date);
-    var mk=pk.mk;
+    if(!e.date)return;
+    var normD=_normDateStr(e.date); // force "DD-Mon-YY"
+    if(!normD)return;
+    var pk=_parseDK(normD);
+    var mk=pk.mk; // "Mon-YY"
     if(!months[mk])months[mk]={};
-    if(!months[mk][e.date])months[mk][e.date]=[];
-    months[mk][e.date].push(e);
+    if(!months[mk][normD])months[mk][normD]=[];
+    // dedupe by ref within same date
+    var already=months[mk][normD].some(function(x){return x.ref===e.ref;});
+    if(!already) months[mk][normD].push(e);
   });
   return months;
 }

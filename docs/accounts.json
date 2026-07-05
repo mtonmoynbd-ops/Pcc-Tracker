@@ -7,10 +7,10 @@
     "userdataFile": "userdata.json"
   },
   {
-    "id": "rasel",
-    "username": "RASEL_PCC_USERNAME",
-    "passHash": "PASTE_SHA256_HASH_HERE",
-    "dataFile": "data_rasel.json",
-    "userdataFile": "userdata_rasel.json"
+    "id": "naim",
+    "username": "01989028561",
+    "passHash": "df243e2506ca890ebd3f0774454164bb87b921cab9c88b5511c4b167164ba3bf",
+    "dataFile": "data_naim.json",
+    "userdataFile": "userdata_naim.json"
   }
 ]

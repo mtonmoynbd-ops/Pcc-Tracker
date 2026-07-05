@@ -3,18 +3,48 @@ from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 from datetime import datetime, timezone, timedelta
 
-USERNAME = os.environ["PCC_USERNAME"]
-PASSWORD = os.environ["PCC_PASSWORD"]
 TOKEN = os.environ["TELEGRAM_TOKEN"]
-CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
-STATE_FILE = "pcc_state.json"
-DATA_FILE = "docs/data.json"
-RSS_FILE = "docs/rss.xml"
-USERDATA_FILE = "docs/userdata.json"
 CERT_DIR = "docs/certs"
+
+# ── Per-account globals (set at the start of run_account) ────────────
+USERNAME = PASSWORD = CHAT_ID = None
+STATE_FILE = DATA_FILE = RSS_FILE = USERDATA_FILE = DEEP_FLAG = None
 
 BD_TZ = timezone(timedelta(hours=6))
 PCC_BASE = "https://pcc.police.gov.bd"
+
+
+def load_accounts():
+    """Multiple accounts via ACCOUNTS_JSON secret, e.g.:
+    [{"id":"tonmoy","username":"...","password":"...","chat_id":"..."},
+     {"id":"rasel","username":"...","password":"...","chat_id":"..."}]
+    Falls back to the old single-account secrets (PCC_USERNAME/PCC_PASSWORD/
+    TELEGRAM_CHAT_ID) if ACCOUNTS_JSON isn't set, so nothing breaks for the
+    existing setup."""
+    raw = os.environ.get("ACCOUNTS_JSON", "").strip()
+    if raw:
+        try:
+            accounts = json.loads(raw)
+            for acc in accounts:
+                acc.setdefault("data_file",     f"docs/data_{acc['id']}.json" if acc["id"] != "default" else "docs/data.json")
+                acc.setdefault("userdata_file", f"docs/userdata_{acc['id']}.json" if acc["id"] != "default" else "docs/userdata.json")
+                acc.setdefault("rss_file",      f"docs/rss_{acc['id']}.xml" if acc["id"] != "default" else "docs/rss.xml")
+                acc.setdefault("state_file",    f"pcc_state_{acc['id']}.json" if acc["id"] != "default" else "pcc_state.json")
+                acc.setdefault("deep_flag",     f"pcc_deep_done_{acc['id']}.flag" if acc["id"] != "default" else "pcc_deep_done.flag")
+            return accounts
+        except Exception as e:
+            print(f"ACCOUNTS_JSON parse error: {e}")
+    return [{
+        "id": "default",
+        "username": os.environ["PCC_USERNAME"],
+        "password": os.environ["PCC_PASSWORD"],
+        "chat_id": os.environ.get("TELEGRAM_CHAT_ID", ""),
+        "data_file": "docs/data.json",
+        "userdata_file": "docs/userdata.json",
+        "rss_file": "docs/rss.xml",
+        "state_file": "pcc_state.json",
+        "deep_flag": "pcc_deep_done.flag",
+    }]
 
 
 def send_telegram(msg):
@@ -310,8 +340,6 @@ async def scrape_form_docs(page, app):
         return {}
 
 
-DEEP_FLAG = "pcc_deep_done.flag"
-
 async def scrape_all_pages(page):
     """Scrape all pagination pages"""
     # First run ever: scrape all pages to recover historical records
@@ -369,7 +397,18 @@ async def scrape_all_pages(page):
     return all_apps
 
 
-async def main():
+async def run_account(account):
+    global USERNAME, PASSWORD, CHAT_ID, STATE_FILE, DATA_FILE, RSS_FILE, USERDATA_FILE, DEEP_FLAG
+    USERNAME      = account["username"]
+    PASSWORD      = account["password"]
+    CHAT_ID       = account["chat_id"]
+    STATE_FILE    = account["state_file"]
+    DATA_FILE     = account["data_file"]
+    RSS_FILE      = account["rss_file"]
+    USERDATA_FILE = account["userdata_file"]
+    DEEP_FLAG     = account["deep_flag"]
+    print(f"=== একাউন্ট: {account['id']} ===")
+
     migrate_pdf_to_png()
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -535,24 +574,30 @@ async def main():
         await browser.close()
 
 
-async def run_with_retry(max_attempts=3):
+async def run_account_with_retry(account, max_attempts=3):
     for attempt in range(1, max_attempts + 1):
         try:
-            await main()
+            await run_account(account)
             return
         except Exception as e:
-            print(f"Attempt {attempt} failed: {e}")
+            print(f"[{account['id']}] Attempt {attempt} failed: {e}")
             if attempt < max_attempts:
-                print(f"Retrying in 30 seconds...")
+                print("Retrying in 30 seconds...")
                 await asyncio.sleep(30)
             else:
-                print("All attempts failed.")
+                print(f"[{account['id']}] All attempts failed.")
                 try:
                     requests.post(
                         f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-                        json={"chat_id": CHAT_ID, "text": f"⚠️ সব retry ব্যর্থ:\n{str(e)[:200]}", "parse_mode": "HTML"}
+                        json={"chat_id": account.get("chat_id"), "text": f"⚠️ সব retry ব্যর্থ:\n{str(e)[:200]}", "parse_mode": "HTML"}
                     )
                 except:
                     pass
 
-asyncio.run(run_with_retry())
+
+async def main():
+    accounts = load_accounts()
+    for account in accounts:
+        await run_account_with_retry(account)
+
+asyncio.run(main())

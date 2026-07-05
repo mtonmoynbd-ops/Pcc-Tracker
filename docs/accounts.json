@@ -2,7 +2,7 @@
   {
     "id": "default",
     "username": "TONMOY_PCC_USERNAME",
-    "passHash": "PASTE_SHA256_HASH_HERE",
+    "passHash": "f1b9fb626c3130bc165aa250690adace49a72c1cd172294a37bd3636f4f80a8c",
     "dataFile": "data.json",
     "userdataFile": "userdata.json"
   },

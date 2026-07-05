@@ -646,6 +646,75 @@ if('serviceWorker' in navigator){
 }
 </script>
 
+<div id="login-gate" style="display:none;position:fixed;inset:0;z-index:99999;background:#0a1628;color:#e2e8f0;align-items:center;justify-content:center;flex-direction:column;padding:24px;font-family:'Segoe UI',sans-serif;">
+  <div style="width:100%;max-width:320px;background:#1e1830;border:1px solid rgba(139,92,246,0.3);border-radius:14px;padding:28px 22px;box-shadow:0 24px 64px rgba(0,0,0,0.6);">
+    <h2 style="margin:0 0 6px;font-size:18px;color:#e8e0f0">🔐 PCC Tracker লগইন</h2>
+    <div style="font-size:12px;color:#9489b0;margin-bottom:18px">আপনার PCC ওয়েবসাইটের আইডি ও পাসওয়ার্ড দিন</div>
+    <input id="lg-user" placeholder="আইডি" autocomplete="username" style="width:100%;padding:10px 12px;margin-bottom:10px;border-radius:10px;border:1px solid rgba(139,92,246,0.3);background:#211c2e;color:#e8e0f0;font-size:14px">
+    <input id="lg-pass" type="password" placeholder="পাসওয়ার্ড" autocomplete="current-password" style="width:100%;padding:10px 12px;margin-bottom:14px;border-radius:10px;border:1px solid rgba(139,92,246,0.3);background:#211c2e;color:#e8e0f0;font-size:14px">
+    <button id="lg-submit" onclick="attemptLogin()" style="width:100%;padding:11px;border:none;border-radius:10px;background:#8b5cf6;color:#fff;font-size:14px;font-weight:600;cursor:pointer">লগইন করুন</button>
+    <div id="lg-error" style="color:#f87171;font-size:12px;margin-top:10px;min-height:16px"></div>
+  </div>
+</div>
+
+<script>
+// ── Multi-account gate ───────────────────────────────────────────
+// accounts.json (public, in docs/) looks like:
+// [{"id":"tonmoy","username":"...","passHash":"<sha256 hex>","dataFile":"data.json","userdataFile":"userdata.json"}, ...]
+window.PCC_DATA_FILE = 'data.json';
+window.PCC_USERDATA_FILE = 'userdata.json';
+window.PCC_RSS_FILE = 'rss.xml';
+window._pccAccounts = [];
+
+async function sha256Hex(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function applyAccount(acc){
+  window.PCC_DATA_FILE = acc.dataFile || 'data.json';
+  window.PCC_USERDATA_FILE = acc.userdataFile || 'userdata.json';
+  window.PCC_RSS_FILE = acc.rssFile || 'rss.xml';
+}
+
+async function attemptLogin(){
+  const user = (document.getElementById('lg-user').value||'').trim();
+  const pass = document.getElementById('lg-pass').value||'';
+  const errEl = document.getElementById('lg-error');
+  errEl.textContent = '';
+  if(!user || !pass){ errEl.textContent = 'আইডি ও পাসওয়ার্ড দিন'; return; }
+  const hash = await sha256Hex(pass);
+  const match = window._pccAccounts.find(a => a.username.toLowerCase() === user.toLowerCase() && a.passHash === hash);
+  if(!match){ errEl.textContent = 'আইডি বা পাসওয়ার্ড সঠিক নয়'; return; }
+  localStorage.setItem('pcc_account_id', match.id);
+  applyAccount(match);
+  document.getElementById('login-gate').style.display = 'none';
+  startApp();
+}
+
+async function initAccountGate(){
+  try{
+    const r = await fetch('accounts.json?t='+Date.now());
+    window._pccAccounts = r.ok ? await r.json() : [];
+  }catch(e){ window._pccAccounts = []; }
+
+  const savedId = localStorage.getItem('pcc_account_id');
+  const saved = window._pccAccounts.find(a => a.id === savedId);
+  if(saved){
+    applyAccount(saved);
+    startApp();
+    return;
+  }
+  if(window._pccAccounts.length === 0){
+    // No accounts.json configured yet — behave exactly like before (single-account, no gate)
+    startApp();
+    return;
+  }
+  document.getElementById('login-gate').style.display = 'flex';
+  document.getElementById('lg-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') attemptLogin(); });
+}
+</script>
+
 <svg style="display:none">
   <symbol id="ico-archive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line>
@@ -981,7 +1050,7 @@ const calSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" f
 const printSVG=`<svg class="cal-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
 const copySVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
 
-const REPO_API='https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/contents/docs/userdata.json';
+function REPO_API(){return 'https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/contents/docs/'+(window.PCC_USERDATA_FILE||'userdata.json');}
 const WORKFLOW_API='https://api.github.com/repos/mtonmoynbd-ops/pcc-tracker/actions/workflows/pcc_check.yml/dispatches';
 const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_UP=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -1242,7 +1311,7 @@ async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
   try{
     const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,clientPhones,clientNotes,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes,forwardedLog,collectedLog};
-    const getR=await fetch(REPO_API,{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
+    const getR=await fetch(REPO_API(),{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
     let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
     const merged={...ud};
@@ -1250,14 +1319,14 @@ async function doBackup(){
     if(existing.status_history)merged.status_history=existing.status_history;
     if(existing.script_updated)merged.script_updated=existing.script_updated;
     const content=btoa(unescape(encodeURIComponent(JSON.stringify(merged))));
-    const putR=await fetch(REPO_API,{method:'PUT',headers:{'Authorization':`token ${pat}`,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify({message:'Auto-backup',content,...(sha?{sha}:{})})});
+    const putR=await fetch(REPO_API(),{method:'PUT',headers:{'Authorization':`token ${pat}`,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify({message:'Auto-backup',content,...(sha?{sha}:{})})});
     setBkDot(putR.ok?'ok':'err');
   }catch(e){setBkDot('err');}
 }
 function setBkDot(s){const el=document.getElementById('backup-dot');if(!el)return;el.className='backup-dot'+(s==='ok'?' ok':s==='err'?' err':'');}
 async function syncFromCloud(){
   try{
-    const r=await fetch('userdata.json?t='+Date.now());if(!r.ok)return;
+    const r=await fetch((window.PCC_USERDATA_FILE||'userdata.json')+'?t='+Date.now());if(!r.ok)return;
     const d=await r.json();
     if(d.stars)stars=d.stars;if(d.delivered)delivered=d.delivered;if(d.codes)codes=d.codes;
     if(d.showDeu)showDeu=d.showDeu;if(d.notes)notes=d.notes;if(d.blinkStopped)blinkStopped=d.blinkStopped;
@@ -3307,12 +3376,12 @@ function render(){
 async function load(){
   try{
     // Try network first, SW will handle cache fallback when offline
-    const r=await fetch('data.json',{cache:'no-store'});
+    const r=await fetch((window.PCC_DATA_FILE||'data.json'),{cache:'no-store'});
     const d=await r.json();
     document.getElementById('updated').textContent='আপডেট: '+d.updated;
     allApps=d.applications;
     try{mergeIntoHistory(allApps);}catch(he){console.warn('History store error:',he);}
-    try{const ur=await fetch('userdata.json',{cache:'no-store'});if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
+    try{const ur=await fetch((window.PCC_USERDATA_FILE||'userdata.json'),{cache:'no-store'});if(ur.ok){const ud=await ur.json();printDates=ud.print_dates||{};statusHistory=ud.status_history||{};}}catch(e){}
     render(); // re-render after statusHistory loaded for Rjct counts
     try{_mergeRejectedHistory();}catch(me){}
     render();
@@ -3321,16 +3390,19 @@ async function load(){
     else{
       // Try cache explicitly when network fails
       try{
-        const cr=await caches.match('https://mtonmoynbd-ops.github.io/Pcc-Tracker/data.json');
+        const cr=await caches.match('https://mtonmoynbd-ops.github.io/Pcc-Tracker/'+(window.PCC_DATA_FILE||'data.json'));
         if(cr){const d=await cr.json();allApps=d.applications;document.getElementById('updated').textContent='📵 অফলাইন: '+d.updated;render();}
         else{document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
       }catch(ce){document.getElementById('list').innerHTML='<div class="loading">❌ লোড হয়নি</div>';}
     }
   }
 }
-load();
-setInterval(load,30000);
-setInterval(()=>syncFromCloud().catch(()=>{}),300000);
+function startApp(){
+  load();
+  setInterval(load,30000);
+  setInterval(()=>syncFromCloud().catch(()=>{}),300000);
+}
+initAccountGate();
 </script>
 
 </body></html>

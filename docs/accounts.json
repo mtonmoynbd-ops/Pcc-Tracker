@@ -1,0 +1,16 @@
+[
+  {
+    "id": "default",
+    "username": "TONMOY_PCC_USERNAME",
+    "passHash": "PASTE_SHA256_HASH_HERE",
+    "dataFile": "data.json",
+    "userdataFile": "userdata.json"
+  },
+  {
+    "id": "rasel",
+    "username": "RASEL_PCC_USERNAME",
+    "passHash": "PASTE_SHA256_HASH_HERE",
+    "dataFile": "data_rasel.json",
+    "userdataFile": "userdata_rasel.json"
+  }
+]

@@ -205,8 +205,12 @@ async def download_cert(page, app):
         os.remove(old_pdf)
 
     try:
-        await page.goto(cert_url, timeout=20000, wait_until="networkidle")
-        await page.wait_for_timeout(2000)
+        await page.goto(cert_url, timeout=20000, wait_until="domcontentloaded")
+        try:
+            await page.wait_for_selector("#printID", timeout=15000)
+        except Exception:
+            pass
+        await page.wait_for_timeout(1500)
         if "login" in page.url.lower():
             return None
         await page.set_viewport_size({"width": 900, "height": 1200})
@@ -235,8 +239,8 @@ async def scrape_form_docs(page, app):
     results = {}
 
     try:
-        await page.goto(form_url, timeout=20000, wait_until="networkidle")
-        await page.wait_for_timeout(2000)
+        await page.goto(form_url, timeout=20000, wait_until="domcontentloaded")
+        await page.wait_for_timeout(2500)
         if "login" in page.url.lower():
             return {}
 
@@ -290,8 +294,8 @@ async def scrape_form_docs(page, app):
                 continue
 
             try:
-                await page.goto(href, timeout=15000, wait_until="networkidle")
-                await page.wait_for_timeout(1000)
+                await page.goto(href, timeout=15000, wait_until="load")
+                await page.wait_for_timeout(1500)
                 await page.set_viewport_size({"width": 900, "height": 1200})
                 await page.screenshot(path=png_path, full_page=True)
                 print(f"✅ {label_text}: {ref}")
@@ -356,7 +360,11 @@ async def scrape_all_pages(page):
         if not has_next:
             print(f"No next page after page {page_num}")
             break
-        await page.wait_for_load_state("networkidle")
+        try:
+            await page.wait_for_load_state("domcontentloaded", timeout=10000)
+        except Exception:
+            pass
+        await page.wait_for_timeout(2000)
         print(f"Navigated to page {page_num + 1}")
     return all_apps
 
@@ -369,15 +377,16 @@ async def main():
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
         )
         page = await context.new_page()
+        page.set_default_timeout(60000)
         try:
             # ── Login ────────────────────────────────────────────────
-            await page.goto("https://pcc.police.gov.bd/ords/r/pcc/pcc/login_desktop", timeout=30000)
-            await page.wait_for_load_state("networkidle")
-            await page.wait_for_timeout(2000)
+            await page.goto("https://pcc.police.gov.bd/ords/r/pcc/pcc/login_desktop", timeout=30000, wait_until="domcontentloaded")
+            await page.wait_for_selector("input[type='text']", timeout=30000)
+            await page.wait_for_timeout(1500)
             await page.fill("input[type='text']",     USERNAME)
             await page.fill("input[type='password']", PASSWORD)
             await page.click("button:has-text('Sign in')")
-            await page.wait_for_load_state("networkidle")
+            await page.wait_for_load_state("domcontentloaded")
             await page.wait_for_timeout(4000)
 
             if "login" in page.url.lower():
@@ -392,8 +401,11 @@ async def main():
                 else "https://pcc.police.gov.bd/ords/r/pcc/pcc/23"
             )
 
-            await page.goto(account_url, timeout=30000)
-            await page.wait_for_load_state("networkidle")
+            await page.goto(account_url, timeout=30000, wait_until="domcontentloaded")
+            try:
+                await page.wait_for_selector("table", timeout=30000)
+            except Exception:
+                pass
             await page.wait_for_timeout(3000)
 
             if "login" in page.url.lower():
@@ -518,7 +530,7 @@ async def main():
             print(f"Done. {len(applications)} apps, {len(changes)} changes, {len(new_files)} new, {cert_count} certs, {doc_count} forms.")
 
         except Exception as e:
-            send_telegram(f"⚠️ সমস্যা:\n{str(e)[:200]}")
+            send_telegram(f"⚠️ সমস্যা:\n{str(e)[:400]}\n📍 URL: {page.url if page else 'unknown'}")
             print(f"Error: {e}")
         await browser.close()
 

@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Wed, 08 Jul 2026 03:15:36 +0600</lastBuildDate>
+<lastBuildDate>Wed, 08 Jul 2026 04:30:33 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>LEONARD PROYASH GOMES - 3/10</title>
+<title>LEONARD PROYASH GOMES - 5/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BN3YKU | 2/10 → 3/10</description>
-<pubDate>Wed, 08 Jul 2026 03:15:36 +0600</pubDate>
-<guid isPermaLink="false">1BN3YKU-3/10-202607080315</guid>
+<description>Ref: 1BN3YKU | 3/10 → 5/10</description>
+<pubDate>Wed, 08 Jul 2026 04:30:33 +0600</pubDate>
+<guid isPermaLink="false">1BN3YKU-5/10-202607080430</guid>
+</item><item>
+<title>MIR AZAD - 5/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BN3EHN | 3/10 → 5/10</description>
+<pubDate>Wed, 08 Jul 2026 04:30:33 +0600</pubDate>
+<guid isPermaLink="false">1BN3EHN-5/10-202607080430</guid>
 </item>
 </channel>
 </rss>

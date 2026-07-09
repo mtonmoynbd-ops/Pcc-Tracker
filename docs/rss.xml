@@ -5,14 +5,26 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Thu, 09 Jul 2026 16:49:40 +0600</lastBuildDate>
+<lastBuildDate>Fri, 10 Jul 2026 02:11:58 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>MD FORIDUL HASSAN - 6/10</title>
+<title>KAKON - 3/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BN8736 | 5/10 → 6/10</description>
-<pubDate>Thu, 09 Jul 2026 16:49:40 +0600</pubDate>
-<guid isPermaLink="false">1BN8736-6/10-202607091649</guid>
+<description>Ref: 1BN8HST | 2/10 → 3/10</description>
+<pubDate>Fri, 10 Jul 2026 02:11:58 +0600</pubDate>
+<guid isPermaLink="false">1BN8HST-3/10-202607100211</guid>
+</item><item>
+<title>RAJIB HOSSAIN - 3/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BN8LR8 | 2/10 → 3/10</description>
+<pubDate>Fri, 10 Jul 2026 02:11:58 +0600</pubDate>
+<guid isPermaLink="false">1BN8LR8-3/10-202607100211</guid>
+</item><item>
+<title>SUMI AKTER - 3/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BN8KD1 | 2/10 → 3/10</description>
+<pubDate>Fri, 10 Jul 2026 02:11:58 +0600</pubDate>
+<guid isPermaLink="false">1BN8KD1-3/10-202607100211</guid>
 </item>
 </channel>
 </rss>

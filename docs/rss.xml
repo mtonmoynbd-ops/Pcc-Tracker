@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Wed, 15 Jul 2026 14:38:31 +0600</lastBuildDate>
+<lastBuildDate>Thu, 16 Jul 2026 12:46:17 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>MOHAMMAD REZAUL ISLAM - Pending For payment - পেমেন্ট এর জন্য অপেক্ষমান।</title>
+<title>MD MAJNU MIAH - 2/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BNC9GS | Draft - খসড়া। → Pending For payment - পেমেন্ট এর জন্য অপেক্ষমান।</description>
-<pubDate>Wed, 15 Jul 2026 14:38:31 +0600</pubDate>
-<guid isPermaLink="false">1BNC9GS-Pending For payment - পেমেন্ট এর জন্য অপেক্ষমান।-202607151438</guid>
+<description>Ref: 1BNDNCQ | 1/10 → 2/10</description>
+<pubDate>Thu, 16 Jul 2026 12:46:17 +0600</pubDate>
+<guid isPermaLink="false">1BNDNCQ-2/10-202607161246</guid>
+</item><item>
+<title>MD SIFAT AHMED - 2/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BNDGVV | 1/10 → 2/10</description>
+<pubDate>Thu, 16 Jul 2026 12:46:17 +0600</pubDate>
+<guid isPermaLink="false">1BNDGVV-2/10-202607161246</guid>
 </item>
 </channel>
 </rss>

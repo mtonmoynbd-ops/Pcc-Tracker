@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Thu, 23 Jul 2026 22:33:41 +0600</lastBuildDate>
+<lastBuildDate>Fri, 24 Jul 2026 14:54:49 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>MD MAJNU MIAH - 8/10</title>
+<title>SADDAM HOSSAIN - 3/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BNDNCQ | 7/10 → 8/10</description>
-<pubDate>Thu, 23 Jul 2026 22:33:41 +0600</pubDate>
-<guid isPermaLink="false">1BNDNCQ-8/10-202607232233</guid>
+<description>Ref: 1BNDQUE | 2/10 → 3/10</description>
+<pubDate>Fri, 24 Jul 2026 14:54:49 +0600</pubDate>
+<guid isPermaLink="false">1BNDQUE-3/10-202607241454</guid>
+</item><item>
+<title>MOHAMMAD REZAUL ISLAM - 3/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BNC9GS | 2/10 → 3/10</description>
+<pubDate>Fri, 24 Jul 2026 14:54:49 +0600</pubDate>
+<guid isPermaLink="false">1BNC9GS-3/10-202607241454</guid>
 </item>
 </channel>
 </rss>

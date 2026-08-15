@@ -5,20 +5,26 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Sun, 16 Aug 2026 01:38:05 +0600</lastBuildDate>
+<lastBuildDate>Sun, 16 Aug 2026 03:31:00 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>NIPEN BAKTA - 4/10</title>
+<title>NIPEN KIRTONIA - 5/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BP8F29 | 3/10 → 4/10</description>
-<pubDate>Sun, 16 Aug 2026 01:38:05 +0600</pubDate>
-<guid isPermaLink="false">1BP8F29-4/10-202608160138</guid>
+<description>Ref: 1BP8F5B | 4/10 → 5/10</description>
+<pubDate>Sun, 16 Aug 2026 03:31:00 +0600</pubDate>
+<guid isPermaLink="false">1BP8F5B-5/10-202608160331</guid>
 </item><item>
-<title>BHOLANATH MOZUMDER - 4/10</title>
+<title>NIPEN BAKTA - 5/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BP8EXS | 3/10 → 4/10</description>
-<pubDate>Sun, 16 Aug 2026 01:38:05 +0600</pubDate>
-<guid isPermaLink="false">1BP8EXS-4/10-202608160138</guid>
+<description>Ref: 1BP8F29 | 4/10 → 5/10</description>
+<pubDate>Sun, 16 Aug 2026 03:31:00 +0600</pubDate>
+<guid isPermaLink="false">1BP8F29-5/10-202608160331</guid>
+</item><item>
+<title>BHOLANATH MOZUMDER - 5/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BP8EXS | 4/10 → 5/10</description>
+<pubDate>Sun, 16 Aug 2026 03:31:00 +0600</pubDate>
+<guid isPermaLink="false">1BP8EXS-5/10-202608160331</guid>
 </item>
 </channel>
 </rss>

@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Wed, 26 Aug 2026 15:52:36 +0600</lastBuildDate>
+<lastBuildDate>Wed, 26 Aug 2026 16:28:19 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>MOHAMMAD BADSHA - 1/10</title>
+<title>MD SOUROV - 6/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BPBWA9 | Pending For payment - পেমেন্ট এর জন্য অপেক্ষমান। → 1/10</description>
-<pubDate>Wed, 26 Aug 2026 15:52:36 +0600</pubDate>
-<guid isPermaLink="false">1BPBWA9-1/10-202608261552</guid>
+<description>Ref: 1BPAFHU | 5/10 → 6/10</description>
+<pubDate>Wed, 26 Aug 2026 16:28:19 +0600</pubDate>
+<guid isPermaLink="false">1BPAFHU-6/10-202608261628</guid>
+</item><item>
+<title>MD RUBEL MAHMUD RONY - 3/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BPDACA | 2/10 → 3/10</description>
+<pubDate>Wed, 26 Aug 2026 16:28:19 +0600</pubDate>
+<guid isPermaLink="false">1BPDACA-3/10-202608261628</guid>
 </item>
 </channel>
 </rss>

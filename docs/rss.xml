@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Sun, 30 Aug 2026 00:39:35 +0600</lastBuildDate>
+<lastBuildDate>Sun, 30 Aug 2026 03:15:25 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>SANTO SORKAR - 3/10</title>
+<title>SANTO SORKAR - 5/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BPBL8B | 2/10 → 3/10</description>
-<pubDate>Sun, 30 Aug 2026 00:39:35 +0600</pubDate>
-<guid isPermaLink="false">1BPBL8B-3/10-202608300039</guid>
+<description>Ref: 1BPBL8B | 3/10 → 5/10</description>
+<pubDate>Sun, 30 Aug 2026 03:15:25 +0600</pubDate>
+<guid isPermaLink="false">1BPBL8B-5/10-202608300315</guid>
+</item><item>
+<title>LOKMAN HOSSAIN - 5/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BPDTEF | 3/10 → 5/10</description>
+<pubDate>Sun, 30 Aug 2026 03:15:25 +0600</pubDate>
+<guid isPermaLink="false">1BPDTEF-5/10-202608300315</guid>
 </item>
 </channel>
 </rss>

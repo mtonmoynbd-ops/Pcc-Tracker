@@ -5,14 +5,26 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Sun, 06 Sep 2026 22:13:39 +0600</lastBuildDate>
+<lastBuildDate>Mon, 07 Sep 2026 00:24:48 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>MOHAMMAD SAIKAT - 8/10</title>
+<title>MOHAMMAD JAHID - 3/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BPAF62 | 7/10 → 8/10</description>
-<pubDate>Sun, 06 Sep 2026 22:13:39 +0600</pubDate>
-<guid isPermaLink="false">1BPAF62-8/10-202609062213</guid>
+<description>Ref: 1BU77GE | 2/10 → 3/10</description>
+<pubDate>Mon, 07 Sep 2026 00:24:48 +0600</pubDate>
+<guid isPermaLink="false">1BU77GE-3/10-202609070024</guid>
+</item><item>
+<title>MASUD RANA - 3/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BU42VB | 2/10 → 3/10</description>
+<pubDate>Mon, 07 Sep 2026 00:24:48 +0600</pubDate>
+<guid isPermaLink="false">1BU42VB-3/10-202609070024</guid>
+</item><item>
+<title>PRODIP SARKER - 3/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BU42M9 | 2/10 → 3/10</description>
+<pubDate>Mon, 07 Sep 2026 00:24:48 +0600</pubDate>
+<guid isPermaLink="false">1BU42M9-3/10-202609070024</guid>
 </item>
 </channel>
 </rss>

@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Tue, 08 Sep 2026 17:21:59 +0600</lastBuildDate>
+<lastBuildDate>Wed, 09 Sep 2026 00:45:33 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>SURMA AKTER - 9/10</title>
+<title>SIHAB KHAN - 3/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BPBW1T | 8/10 → 9/10</description>
-<pubDate>Tue, 08 Sep 2026 17:21:59 +0600</pubDate>
-<guid isPermaLink="false">1BPBW1T-9/10-202609081721</guid>
+<description>Ref: 1BU7X8B | 2/10 → 3/10</description>
+<pubDate>Wed, 09 Sep 2026 00:45:33 +0600</pubDate>
+<guid isPermaLink="false">1BU7X8B-3/10-202609090045</guid>
+</item><item>
+<title>SHEIKH SAAD - 3/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BU765V | 1/10 → 3/10</description>
+<pubDate>Wed, 09 Sep 2026 00:45:33 +0600</pubDate>
+<guid isPermaLink="false">1BU765V-3/10-202609090045</guid>
 </item>
 </channel>
 </rss>

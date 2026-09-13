@@ -5,14 +5,26 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Sun, 13 Sep 2026 01:11:03 +0600</lastBuildDate>
+<lastBuildDate>Sun, 13 Sep 2026 16:42:48 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>ARIF BEPARI - 5/10</title>
+<title>SAKIL HOSSAIN - Application Rejected. - আবেদন ত্রুটিযুক্ত। পুনরায় আবেদনযোগ্য।</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BU7HVK | 4/10 → 5/10</description>
-<pubDate>Sun, 13 Sep 2026 01:11:03 +0600</pubDate>
-<guid isPermaLink="false">1BU7HVK-5/10-202609130111</guid>
+<description>Ref: 1BU6HBH | 1/10 → Application Rejected. - আবেদন ত্রুটিযুক্ত। পুনরায় আবেদনযোগ্য।</description>
+<pubDate>Sun, 13 Sep 2026 16:42:48 +0600</pubDate>
+<guid isPermaLink="false">1BU6HBH-Application Rejected. - আবেদন ত্রুটিযুক্ত। পুনরায় আবেদনযোগ্য।-202609131642</guid>
+</item><item>
+<title>FARDIN ISLAM - 8/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BU64D7 | 7/10 → 8/10</description>
+<pubDate>Sun, 13 Sep 2026 16:42:48 +0600</pubDate>
+<guid isPermaLink="false">1BU64D7-8/10-202609131642</guid>
+</item><item>
+<title>ARIF BEPARI - 6/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BU7HVK | 5/10 → 6/10</description>
+<pubDate>Sun, 13 Sep 2026 16:42:48 +0600</pubDate>
+<guid isPermaLink="false">1BU7HVK-6/10-202609131642</guid>
 </item>
 </channel>
 </rss>

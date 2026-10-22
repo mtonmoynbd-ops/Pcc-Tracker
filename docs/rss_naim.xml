@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Thu, 22 Oct 2026 16:50:09 +0600</lastBuildDate>
+<lastBuildDate>Fri, 23 Oct 2026 01:43:00 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>CHONCHOL HOSSAIN - 6/10</title>
+<title>NAZMUL HOSSAIN - 3/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BV5VTB | 5/10 → 6/10</description>
-<pubDate>Thu, 22 Oct 2026 16:50:09 +0600</pubDate>
-<guid isPermaLink="false">1BV5VTB-6/10-202610221650</guid>
+<description>Ref: 1BV6E2S | 2/10 → 3/10</description>
+<pubDate>Fri, 23 Oct 2026 01:43:00 +0600</pubDate>
+<guid isPermaLink="false">1BV6E2S-3/10-202610230143</guid>
+</item><item>
+<title>GOPAL DAS - 3/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BV6HT1 | 2/10 → 3/10</description>
+<pubDate>Fri, 23 Oct 2026 01:43:00 +0600</pubDate>
+<guid isPermaLink="false">1BV6HT1-3/10-202610230143</guid>
 </item>
 </channel>
 </rss>

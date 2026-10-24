@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Sat, 24 Oct 2026 01:37:39 +0600</lastBuildDate>
+<lastBuildDate>Sat, 24 Oct 2026 19:49:27 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>MD RUBEL HOSSAIN - 5/10</title>
+<title>MD RUBEL HOSSAIN - 6/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BV7QFH | 3/10 → 5/10</description>
-<pubDate>Sat, 24 Oct 2026 01:37:39 +0600</pubDate>
-<guid isPermaLink="false">1BV7QFH-5/10-202610240137</guid>
+<description>Ref: 1BV7QFH | 5/10 → 6/10</description>
+<pubDate>Sat, 24 Oct 2026 19:49:27 +0600</pubDate>
+<guid isPermaLink="false">1BV7QFH-6/10-202610241949</guid>
+</item><item>
+<title>CHONCHOL HOSSAIN - 7/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BV5VTB | 6/10 → 7/10</description>
+<pubDate>Sat, 24 Oct 2026 19:49:27 +0600</pubDate>
+<guid isPermaLink="false">1BV5VTB-7/10-202610241949</guid>
 </item>
 </channel>
 </rss>

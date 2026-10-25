@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Sun, 25 Oct 2026 12:57:19 +0600</lastBuildDate>
+<lastBuildDate>Mon, 26 Oct 2026 01:05:45 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>SAFALY AKTER - 2/10</title>
+<title>AMDAD ULLAH HOSSAIN - 5/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BV8FPE | 1/10 → 2/10</description>
-<pubDate>Sun, 25 Oct 2026 12:57:19 +0600</pubDate>
-<guid isPermaLink="false">1BV8FPE-2/10-202610251257</guid>
+<description>Ref: 1BV78KR | 3/10 → 5/10</description>
+<pubDate>Mon, 26 Oct 2026 01:05:45 +0600</pubDate>
+<guid isPermaLink="false">1BV78KR-5/10-202610260105</guid>
+</item><item>
+<title>MD MIJANUR RAHMAN - 5/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BV73B6 | 3/10 → 5/10</description>
+<pubDate>Mon, 26 Oct 2026 01:05:45 +0600</pubDate>
+<guid isPermaLink="false">1BV73B6-5/10-202610260105</guid>
 </item>
 </channel>
 </rss>

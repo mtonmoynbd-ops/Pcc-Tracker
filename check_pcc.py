@@ -198,7 +198,7 @@ def migrate_pdf_to_png():
     own_refs = set()
     try:
         with open(DATA_FILE, encoding="utf-8") as f:
-            own_refs = {a["ref"] for a in json.load(f).get("applications", [])}
+            own_refs = {a["ref"] for a in json.load(f).get("applications", []) if a.get("status") != "10/10"}
     except Exception:
         pass
     for fname in os.listdir(CERT_DIR):
@@ -218,18 +218,64 @@ def migrate_pdf_to_png():
                 print(f"Remove failed [{fname}]: {e}")
 
 
+DONE_KEEP_DAYS = 30
+MAX_CERT_BACKFILL = 5   # per run: certificates generated for kept 10/10 files that lack one
+
+
+def kept_done_refs(applications):
+    """10/10 apps that stay in the list: Urgent/Important (until Delivered) and
+    Normal ones within DONE_KEEP_DAYS of reaching 10/10. Same rule as the app.
+    For these only the certificate image is kept (other docs are removed)."""
+    ud        = load_userdata()
+    stars     = ud.get("stars", {}) or {}
+    delivered = ud.get("delivered", {}) or {}
+    hist      = ud.get("status_history", {}) or {}
+    today     = datetime.now(BD_TZ).date()
+    kept = set()
+    for a in applications:
+        if a.get("status") != "10/10":
+            continue
+        ref = a["ref"]
+        if (stars.get(ref) or 0) > 0:
+            if not delivered.get(ref):
+                kept.add(ref)
+            continue
+        done_date = None
+        for e in reversed(hist.get(ref, [])):
+            if e.get("status") == "10/10" and e.get("date"):
+                try:
+                    done_date = datetime.strptime(e["date"], "%d-%b-%Y").date()
+                except Exception:
+                    pass
+                break
+        if done_date is None or (today - done_date).days <= DONE_KEEP_DAYS:
+            kept.add(ref)
+    return kept
+
+
 def cleanup_certs(applications):
     """Remove cert/doc PNGs for apps that are 10/10 or no longer in list"""
     if not os.path.exists(CERT_DIR):
         return
     other_refs     = all_account_refs() - {a["ref"] for a in applications}
     active_refs    = {a["ref"] for a in applications} | other_refs
-    delivered_refs = {a["ref"] for a in applications if a["status"] == "10/10"}
+    kept_refs      = kept_done_refs(applications)
+    delivered_refs = {a["ref"] for a in applications if a["status"] == "10/10"} - kept_refs
     for fname in os.listdir(CERT_DIR):
         if not fname.endswith(".png") and not fname.endswith(".pdf"):
             continue
         # ref = everything before first underscore or dot
         ref = fname.split("_")[0].split(".")[0]
+        # Kept 10/10: keep only the certificate ({ref}.png); remove form/chalan/passport/nid/...
+        if ref in kept_refs and ref in active_refs:
+            if "_" not in fname and fname.endswith(".png"):
+                continue
+            try:
+                os.remove(os.path.join(CERT_DIR, fname))
+                print(f"🗑️ Removed doc (10/10 keeps certificate only): {fname}")
+            except Exception as e:
+                print(f"Remove failed [{fname}]: {e}")
+            continue
         if ref in delivered_refs or ref not in active_refs:
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
@@ -494,6 +540,19 @@ async def run_account(account):
             for app in applications:
                 status_num = int(app["status"].split('/')[0]) if '/' in app["status"] else 0
                 if status_num == 9 and app.get("cert_url"):
+                    app["cert_file"] = await download_cert(page, app)
+
+            # ── 10/10 files kept in the list: show only the certificate ──
+            kept_done = kept_done_refs(applications)
+            backfilled = 0
+            for app in applications:
+                if app["status"] != "10/10" or app["ref"] not in kept_done:
+                    continue
+                png = f"{CERT_DIR}/{app['ref']}.png"
+                if os.path.exists(png):
+                    app["cert_file"] = f"certs/{app['ref']}.png"
+                elif app.get("cert_url") and backfilled < MAX_CERT_BACKFILL:
+                    backfilled += 1
                     app["cert_file"] = await download_cert(page, app)
 
             # ── Download form docs (latest 45 only, skip old 10/10) ──

@@ -431,6 +431,7 @@
   /* ── Payment button / Paid ── */
   .pay-btn { width: 22px; height: 22px; border-radius: 50%; background: #1f1a0a; border: 1px solid #b45309; color: #fbbf24; font-size: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; line-height: 1; }
   body.light .pay-btn { background: #fef3c7; border-color: #d97706; color: #b45309; }
+  .paid-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.8); flex-shrink: 0; }
   .paid-badge { display: inline-block; margin-left: 5px; padding: 0 5px; border-radius: 8px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.5); color: #4ade80; font-size: 9px; font-weight: 800; vertical-align: middle; }
   body.light .paid-badge { background: #dcfce7; color: #15803d; }
   .pay-search { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 10px; border: 1px solid #334155; background: #0a1628; color: #e2e8f0; font-size: 13px; margin-bottom: 8px; outline: none; }
@@ -1664,6 +1665,17 @@ function stagePressStart(e,ref){
   const s=stars[ref]||0;
   stageTimer[ref]=setTimeout(async()=>{
     if(btn)btn.classList.remove('pressing');
+    const _pApp=allApps.find(a=>a.ref===ref)||historyStore[ref];
+    const _pNum=_pApp?(parseInt((_pApp.status||'').split('/')[0])||0):0;
+    if(stage===0&&s>0&&_pNum===10){
+      // Jumped straight to 10/10 without a 9/10 stage → long press collects directly
+      const ok=await showConfirm('Collected করবেন?','সরাসরি 10/10 — Forwarded ছাড়াই');if(!ok)return;
+      forwarded[ref]=true;collected[ref]=true;
+      collectedDay[ref]=daysSince(_pApp.apply_date,ref)||0;collectedDate[ref]=todayStr();
+      collectedLog.push({date:todayStr(),ref:_pApp.ref,name:_pApp.name,printDate:getEffectivePrintDate(_pApp.ref)||''});
+      save();render();showToast('✅ Collected');
+      return;
+    }
     if(stage===0){
       // important/urgent → confirm before forwarding
       if(s>0){const ok=await showConfirm('Forwarded করবেন?');if(!ok)return;}
@@ -3309,7 +3321,7 @@ function cardHTML(app){
   let dayClass='day-normal';
   if(showRemaining&&s>0&&!isDelivered&&_rem!==undefined&&_rem>0&&_rem<=2&&(s===1||s===2))dayClass='day-warn-amber';
   const statusNum2=parseInt((app.status||'').split('/')[0])||0;
-  const alertBlink=(s===1&&statusNum2>=2&&stage===0)?'alert-blink':'';
+  const alertBlink=(s===1&&statusNum2===2&&stage===0)?'alert-blink':'';
   const stageBtn=s>0?`<button class="stage-btn ${stageCls} ${alertBlink}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'';
   let deuHTML='';
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
@@ -3351,8 +3363,8 @@ function cardHTML(app){
         ontouchcancel="pressEnd('${app.ref}')"
         onclick="handleTap('${app.ref}')">
         <div class="card-top">
-          <div class="name" onclick="${nameClick}">${app._hl?hlText(app.name,app._hl):app.name}${paidStore[app.ref]?'<span class="paid-badge">৳ Paid</span>':''}</div>
-          <div class="card-top-right">${stageBtn}</div>
+          <div class="name" onclick="${nameClick}">${app._hl?hlText(app.name,app._hl):app.name}</div>
+          <div class="card-top-right">${paidStore[app.ref]?'<span class="paid-dot" title="Paid"></span>':''}${stageBtn}</div>
         </div>
         <div class="info">
           ${refHTML} &nbsp;|&nbsp;

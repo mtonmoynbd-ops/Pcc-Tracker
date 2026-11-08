@@ -175,10 +175,32 @@ def parse_rows(rows):
     return apps
 
 
+def all_account_refs():
+    """Refs of every account's data file — CERT_DIR is shared between accounts."""
+    refs = set()
+    try:
+        for acc in load_accounts():
+            try:
+                with open(acc["data_file"], encoding="utf-8") as f:
+                    for a in json.load(f).get("applications", []):
+                        refs.add(a["ref"])
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return refs
+
+
 def migrate_pdf_to_png():
     """Delete old PDFs and cert PNGs (no suffix) to force re-screenshot without footer"""
     if not os.path.exists(CERT_DIR):
         return
+    own_refs = set()
+    try:
+        with open(DATA_FILE, encoding="utf-8") as f:
+            own_refs = {a["ref"] for a in json.load(f).get("applications", [])}
+    except Exception:
+        pass
     for fname in os.listdir(CERT_DIR):
         # Delete PDFs always
         if fname.endswith(".pdf"):
@@ -188,7 +210,7 @@ def migrate_pdf_to_png():
             except Exception as e:
                 print(f"Remove failed [{fname}]: {e}")
         # Delete cert PNGs (no underscore = cert, not form/chalan/passport)
-        elif fname.endswith(".png") and "_" not in fname:
+        elif fname.endswith(".png") and "_" not in fname and fname[:-4] in own_refs:
             try:
                 os.remove(os.path.join(CERT_DIR, fname))
                 print(f"🗑️ Removed old cert PNG: {fname}")
@@ -200,7 +222,8 @@ def cleanup_certs(applications):
     """Remove cert/doc PNGs for apps that are 10/10 or no longer in list"""
     if not os.path.exists(CERT_DIR):
         return
-    active_refs    = {a["ref"] for a in applications}
+    other_refs     = all_account_refs() - {a["ref"] for a in applications}
+    active_refs    = {a["ref"] for a in applications} | other_refs
     delivered_refs = {a["ref"] for a in applications if a["status"] == "10/10"}
     for fname in os.listdir(CERT_DIR):
         if not fname.endswith(".png") and not fname.endswith(".pdf"):

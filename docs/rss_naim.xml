@@ -5,14 +5,20 @@
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
 <description>PCC Status Updates</description>
 <language>bn</language>
-<lastBuildDate>Sun, 08 Nov 2026 00:20:44 +0600</lastBuildDate>
+<lastBuildDate>Sun, 08 Nov 2026 19:58:20 +0600</lastBuildDate>
 <atom:link href="https://mtonmoynbd-ops.github.io/Pcc-Tracker/rss.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title>MOHAMMAD SAROWAR - 8/10</title>
+<title>MD SHOIMUL HAQUE - 7/10</title>
 <link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
-<description>Ref: 1BW1P29 | 7/10 → 8/10</description>
-<pubDate>Sun, 08 Nov 2026 00:20:44 +0600</pubDate>
-<guid isPermaLink="false">1BW1P29-8/10-202611080020</guid>
+<description>Ref: 1BW2WS7 | 6/10 → 7/10</description>
+<pubDate>Sun, 08 Nov 2026 19:58:20 +0600</pubDate>
+<guid isPermaLink="false">1BW2WS7-7/10-202611081958</guid>
+</item><item>
+<title>ASRAFUL ISLAM - 9/10</title>
+<link>https://mtonmoynbd-ops.github.io/Pcc-Tracker/</link>
+<description>Ref: 1BVCQ3R | 8/10 → 9/10</description>
+<pubDate>Sun, 08 Nov 2026 19:58:20 +0600</pubDate>
+<guid isPermaLink="false">1BVCQ3R-9/10-202611081958</guid>
 </item>
 </channel>
 </rss>

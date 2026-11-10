@@ -71,6 +71,21 @@ def save_state(state):
         json.dump(state, f)
 
 
+def fix_mojibake(s):
+    """Repair text that was saved double-encoded (UTF-8 read as Latin-1), e.g. old Bengali statuses."""
+    if not isinstance(s, str):
+        return s
+    cur = s
+    for _ in range(4):
+        if not any("\u00c0" <= c <= "\u00ff" for c in cur):
+            break
+        try:
+            cur = cur.encode("latin-1").decode("utf-8")
+        except Exception:
+            break
+    return cur
+
+
 def load_userdata():
     try:
         with open(USERDATA_FILE) as f:
@@ -586,6 +601,12 @@ async def run_account(account):
             old_statuses    = old_state.get("statuses", {})
             old_print_dates = old_state.get("print_dates", {})
             old_history     = old_state.get("status_history", {})
+            # Self-heal legacy double-encoded (garbled) statuses in history
+            old_history = {
+                r: [dict(e, status=fix_mojibake(e.get("status"))) if isinstance(e, dict) else e for e in h]
+                for r, h in (old_history or {}).items()
+            }
+            old_statuses = {r: fix_mojibake(v) for r, v in (old_statuses or {}).items()}
 
             new_statuses    = {}
             new_print_dates = dict(old_print_dates)

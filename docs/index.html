@@ -2578,6 +2578,62 @@ async function resetCounts(){
   }
 }
 
+// ── Mojibake repair (old status_history entries saved double-encoded) ──
+const _shFixed=new WeakSet();
+function fixMojibake(str){
+  let cur=str;
+  for(let k=0;k<4;k++){
+    if(typeof cur!=='string'||!/[\u00C0-\u00FF]/.test(cur))break;
+    try{
+      const bytes=new Uint8Array(cur.length);
+      for(let i=0;i<cur.length;i++){const c=cur.charCodeAt(i);if(c>255)return cur;bytes[i]=c;}
+      cur=new TextDecoder('utf-8',{fatal:true}).decode(bytes);
+    }catch(e){break;}
+  }
+  return cur;
+}
+function _fixStatusHistory(){
+  if(!statusHistory||typeof statusHistory!=='object'||_shFixed.has(statusHistory))return;
+  Object.keys(statusHistory).forEach(function(r){
+    const h=statusHistory[r];
+    if(Array.isArray(h))h.forEach(function(e){if(e&&typeof e.status==='string')e.status=fixMojibake(e.status);});
+  });
+  _shFixed.add(statusHistory);
+}
+
+// ── One-time: make header Urgent/Important counts = running month ──
+let _baselinePending=false;
+function _histItems(arr,type){return (arr||[]).map(function(e){
+  const m=String(e).match(/^(.*?)\s*\b([A-Z0-9]{6,})\s*$/);const ref=m?m[2]:'';
+  const app=ref?_findApp(ref):null;
+  return {ref:ref,name:(m&&m[1])?m[1]:String(e),applyDate:app?(app.apply_date||''):'',phone:app?(app.phone||''):'',type:type};
+});}
+async function baselineMonthOnce(){
+  if(_baselinePending||localStorage.getItem('pcc_counts_baseline')||!allApps.length)return;
+  _baselinePending=true;
+  try{
+    const now=new Date();const cur=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    const inMonth=function(a){const iso=toInputDate(a.apply_date||'');return !!iso&&iso.slice(0,7)===cur;};
+    const seen=new Set(allApps.map(function(a){return a.ref;}));
+    const pool=allApps.concat(Object.values(historyStore).filter(function(h){return h&&!seen.has(h.ref);}));
+    const uL=pool.filter(function(a){return (stars[a.ref]||0)===2&&inMonth(a);}),iL=pool.filter(function(a){return (stars[a.ref]||0)===1&&inMonth(a);});
+    if(uL.length===counts.urgent&&iL.length===counts.important){localStorage.setItem('pcc_counts_baseline','1');return;}
+    const ok=await showConfirm('হেডারের সংখ্যা চলতি মাসের করবেন?','এখন: Urgent '+counts.urgent+' + Important '+counts.important+' → চলতি মাস (আবেদনের তারিখ ধরে): Urgent '+uL.length+' + Important '+iL.length+'। আগের সংখ্যা আর্কাইভে (রিসেট ট্যাব) যাবে।');
+    localStorage.setItem('pcc_counts_baseline','1');
+    if(!ok)return;
+    const first=new Date(now.getFullYear(),now.getMonth(),1);const last=new Date(first.getTime()-86400000);
+    const resetDate=String(last.getDate()).padStart(2,'0')+'-'+MONTHS_SHORT[last.getMonth()]+'-'+String(last.getFullYear()).slice(2);
+    const uItems=_histItems(history.urgent,'urgent'),iItems=_histItems(history.important,'important');
+    if(counts.urgent||counts.important||uItems.length||iItems.length){
+      resetArchive.unshift({id:Date.now(),resetDate:resetDate,fromDate:'',urgentItems:uItems,importantItems:iItems,urgentCount:counts.urgent||0,importantCount:counts.important||0,forwardedLog:[],collectedLog:[],auto:true});
+      localStorage.setItem('pcc_reset_archive',JSON.stringify(resetArchive));
+    }
+    counts={urgent:uL.length,important:iL.length};
+    history={urgent:uL.map(function(a){return a.name+' '+a.ref;}),important:iL.map(function(a){return a.name+' '+a.ref;})};
+    save();render();showToast('✅ হেডার এখন চলতি মাসের');
+  }finally{_baselinePending=false;}
+}
+
 // ── Monthly auto-reset of Urgent/Important counters (header) ──
 function monthlyRollover(){
   try{
@@ -3672,7 +3728,9 @@ function _sortByDate(arr){
   return arr.slice().sort(function(a,b){return toNum(b.apply_date)-toNum(a.apply_date);});
 }
 function render(){
+  _fixStatusHistory();
   monthlyRollover();
+  baselineMonthOnce();
   const q=(document.getElementById('search-bar').value||'').toLowerCase().trim();
   const displayApps=getDisplayApps().filter(a=>{
     if(!matchesFilter(a))return false;

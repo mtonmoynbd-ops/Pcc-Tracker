@@ -611,6 +611,7 @@
   .stage-btn.fwd { color: #eab308; }
   .stage-btn.rejected { background:transparent;border-color:#ef4444;color:#ef4444; }
   .stage-btn.col { color: #22c55e; }
+  .stage-btn.rdy { color: #f59e0b; }
   .stage-btn.del { color: #34d399; font-size: 12px; }
   .stage-btn.pressing { transform: scale(0.85); opacity: 0.6; }
   @keyframes stage-blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
@@ -1129,6 +1130,7 @@ async function initAccountGate(){
     </div>
     <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-top:14px">
       <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">৳ পেমেন্ট শুরুর তারিখ</div>
+      <div style="font-size:10px;color:#64748b;margin-bottom:8px">অ্যাপ ভার্সন: 2026-11-11 · stage-icons-2</div>
       <div class="settings-info" style="margin-bottom:8px">এই তারিখের আগের আবেদন, যেগুলো ৩/১০ পার করেছে, সেই Urgent/Important ফাইল "পুরনো" ধরা হবে: ৳ ব্লিংক করবে না, up: গণনায় আসবে না। (২/১০ বা তার আগের ফাইল এর বাইরে, তারা চলতিই থাকে।) (পেমেন্ট শিটে তবুও দেওয়া যাবে।) ফাঁকা = সব ফাইল ধরা হবে।</div>
       <input class="settings-input" type="date" id="pay-start-input" onchange="savePayStart(this.value)">
       <button class="settings-save-btn" onclick="savePayStart('')" style="margin-top:8px;background:transparent;border:1px dashed #475569;color:#94a3b8">সব ফাইল ধরুন (তারিখ মুছুন)</button>
@@ -3855,8 +3857,9 @@ function cardHTML(app){
   const hasDeu=!isDelivered&&showDeu[app.ref];const deuVal=codes[app.ref]||'';const isEditing=editingDeu[app.ref];
   const isFwd=forwarded[app.ref]||false;const isCol=collected[app.ref]||false;
   const stage=isDelivered?3:isCol?2:isFwd?1:0;
-  const stageIcon=isRejectedCard?'🚫':(stage===0?'⏳':stage===1?'📤':stage===2?'📦':'✅');
-  const stageCls=isRejectedCard?'rejected':(stage===0?'':stage===1?'fwd':stage===2?'col':'del');
+  const readyCol=s>0&&!isDelivered&&!isCol&&!isRejectedCard&&num>=9;
+  const stageIcon=isRejectedCard?'🚫':(readyCol?'📥':(stage===0?'⏳':stage===1?'📤':stage===2?'📦':'✅'));
+  const stageCls=isRejectedCard?'rejected':(readyCol?'rdy':(stage===0?'':stage===1?'fwd':stage===2?'col':'del'));
   const statusNum=parseInt((app.status||'').split('/')[0])||0;
   const isDraftOrPending=(app.status||'').toLowerCase().includes('draft')||(app.status||'').toLowerCase().includes('pending');
   const days=(!isDelivered&&showDetails&&!isDraftOrPending&&!isRejectedCard&&statusNum>=1)?daysSince(app.apply_date,app.ref):null;
@@ -3903,7 +3906,7 @@ function cardHTML(app){
   let dayClass='day-normal';
   if(showRemaining&&s>0&&!isDelivered&&_rem!==undefined&&_rem>0&&_rem<=2&&(s===1||s===2))dayClass='day-warn-amber';
   const statusNum2=parseInt((app.status||'').split('/')[0])||0;
-  const alertBlink=(s===1&&statusNum2===2&&stage===0)?'alert-blink':'';
+  const alertBlink=(s===1&&statusNum2===2&&stage===0&&!isDelivered)?'alert-blink':'';
   const stageBtn=s>0?`<button class="stage-btn ${stageCls} ${alertBlink}" id="sbtn-${app.ref}" oncontextmenu="return false" ontouchstart="stagePressStart(event,'${app.ref}')" ontouchend="stagePressEnd('${app.ref}')" ontouchcancel="stagePressEnd('${app.ref}')" onclick="event.stopPropagation()">${stageIcon}</button>`:'';
   let deuHTML='';
   if(hasDeu){if(isEditing||!deuVal){deuHTML=`<input id="deu-input-${app.ref}" class="deu-input" type="text" maxlength="6" placeholder="Deu" value="${deuVal}" onblur="updateCode('${app.ref}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="event.stopPropagation()">`;}else{deuHTML=`<span class="deu-text" onclick="startEditDeu('${app.ref}');event.stopPropagation()">${deuVal}</span>`;}}
@@ -4020,8 +4023,20 @@ function _sortByDate(arr){
   }
   return arr.slice().sort(function(a,b){return toNum(b.apply_date)-toNum(a.apply_date);});
 }
+// Starred files that reached 3/10 are treated as forwarded (the 2/10 window may be very short)
+function autoForwardAtThree(){
+  let ch=false;
+  getDisplayApps().forEach(function(a){
+    if(!(stars[a.ref]||0)||forwarded[a.ref]||collected[a.ref]||delivered[a.ref])return;
+    const st=a.status||'';if(/reject/i.test(st))return;
+    const n=parseInt(st.split('/')[0])||0;
+    if(n>=3){forwarded[a.ref]=true;blinkStopped[a.ref]=true;ch=true;}
+  });
+  if(ch)save();
+}
 function render(){
   _fixStatusHistory();
+  autoForwardAtThree();
   monthlyRollover();
   baselineMonthOnce();
   payStartPromptOnce();

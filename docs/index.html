@@ -452,6 +452,9 @@
   .cal-cnt { font-size: 10px; font-weight: 800; letter-spacing: 0.2px; flex-shrink: 0; }
   .cal-cnt.im { color: #fbbf24; }
   .cal-cnt.ur { color: #ef4444; }
+  .pay-report { border: 1px solid rgba(245,158,11,0.5); background: rgba(251,191,36,0.07); border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+  .pay-rt { font-size: 12px; font-weight: 800; color: #fbbf24; margin-bottom: 6px; }
+  .pay-rbtns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
   .pay-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
   .pay-nav button { background: transparent; border: 1px solid #334155; color: #94a3b8; border-radius: 8px; width: 32px; height: 28px; font-size: 16px; cursor: pointer; }
   .pay-nav span { font-size: 13px; font-weight: 700; color: #fbbf24; }
@@ -1018,9 +1021,8 @@ async function initAccountGate(){
   <div class="modal-box" style="max-width:400px">
     <div class="modal-title"><span>৳ পেমেন্ট রেকর্ড</span><button class="modal-close" onclick="closePayModal()">✕</button></div>
     <div class="pay-nav"><button onclick="payNav(-1)">‹</button><span id="pay-month-lbl"></span><button onclick="payNav(1)">›</button></div>
+    <div id="pay-report"></div>
     <input class="pay-search" id="pay-search" type="text" placeholder="নাম, Ref বা রেজিস্টার (সব মাসে খোঁজে)..." oninput="payQuery=this.value;renderPayHistory()">
-    <div id="pay-summary" class="ps-total" style="margin:0 0 8px"></div>
-    <div id="pay-actions" style="display:flex;gap:6px;margin-bottom:8px"></div>
     <div id="pay-trash"></div>
     <div id="pay-extra"></div>
     <div class="pay-list" id="pay-list"></div>
@@ -2127,8 +2129,10 @@ function confirmPaySheet(){
   const total=items.reduce(function(t,x){return t+x.amount;},0);
   payments.push({id:'p'+Date.now(),ts:new Date().toISOString(),regId:reg.id,regName:reg.name,regPhone:reg.phone||'',items:items,total:total});
   localStorage.setItem('pcc_last_reg',reg.id);
+  const _newPay=payments[payments.length-1];
   rebuildPaid();_psRefs=[];_psAmt={};closePaySheet();save();render();
   showToast('✅ '+items.length+' ফাইল · '+fmtMoney(total)+' → '+reg.name);
+  setTimeout(function(){waReceipt(_newPay.id);},450); // summary → that register on WhatsApp
   if(document.getElementById('fwd-log-modal').classList.contains('open'))openForwardedLogModal();
   if(document.getElementById('pay-modal').classList.contains('open'))renderPayHistory();
   if(document.getElementById('archive-modal').classList.contains('open')&&archTab==='paid')renderArchiveContent();
@@ -2204,45 +2208,63 @@ function renderPayHistory(){
   const tr=document.getElementById('pay-trash');
   if(tr)tr.innerHTML=payTrash.length?'<button class="pay-mini" style="margin-bottom:8px" onclick="restoreLastPayment()">↩ মুছে ফেলা পেমেন্ট ফিরিয়ে আনুন ('+payTrash.length+')</button>':'';
   const q=(payQuery||'').toLowerCase().trim();
-  const pa=document.getElementById('pay-actions');
-  if(pa)pa.innerHTML=q?'':'<button class="pay-mini" onclick="copyMonthReport()">📋 মাসিক রিপোর্ট কপি</button><button class="pay-mini" onclick="downloadMonthCSV()">⬇ CSV</button>';
   const isCur=payMonth.getTime()===_monthStartNow().getTime();
-  const pk=payMonth.getFullYear()+'-'+String(payMonth.getMonth()+1).padStart(2,'0');
-  document.getElementById('pay-month-lbl').textContent=q?'সব মাস (সার্চ)':MONTHS_SHORT[payMonth.getMonth()]+' '+payMonth.getFullYear()+(isCur?' · চলতি মাস':'');
+  const y=payMonth.getFullYear(),m=payMonth.getMonth();
+  const pk=y+'-'+String(m+1).padStart(2,'0');
+  document.getElementById('pay-month-lbl').textContent=q?'সব মাস (সার্চ)':MONTHS_SHORT[m]+' '+y+(isCur?' · চলতি মাস':'');
   const matchQ=function(p){return (p.regName||'').toLowerCase().includes(q)||(p.items||[]).some(function(x){return (x.name||'').toLowerCase().includes(q)||(x.ref||'').toLowerCase().includes(q);});};
   const list=payments.filter(function(p){return q?matchQ(p):_payMonthKey(p)===pk;}).sort(function(a,b){return (b.ts||'').localeCompare(a.ts||'');});
   const all=[];list.forEach(function(p){(p.items||[]).forEach(function(x){all.push({x:x,p:p});});});
-  const c=_batchCounts(all.map(function(e){return e.x;}));const tot=list.reduce(function(t,p){return t+(p.total||0);},0);
-  document.getElementById('pay-summary').innerHTML='<span>'+all.length+' ফাইল'+(c.i?' · Im '+c.i:'')+(c.u?' · Ur '+c.u:'')+'</span><span>মোট '+fmtMoney(tot)+'</span>';
-  // extra: per-register totals, carry-over, unpaid of this month
-  let extra='';
-  if(!q){
-    const dues=_dues();
-    extra+=Object.keys(dues).map(function(id){const d=dues[id];
-      return '<div class="reg-sum" style="cursor:pointer" onclick="payDues(\''+id+'\')"><span class="n">⏳ বকেয়া · 👤 '+_payEsc(d.reg.name)+'</span><span>'+d.refs.length+' ফাইল'+(d.i?' · Im '+d.i:'')+(d.u?' · Ur '+d.u:'')+'</span><span style="color:#f59e0b;font-weight:700">'+fmtMoney(d.total)+'</span><span class="pay-mini">৳ দিন</span></div>';}).join('');
-  }
-  if(list.length){
+
+  // ── Monthly report card (shown first) ──
+  const rep=document.getElementById('pay-report');
+  if(q){rep.innerHTML='';}
+  else{
     const byReg={};
-    list.forEach(function(p){const k=p.regName||'—';if(!byReg[k])byReg[k]={items:[],total:0};(p.items||[]).forEach(function(x){byReg[k].items.push(x);});byReg[k].total+=p.total||0;});
-    extra+=Object.keys(byReg).sort(function(a,b){return byReg[b].total-byReg[a].total;}).map(function(k){
-      const bc=_batchCounts(byReg[k].items);
-      return '<div class="reg-sum"><span class="n">👤 '+_payEsc(k)+'</span><span>'+byReg[k].items.length+' ফাইল'+(bc.i?' · Im '+bc.i:'')+(bc.u?' · Ur '+bc.u:'')+'</span><span style="color:#fbbf24;font-weight:700">'+fmtMoney(byReg[k].total)+'</span></div>';
-    }).join('');
-  }
-  if(!q){
-    const carry=all.filter(function(e){return _isCarry(e.x,e.p);});
-    if(carry.length)extra+='<div class="pay-note" style="margin-top:6px">↩ আগের মাসের আবেদন, এ মাসে পেমেন্ট: '+carry.length+' ফাইল · '+fmtMoney(carry.reduce(function(t,e){return t+(e.x.amount||0);},0))+' (পেমেন্টের মাসেই গোনা হয়েছে)</div>';
+    let h='<div class="pay-report"><div class="pay-rt">📊 মাসিক রিপোর্ট — '+MONTHS_SHORT[m]+' '+y+'</div>';
+    if(list.length){
+      const c=_batchCounts(all.map(function(e){return e.x;}));const tot=list.reduce(function(t,p){return t+(p.total||0);},0);
+      h+='<div class="ps-total" style="margin:0 0 6px"><span>'+all.length+' ফাইল'+(c.u?' · Ur '+c.u:'')+(c.i?' · Im '+c.i:'')+'</span><span>মোট '+fmtMoney(tot)+'</span></div>';
+      const order=[];
+      list.forEach(function(p){const k=_payKey(p);if(!byReg[k]){byReg[k]={name:p.regName||'—',items:[],total:0};order.push(k);}(p.items||[]).forEach(function(x){byReg[k].items.push(x);});byReg[k].total+=p.total||0;});
+      order.sort(function(a,b){return byReg[b].total-byReg[a].total;});
+      _rptKeys=order;
+      h+=order.map(function(k){const bc=_batchCounts(byReg[k].items);
+        return '<div class="reg-sum"><span class="n">👤 '+_payEsc(byReg[k].name)+'</span><span>'+byReg[k].items.length+' ফাইল'+(bc.u?' · Ur '+bc.u:'')+(bc.i?' · Im '+bc.i:'')+'</span><span style="color:#fbbf24;font-weight:700">'+fmtMoney(byReg[k].total)+'</span></div>';}).join('');
+      const carry=all.filter(function(e){return _isCarry(e.x,e.p);});
+      if(carry.length)h+='<div class="pay-note" style="margin-top:6px">↩ আগের মাসের আবেদন, এ মাসে পেমেন্ট: '+carry.length+' ফাইল · '+fmtMoney(carry.reduce(function(t,e){return t+(e.x.amount||0);},0))+' (পেমেন্টের মাসেই গোনা)</div>';
+    }else{
+      _rptKeys=[];h+='<div class="pay-note">এ মাসে কোনো পেমেন্ট নেই</div>';
+    }
     const seen=new Set(allApps.map(function(a){return a.ref;}));
-    const pool=allApps.concat(Object.values(historyStore).filter(function(h){return h&&!seen.has(h.ref);}));
+    const pool=allApps.concat(Object.values(historyStore).filter(function(x){return x&&!seen.has(x.ref);}));
     let ui=0,uu=0;
     pool.forEach(function(a){
       const lv=stars[a.ref]||0;if(!lv||paidStore[a.ref]||_isLegacy(a))return;
       const iso=toInputDate(a.apply_date||'');if(!iso||iso.slice(0,7)!==pk)return;
       if(lv===2)uu++;else ui++;
     });
-    if(ui||uu)extra+='<div class="pay-note" style="margin-top:6px">⏳ এ মাসের আবেদনের আনপেইড: '+(ui?'Im '+ui:'')+(ui&&uu?' · ':'')+(uu?'Ur '+uu:'')+' — পরের মাসে পেমেন্ট হলে সেই মাসে "↩" ট্যাগসহ যাবে</div>';
+    if(ui||uu)h+='<div class="pay-note" style="margin-top:6px">⏳ এ মাসের আবেদনের আনপেইড: '+(ui?'Im '+ui:'')+(ui&&uu?' · ':'')+(uu?'Ur '+uu:'')+'</div>';
+    if(list.length){
+      h+='<div class="pay-rbtns"><button class="pay-mini" onclick="copyMonthReport()">📋 কপি</button>';
+      h+=_rptKeys.map(function(k,i){return '<button class="pay-mini" style="border-color:#22c55e;color:#4ade80;background:rgba(34,197,94,0.12)" onclick="sendMonthReport('+i+')">💬 '+_payEsc(byReg[k].name)+' কে পাঠান</button>';}).join('');
+      h+='</div>';
+    }
+    h+='</div>';
+    rep.innerHTML=h;
+  }
+
+  // ── Dues (all time, current state) ──
+  let extra='';
+  if(!q){
+    const dues=_dues();
+    extra+=Object.keys(dues).map(function(id){const d=dues[id];
+      return '<div class="reg-sum" style="cursor:pointer" onclick="payDues(\''+id+'\')"><span class="n">⏳ বকেয়া · 👤 '+_payEsc(d.reg.name)+'</span><span>'+d.refs.length+' ফাইল'+(d.i?' · Im '+d.i:'')+(d.u?' · Ur '+d.u:'')+'</span><span style="color:#f59e0b;font-weight:700">'+fmtMoney(d.total)+'</span><span class="pay-mini">৳ দিন</span></div>';}).join('');
+    if(extra)extra='<div style="margin-bottom:8px">'+extra+'</div>';
   }
   document.getElementById('pay-extra').innerHTML=extra;
+
+  // ── Payment list ──
   document.getElementById('pay-list').innerHTML=list.length?list.map(function(p){
     const bc=_batchCounts(p.items||[]);
     return '<div class="pay-batch"><div class="pay-bh"><span class="pay-bt">🕒 '+fmtPayTime(p.ts)+'</span><span class="pay-bamt">'+fmtMoney(p.total)+'</span><span class="paid-un" style="color:#60a5fa" onclick="copyReceipt(\''+p.id+'\')">📋</span><span class="paid-un" style="color:#22c55e" onclick="waReceipt(\''+p.id+'\')">💬</span><span class="paid-un" onclick="deletePayment(\''+p.id+'\')">✕</span></div>'
@@ -2250,11 +2272,21 @@ function renderPayHistory(){
       +_payItemRows(p)+'</div>';
   }).join(''):'<div style="color:#475569;text-align:center;padding:20px;font-size:12px">'+(q?'কোনো রেকর্ড মেলেনি':'এ মাসে কোনো পেমেন্ট নেই')+'</div>';
 }
+let _rptKeys=[];
+function _payKey(p){return p.regId||('n:'+(p.regName||''));}
+function _itemLine(x,p,i,withCarry){
+  const tags=[];if(x.level===2)tags.push('Urgent');
+  if(withCarry&&_isCarry(x,p)){const fk=_fileMonthKey(x);tags.push('↩ '+MONTHS_SHORT[parseInt(fk.slice(5,7))-1]);}
+  return (i+1)+'. '+x.name+' — '+x.ref+(tags.length?' ('+tags.join(', ')+')':'');
+}
+// WhatsApp-clean payment summary: file names + ref, "(Urgent)" only on urgent ones, and the grand total
 function _receiptText(p){
-  const bc=_batchCounts(p.items||[]);
-  const L=['৳ পেমেন্ট রসিদ','তারিখ: '+fmtPayTime(p.ts),'রেজিস্টার: '+(p.regName||'—'),''];
-  (p.items||[]).forEach(function(x,i){L.push((i+1)+'. '+(x.level===2?'[Ur] ':x.level===1?'[Im] ':'')+x.name+' ('+x.ref+') — '+fmtMoney(x.amount));});
-  L.push('');L.push('ফাইল: '+(p.items||[]).length+((bc.u||bc.i)?' (Ur '+bc.u+', Im '+bc.i+')':''));L.push('মোট: '+fmtMoney(p.total));
+  const items=p.items||[];const c=_batchCounts(items);
+  const L=['*পেমেন্ট সামারি*',fmtPayTime(p.ts),''];
+  items.forEach(function(x,i){L.push(_itemLine(x,p,i,false));});
+  L.push('');
+  L.push('মোট ফাইল: '+items.length+(c.u?' (Urgent '+c.u+')':''));
+  L.push('*মোট পেমেন্ট: '+fmtMoney(p.total)+'*');
   return L.join('\n');
 }
 function copyReceipt(id){
@@ -2327,7 +2359,7 @@ function renderPaidArchive(el){
         +_payItemRows(p)+'</div>';
     }).join('');
     const gy=parseInt(e[0].slice(0,4)),gm=parseInt(e[0].slice(5,7));
-    return '<div class="arch-section"><div class="arch-header"><span class="arch-month-label">৳ '+g.label+'</span><span><button class="pay-mini" onclick="copyMonthReport('+gy+','+gm+')">📋</button> <button class="pay-mini" onclick="downloadMonthCSV('+gy+','+gm+')">⬇ CSV</button></span></div>'
+    return '<div class="arch-section"><div class="arch-header"><span class="arch-month-label">৳ '+g.label+'</span><span><button class="pay-mini" onclick="copyMonthReport('+gy+','+gm+')">📋 রিপোর্ট কপি</button></span></div>'
       +'<div class="arch-badges">'+(mc.u?'<span class="arch-badge urgent">🔴 '+mc.u+'</span>':'')+(mc.i?'<span class="arch-badge important">⭐ '+mc.i+'</span>':'')+'<span class="arch-badge total">'+items.length+' ফাইল · '+fmtMoney(mtot)+'</span></div>'
       +'<div style="margin:6px 0 8px">'+regRows+'</div>'+batches+'</div>';
   }).join('');
@@ -2843,41 +2875,33 @@ async function payStartPromptOnce(){
   }finally{_psAskPending=false;}
 }
 
-// ── Monthly payment report (copy / CSV) ──
+// ── Monthly payment report (copy / send to register) ──
 function _monthPays(y,m){
   return payments.filter(function(p){const d=new Date(p.ts);return !isNaN(d)&&d.getFullYear()===y&&d.getMonth()===m;}).sort(function(a,b){return (a.ts||'').localeCompare(b.ts||'');});
 }
 function _curPayYM(){const d=payMonth||_monthStartNow();return [d.getFullYear(),d.getMonth()];}
-function _monthReportText(y,m){
-  const list=_monthPays(y,m);if(!list.length)return '';
+function _monthReportText(y,m,key){
+  let list=_monthPays(y,m);if(key)list=list.filter(function(p){return _payKey(p)===key;});
+  if(!list.length)return '';
   const all=[];list.forEach(function(p){(p.items||[]).forEach(function(x){all.push({x:x,p:p});});});
   const c=_batchCounts(all.map(function(e){return e.x;}));const tot=list.reduce(function(t,p){return t+(p.total||0);},0);
-  const L=['৳ পেমেন্ট রিপোর্ট — '+MONTHS_SHORT[m]+' '+y,'মোট: '+fmtMoney(tot)+' · '+all.length+' ফাইল (Ur '+c.u+', Im '+c.i+')','','রেজিস্টার ভিত্তিক:'];
-  const byReg={};
-  list.forEach(function(p){const k=p.regName||'—';if(!byReg[k])byReg[k]={items:[],total:0};(p.items||[]).forEach(function(x){byReg[k].items.push(x);});byReg[k].total+=p.total||0;});
-  Object.keys(byReg).sort(function(a,b){return byReg[b].total-byReg[a].total;}).forEach(function(k){
-    const bc=_batchCounts(byReg[k].items);L.push('• '+k+' — '+byReg[k].items.length+' ফাইল (Ur '+bc.u+', Im '+bc.i+') — '+fmtMoney(byReg[k].total));
-  });
-  const carry=all.filter(function(e){return _isCarry(e.x,e.p);});
-  if(carry.length){L.push('');L.push('↩ আগের মাসের আবেদন, এ মাসে পেমেন্ট: '+carry.length+' ফাইল · '+fmtMoney(carry.reduce(function(t,e){return t+(e.x.amount||0);},0)));}
-  L.push('');L.push('বিস্তারিত:');
+  const L=['*মাসিক পেমেন্ট রিপোর্ট — '+MONTHS_SHORT[m]+' '+y+'*'];
+  if(key)L.push('রেজিস্টার: '+(list[0].regName||'—'));
+  L.push('');
+  L.push('মোট ফাইল: '+all.length+' (Urgent '+c.u+', Important '+c.i+')');
+  L.push('*মোট পেমেন্ট: '+fmtMoney(tot)+'*');
+  if(!key){
+    const byReg={},order=[];
+    list.forEach(function(p){const k=_payKey(p);if(!byReg[k]){byReg[k]={name:p.regName||'—',n:0,total:0};order.push(k);}byReg[k].n+=(p.items||[]).length;byReg[k].total+=p.total||0;});
+    L.push('');
+    order.sort(function(a,b){return byReg[b].total-byReg[a].total;}).forEach(function(k){L.push('• '+byReg[k].name+' — '+byReg[k].n+' ফাইল — '+fmtMoney(byReg[k].total));});
+  }
   list.forEach(function(p){
-    L.push(fmtPayTime(p.ts)+' · '+(p.regName||'—')+' · '+fmtMoney(p.total));
-    (p.items||[]).forEach(function(x,i){
-      const fk=_fileMonthKey(x);
-      L.push('  '+(i+1)+'. '+(x.level===2?'[Ur] ':x.level===1?'[Im] ':'')+x.name+' ('+x.ref+')'+(_isCarry(x,p)?' ↩'+MONTHS_SHORT[parseInt(fk.slice(5,7))-1]:'')+' — '+fmtMoney(x.amount));
-    });
+    L.push('');
+    L.push('— '+fmtPayTime(p.ts)+(key?'':' · '+(p.regName||'—'))+' · '+fmtMoney(p.total));
+    (p.items||[]).forEach(function(x,i){L.push(_itemLine(x,p,i,true));});
   });
   return L.join('\n');
-}
-function _csvCell(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
-function _monthCSV(y,m){
-  const list=_monthPays(y,m);if(!list.length)return '';
-  const rows=[['তারিখ-সময়','রেজিস্টার','Ref','নাম','টাইপ','আবেদনের তারিখ','আগের মাসের ফাইল','টাকা']];
-  list.forEach(function(p){(p.items||[]).forEach(function(x){
-    rows.push([fmtPayTime(p.ts),p.regName||'',x.ref,x.name,x.level===2?'Urgent':x.level===1?'Important':'',x.applyDate||((_findApp(x.ref)||{}).apply_date)||'',_isCarry(x,p)?'হ্যাঁ':'না',x.amount]);
-  });});
-  return rows.map(function(r){return r.map(_csvCell).join(',');}).join('\r\n');
 }
 function copyMonthReport(y,m){
   if(y===undefined){const ym=_curPayYM();y=ym[0];m=ym[1];}
@@ -2885,13 +2909,19 @@ function copyMonthReport(y,m){
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){showToast('✓ রিপোর্ট কপি');}).catch(function(){showToast('কপি করা যায়নি');});
   else showToast('কপি করা যায়নি');
 }
-function downloadMonthCSV(y,m){
-  if(y===undefined){const ym=_curPayYM();y=ym[0];m=ym[1];}
-  const csv=_monthCSV(y,m);if(!csv){showToast('এ মাসে কোনো পেমেন্ট নেই');return;}
-  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');
-  a.href=url;a.download='pcc-payments-'+y+'-'+String(m+1).padStart(2,'0')+'.csv';
-  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1500);
+function sendMonthReport(i){
+  const key=_rptKeys[i];if(!key)return;
+  const ym=_curPayYM();const t=_monthReportText(ym[0],ym[1],key);if(!t){showToast('এ মাসে কোনো পেমেন্ট নেই');return;}
+  const p=_monthPays(ym[0],ym[1]).filter(function(x){return _payKey(x)===key;})[0];
+  let phone=p&&p.regPhone;
+  if(!phone&&p&&p.regId){const r=registers.find(function(x){return x.id===p.regId;});if(r)phone=r.phone;}
+  let n=(phone||'').replace(/[^0-9]/g,'');
+  if(!n){
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t);
+    showToast('নম্বর নেই — রিপোর্ট কপি হলো');return;
+  }
+  if(n.indexOf('88')!==0)n='88'+n;
+  window.open('https://wa.me/'+n+'?text='+encodeURIComponent(t),'_blank');
 }
 
 // ── Monthly auto-reset of Urgent/Important counters (header) ──

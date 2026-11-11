@@ -457,6 +457,10 @@
   .pay-nav span { font-size: 13px; font-weight: 700; color: #fbbf24; }
   .carry-tag { display: inline-block; padding: 0 5px; border-radius: 8px; background: rgba(148,163,184,0.15); border: 1px solid rgba(148,163,184,0.4); color: #cbd5e1; font-size: 9px; font-weight: 700; margin-left: 4px; flex-shrink: 0; }
   .pay-note { font-size: 11px; color: #94a3b8; margin: 0 0 8px; line-height: 1.5; }
+  .ps-amt { width: 74px; box-sizing: border-box; padding: 4px 6px; border-radius: 8px; border: 1px solid #b45309; background: rgba(251,191,36,0.08); color: #fbbf24; font-size: 12px; font-weight: 700; text-align: right; outline: none; flex-shrink: 0; }
+  body.light .ps-amt { background: #fffbeb; color: #92400e; }
+  .undo-bar { position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 700; background: #1e293b; border: 1px solid #475569; color: #e2e8f0; border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; font-size: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+  .undo-bar button { background: #78350f; border: 1px solid #b45309; color: #fde68a; border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
   .reg-lbl { font-size: 10px; font-weight: 700; margin-bottom: 3px; line-height: 1.3; }
   .reg-row .rr > div input { width: 100%; box-sizing: border-box; }
   .section-count.unpaid-count { color: #fbbf24; margin-right: 10px; }
@@ -1016,6 +1020,8 @@ async function initAccountGate(){
     <div class="pay-nav"><button onclick="payNav(-1)">‹</button><span id="pay-month-lbl"></span><button onclick="payNav(1)">›</button></div>
     <input class="pay-search" id="pay-search" type="text" placeholder="নাম, Ref বা রেজিস্টার (সব মাসে খোঁজে)..." oninput="payQuery=this.value;renderPayHistory()">
     <div id="pay-summary" class="ps-total" style="margin:0 0 8px"></div>
+    <div id="pay-actions" style="display:flex;gap:6px;margin-bottom:8px"></div>
+    <div id="pay-trash"></div>
     <div id="pay-extra"></div>
     <div class="pay-list" id="pay-list"></div>
   </div>
@@ -1118,6 +1124,12 @@ async function initAccountGate(){
       <div id="reg-list"></div>
       <button class="settings-save-btn" onclick="addRegisterRow()" style="margin-top:2px;background:transparent;border:1px dashed #475569;color:#94a3b8">➕ রেজিস্টার যোগ করুন</button>
       <button class="settings-save-btn" onclick="saveRegisters()" style="margin-top:8px">রেজিস্টার সেভ করুন</button>
+    </div>
+    <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-top:14px">
+      <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">৳ পেমেন্ট শুরুর তারিখ</div>
+      <div class="settings-info" style="margin-bottom:8px">এই তারিখের আগের আবেদন, যেগুলো ৩/১০ পার করেছে, সেই Urgent/Important ফাইল "পুরনো" ধরা হবে: ৳ ব্লিংক করবে না, up: গণনায় আসবে না। (২/১০ বা তার আগের ফাইল এর বাইরে, তারা চলতিই থাকে।) (পেমেন্ট শিটে তবুও দেওয়া যাবে।) ফাঁকা = সব ফাইল ধরা হবে।</div>
+      <input class="settings-input" type="date" id="pay-start-input" onchange="savePayStart(this.value)">
+      <button class="settings-save-btn" onclick="savePayStart('')" style="margin-top:8px;background:transparent;border:1px dashed #475569;color:#94a3b8">সব ফাইল ধরুন (তারিখ মুছুন)</button>
     </div>
   </div>
 </div>
@@ -1244,6 +1256,9 @@ let resetConfirm=false,resetTimer=null;
 let registers=[];try{registers=JSON.parse(localStorage.getItem('pcc_registers')||'[]');}catch(e){}
 let payments=[];try{payments=JSON.parse(localStorage.getItem('pcc_payments')||'[]');}catch(e){}
 let paidStore={};
+let payStart=localStorage.getItem('pcc_pay_start')||'';
+let starDate={};try{starDate=JSON.parse(localStorage.getItem('pcc_star_date')||'{}');}catch(e){}
+let fileReg={};try{fileReg=JSON.parse(localStorage.getItem('pcc_file_reg')||'{}');}catch(e){}
 function rebuildPaid(){paidStore={};payments.forEach(function(p){(p.items||[]).forEach(function(it){paidStore[it.ref]=p.id;});});}
 (function(){ // one-time migrations from older versions
   try{
@@ -1436,6 +1451,8 @@ function saveLocal(){
   localStorage.setItem('pcc_collected_log',JSON.stringify(collectedLog));
   localStorage.setItem('pcc_payments',JSON.stringify(payments));
   localStorage.setItem('pcc_registers',JSON.stringify(registers));
+  localStorage.setItem('pcc_star_date',JSON.stringify(starDate));
+  localStorage.setItem('pcc_file_reg',JSON.stringify(fileReg));
 }
 function save(){saveLocal();scheduleBackup();}
 
@@ -1444,7 +1461,7 @@ function scheduleBackup(){if(backupTimer)clearTimeout(backupTimer);backupTimer=s
 async function doBackup(){
   const pat=localStorage.getItem('pcc_pat');if(!pat)return;setBkDot('...');
   try{
-    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,clientPhones,clientNotes,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes,forwardedLog,collectedLog,payments,registers,countsMonth:localStorage.getItem('pcc_counts_month')||''};
+    const ud={stars,delivered,codes,showDeu,notes,blinkStopped,policeTags,clientNames,clientPhones,clientNotes,counts,history,forwarded,collected,collectedDay,collectedDate,manualPrintDates,resetArchive,calNotes,forwardedLog,collectedLog,payments,registers,countsMonth:localStorage.getItem('pcc_counts_month')||'',payStart:payStart,starDate:starDate,fileReg:fileReg};
     const getR=await fetch(REPO_API(),{headers:{'Authorization':`token ${pat}`,'Accept':'application/vnd.github.v3+json'}});
     let sha=null,existing={};
     if(getR.ok){const d=await getR.json();sha=d.sha;try{existing=JSON.parse(atob(d.content.replace(/\n/g,'')));}catch(e){}}
@@ -1465,7 +1482,7 @@ async function syncFromCloud(){
     if(d.stars)stars=d.stars;if(d.delivered)delivered=d.delivered;if(d.codes)codes=d.codes;
     if(d.showDeu)showDeu=d.showDeu;if(d.notes)notes=d.notes;if(d.blinkStopped)blinkStopped=d.blinkStopped;
     if(d.policeTags)policeTags=d.policeTags;if(d.clientNames)clientNames=d.clientNames;
-    if(d.counts)counts=d.counts;if(d.history)history=d.history;if(d.countsMonth)localStorage.setItem('pcc_counts_month',d.countsMonth);
+    if(d.counts)counts=d.counts;if(d.history)history=d.history;if(d.countsMonth)localStorage.setItem('pcc_counts_month',d.countsMonth);if(typeof d.payStart==='string'){payStart=d.payStart;localStorage.setItem('pcc_pay_start',payStart);}if(d.starDate)starDate=d.starDate;if(d.fileReg)fileReg=d.fileReg;
     if(d.forwarded)forwarded=d.forwarded;if(d.collected)collected=d.collected;if(d.collectedDay)collectedDay=d.collectedDay;if(d.collectedDate)collectedDate=d.collectedDate;if(d.clientPhones)clientPhones=d.clientPhones;if(d.clientNotes)clientNotes=d.clientNotes;
     if(d.manualPrintDates)manualPrintDates=d.manualPrintDates;
     if(d.resetArchive)resetArchive=d.resetArchive;if(d.calNotes)calNotes=d.calNotes;
@@ -1752,13 +1769,16 @@ function stagePressStart(e,ref){
     if(stage===0){
       // important/urgent → confirm before forwarding
       if(s>0){const ok=await stageConfirm(ref,'Forwarded করবেন?');if(!ok)return;}
+      let _fwdReg='';
+      if(s>0){_fwdReg=await pickRegister('কোন রেজিস্টারকে ফরোয়ার্ড?');if(_fwdReg===null)return;if(_fwdReg)fileReg[ref]=_fwdReg;}
       forwarded[ref]=true;collected[ref]=false;delete collectedDay[ref];
       const _fwdApp=allApps.find(a=>a.ref===ref);
       if(_fwdApp){forwardedLog.push({date:todayStr(),ref:_fwdApp.ref,name:_fwdApp.name,printDate:getEffectivePrintDate(_fwdApp.ref)||'',applyDate:_fwdApp.apply_date||''});}
       // Send to register WhatsApp if set
       const app=allApps.find(a=>a.ref===ref);
-      if(_registerPhone&&app){
-        const waNum='88'+_registerPhone.replace(/[^0-9]/g,'');
+      const _wp1=_regPhoneFor(_fwdReg);
+      if(_wp1&&app){
+        const waNum='88'+_wp1.replace(/[^0-9]/g,'');
         const msg=encodeURIComponent(app.name+' — '+app.ref);
         setTimeout(()=>window.open('https://wa.me/'+waNum+'?text='+msg,'_blank'),500);
       }
@@ -1800,7 +1820,7 @@ function renderCal(){
     const poolC=allApps.concat(Object.values(historyStore).filter(h=>h&&!seenC.has(h.ref)));
     poolC.forEach(a=>{
       const lv=stars[a.ref]||0;if(!lv)return;
-      const iso=toInputDate(a.apply_date||'');if(!iso)return;
+      const iso=starDate[a.ref]||toInputDate(a.apply_date||'');if(!iso)return;
       if(parseInt(iso.slice(0,4))===y&&parseInt(iso.slice(5,7))-1===m){if(lv===2)urC++;else imC++;}
     });
   }
@@ -2052,33 +2072,44 @@ function _batchCounts(items){
 
 // Pay sheet (single or many files)
 function openPaySheet(refs){
+  _psAmt={};
   _psRefs=(refs||[]).filter(function(r){return !paidStore[r]&&(stars[r]||0)>0;});
   if(!_psRefs.length){showToast('Urgent/Important মার্ক করা আনপেইড ফাইল নেই');return;}
   const last=localStorage.getItem('pcc_last_reg')||'';
   _psReg=registers.some(function(r){return r.id===last;})?last:(registers[0]?registers[0].id:'');
+  const _cnt={};_psRefs.forEach(function(r){const id=fileReg[r];if(id&&registers.some(function(x){return x.id===id;}))_cnt[id]=(_cnt[id]||0)+1;});
+  const _best=Object.keys(_cnt).sort(function(a,b){return _cnt[b]-_cnt[a];})[0];if(_best)_psReg=_best;
   renderPaySheet();
   document.getElementById('paysheet-modal').classList.add('open');
 }
 function closePaySheet(){document.getElementById('paysheet-modal').classList.remove('open');}
-function _psPick(id){_psReg=id;renderPaySheet();}
+function _psPick(id){_psReg=id;_psAmt={};renderPaySheet();}
+let _psAmt={};
+function _psAmount(ref,reg){
+  if(_psAmt[ref]!==undefined&&_psAmt[ref]!=='')return parseFloat(_psAmt[ref])||0;
+  return (stars[ref]||0)===2?(reg.urgentRate||0):(reg.importantRate||0);
+}
+function _psSetAmt(ref,v){_psAmt[ref]=v;_psTotals();}
+function _psTotals(){
+  const reg=registers.find(function(r){return r.id===_psReg;});if(!reg)return;
+  let u=0,im=0,total=0;
+  _psRefs.forEach(function(ref){if((stars[ref]||0)===2)u++;else im++;total+=_psAmount(ref,reg);});
+  document.getElementById('ps-total').innerHTML='<span>'+_psRefs.length+' ফাইল'+(u?' · Ur '+u:'')+(im?' · Im '+im:'')+'</span><span>মোট '+fmtMoney(total)+'</span>';
+}
 function renderPaySheet(){
   const regsEl=document.getElementById('ps-regs'),filesEl=document.getElementById('ps-files'),totEl=document.getElementById('ps-total'),go=document.getElementById('ps-go');
   if(!registers.length){
-    regsEl.innerHTML='<div style="font-size:12px;color:#f59e0b">⚠️ আগে সেটিংসে রেজিস্টার ও রেট যোগ করুন</div>';
+    regsEl.innerHTML='<div style="font-size:12px;color:#f59e0b">⚠️ আগে সেটিংসে রেজিস্টার ও রেট যোগ করুন</div><button class="pay-go" style="margin-top:8px" onclick="closePaySheet();openSettings()">⚙️ সেটিংস খুলুন</button>';
     filesEl.innerHTML='';totEl.innerHTML='';go.disabled=true;
-    regsEl.innerHTML+='<button class="pay-go" style="margin-top:8px" onclick="closePaySheet();openSettings()">⚙️ সেটিংস খুলুন</button>';
     return;
   }
   const reg=registers.find(function(r){return r.id===_psReg;})||registers[0];_psReg=reg.id;
   regsEl.innerHTML=registers.map(function(r){return '<button class="ps-chip '+(r.id===reg.id?'on':'')+'" onclick="_psPick(\''+r.id+'\')">'+_payEsc(r.name)+'</button>';}).join('');
-  let u=0,im=0,total=0;
   filesEl.innerHTML=_psRefs.map(function(ref){
     const a=_findApp(ref)||{name:ref,ref:ref};const lv=stars[ref]||0;
-    const amt=lv===2?(reg.urgentRate||0):(reg.importantRate||0);
-    if(lv===2)u++;else im++;total+=amt;
-    return '<div class="pay-row"><span class="pay-chk">'+_lvlIcon(lv)+'</span><span class="pay-name">'+_payEsc(a.name)+'</span><span class="pay-ref">'+_payEsc(ref)+'</span><span class="pay-st" style="color:#fbbf24">'+fmtMoney(amt)+'</span></div>';
+    return '<div class="pay-row"><span class="pay-chk">'+_lvlIcon(lv)+'</span><span class="pay-name">'+_payEsc(a.name)+'</span><span class="pay-ref">'+_payEsc(ref)+'</span>'+((fileReg[ref]&&fileReg[ref]!==reg.id&&_regName(fileReg[ref]))?'<span class="carry-tag">'+_payEsc(_regName(fileReg[ref]))+'</span>':'')+'<input class="ps-amt" type="number" inputmode="numeric" value="'+_psAmount(ref,reg)+'" oninput="_psSetAmt(\''+ref+'\',this.value)"></div>';
   }).join('');
-  totEl.innerHTML='<span>'+_psRefs.length+' ফাইল'+(u?' · 🔴 '+u:'')+(im?' · ⭐ '+im:'')+'</span><span>মোট '+fmtMoney(total)+'</span>';
+  _psTotals();
   go.disabled=false;
 }
 function confirmPaySheet(){
@@ -2087,13 +2118,16 @@ function confirmPaySheet(){
   _psRefs.forEach(function(ref){
     if(paidStore[ref])return;const lv=stars[ref]||0;if(!lv)return;
     const a=_findApp(ref)||{name:ref};
-    items.push({ref:ref,name:a.name,level:lv,applyDate:a.apply_date||'',amount:lv===2?(reg.urgentRate||0):(reg.importantRate||0)});
+    const rate=lv===2?(reg.urgentRate||0):(reg.importantRate||0);const amt=_psAmount(ref,reg);
+    const it={ref:ref,name:a.name,level:lv,applyDate:a.apply_date||'',amount:amt};
+    if(amt!==rate)it.rate=rate;
+    items.push(it);
   });
   if(!items.length){closePaySheet();return;}
   const total=items.reduce(function(t,x){return t+x.amount;},0);
   payments.push({id:'p'+Date.now(),ts:new Date().toISOString(),regId:reg.id,regName:reg.name,regPhone:reg.phone||'',items:items,total:total});
   localStorage.setItem('pcc_last_reg',reg.id);
-  rebuildPaid();_psRefs=[];closePaySheet();save();render();
+  rebuildPaid();_psRefs=[];_psAmt={};closePaySheet();save();render();
   showToast('✅ '+items.length+' ফাইল · '+fmtMoney(total)+' → '+reg.name);
   if(document.getElementById('fwd-log-modal').classList.contains('open'))openForwardedLogModal();
   if(document.getElementById('pay-modal').classList.contains('open'))renderPayHistory();
@@ -2102,7 +2136,7 @@ function confirmPaySheet(){
 function payWaiting(){
   const refs=getDisplayApps().filter(function(a){
     const n=parseInt((a.status||'').split('/')[0])||0;
-    return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref]&&!paidStore[a.ref];
+    return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref]&&!paidStore[a.ref]&&!_isLegacy(a);
   }).map(function(a){return a.ref;});
   if(!refs.length){showToast('সব ফাইল পেইড');return;}
   openPaySheet(refs);
@@ -2167,7 +2201,11 @@ function _payItemRows(p){
 }
 function renderPayHistory(){
   if(!payMonth)payMonth=_monthStartNow();
+  const tr=document.getElementById('pay-trash');
+  if(tr)tr.innerHTML=payTrash.length?'<button class="pay-mini" style="margin-bottom:8px" onclick="restoreLastPayment()">↩ মুছে ফেলা পেমেন্ট ফিরিয়ে আনুন ('+payTrash.length+')</button>':'';
   const q=(payQuery||'').toLowerCase().trim();
+  const pa=document.getElementById('pay-actions');
+  if(pa)pa.innerHTML=q?'':'<button class="pay-mini" onclick="copyMonthReport()">📋 মাসিক রিপোর্ট কপি</button><button class="pay-mini" onclick="downloadMonthCSV()">⬇ CSV</button>';
   const isCur=payMonth.getTime()===_monthStartNow().getTime();
   const pk=payMonth.getFullYear()+'-'+String(payMonth.getMonth()+1).padStart(2,'0');
   document.getElementById('pay-month-lbl').textContent=q?'সব মাস (সার্চ)':MONTHS_SHORT[payMonth.getMonth()]+' '+payMonth.getFullYear()+(isCur?' · চলতি মাস':'');
@@ -2178,6 +2216,11 @@ function renderPayHistory(){
   document.getElementById('pay-summary').innerHTML='<span>'+all.length+' ফাইল'+(c.i?' · Im '+c.i:'')+(c.u?' · Ur '+c.u:'')+'</span><span>মোট '+fmtMoney(tot)+'</span>';
   // extra: per-register totals, carry-over, unpaid of this month
   let extra='';
+  if(!q){
+    const dues=_dues();
+    extra+=Object.keys(dues).map(function(id){const d=dues[id];
+      return '<div class="reg-sum" style="cursor:pointer" onclick="payDues(\''+id+'\')"><span class="n">⏳ বকেয়া · 👤 '+_payEsc(d.reg.name)+'</span><span>'+d.refs.length+' ফাইল'+(d.i?' · Im '+d.i:'')+(d.u?' · Ur '+d.u:'')+'</span><span style="color:#f59e0b;font-weight:700">'+fmtMoney(d.total)+'</span><span class="pay-mini">৳ দিন</span></div>';}).join('');
+  }
   if(list.length){
     const byReg={};
     list.forEach(function(p){const k=p.regName||'—';if(!byReg[k])byReg[k]={items:[],total:0};(p.items||[]).forEach(function(x){byReg[k].items.push(x);});byReg[k].total+=p.total||0;});
@@ -2193,7 +2236,7 @@ function renderPayHistory(){
     const pool=allApps.concat(Object.values(historyStore).filter(function(h){return h&&!seen.has(h.ref);}));
     let ui=0,uu=0;
     pool.forEach(function(a){
-      const lv=stars[a.ref]||0;if(!lv||paidStore[a.ref])return;
+      const lv=stars[a.ref]||0;if(!lv||paidStore[a.ref]||_isLegacy(a))return;
       const iso=toInputDate(a.apply_date||'');if(!iso||iso.slice(0,7)!==pk)return;
       if(lv===2)uu++;else ui++;
     });
@@ -2202,16 +2245,54 @@ function renderPayHistory(){
   document.getElementById('pay-extra').innerHTML=extra;
   document.getElementById('pay-list').innerHTML=list.length?list.map(function(p){
     const bc=_batchCounts(p.items||[]);
-    return '<div class="pay-batch"><div class="pay-bh"><span class="pay-bt">🕒 '+fmtPayTime(p.ts)+'</span><span class="pay-bamt">'+fmtMoney(p.total)+'</span><span class="paid-un" onclick="deletePayment(\''+p.id+'\')">✕</span></div>'
+    return '<div class="pay-batch"><div class="pay-bh"><span class="pay-bt">🕒 '+fmtPayTime(p.ts)+'</span><span class="pay-bamt">'+fmtMoney(p.total)+'</span><span class="paid-un" style="color:#60a5fa" onclick="copyReceipt(\''+p.id+'\')">📋</span><span class="paid-un" style="color:#22c55e" onclick="waReceipt(\''+p.id+'\')">💬</span><span class="paid-un" onclick="deletePayment(\''+p.id+'\')">✕</span></div>'
       +'<div class="pay-bsub">👤 '+_payEsc(p.regName||'—')+' · '+(p.items||[]).length+' ফাইল'+(bc.i?' · Im '+bc.i+' ('+fmtMoney(bc.it)+')':'')+(bc.u?' · Ur '+bc.u+' ('+fmtMoney(bc.ut)+')':'')+'</div>'
       +_payItemRows(p)+'</div>';
   }).join(''):'<div style="color:#475569;text-align:center;padding:20px;font-size:12px">'+(q?'কোনো রেকর্ড মেলেনি':'এ মাসে কোনো পেমেন্ট নেই')+'</div>';
 }
+function _receiptText(p){
+  const bc=_batchCounts(p.items||[]);
+  const L=['৳ পেমেন্ট রসিদ','তারিখ: '+fmtPayTime(p.ts),'রেজিস্টার: '+(p.regName||'—'),''];
+  (p.items||[]).forEach(function(x,i){L.push((i+1)+'. '+(x.level===2?'[Ur] ':x.level===1?'[Im] ':'')+x.name+' ('+x.ref+') — '+fmtMoney(x.amount));});
+  L.push('');L.push('ফাইল: '+(p.items||[]).length+((bc.u||bc.i)?' (Ur '+bc.u+', Im '+bc.i+')':''));L.push('মোট: '+fmtMoney(p.total));
+  return L.join('\n');
+}
+function copyReceipt(id){
+  const p=payments.find(function(x){return x.id===id;});if(!p)return;
+  const t=_receiptText(p);
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){showToast('✓ রসিদ কপি');}).catch(function(){showToast('কপি করা যায়নি');});
+  else showToast('কপি করা যায়নি');
+}
+function waReceipt(id){
+  const p=payments.find(function(x){return x.id===id;});if(!p)return;
+  const t=_receiptText(p);let n=(p.regPhone||'').replace(/[^0-9]/g,'');
+  if(!n){copyReceipt(id);showToast('নম্বর নেই — রসিদ কপি হলো');return;}
+  if(n.indexOf('88')!==0)n='88'+n;
+  window.open('https://wa.me/'+n+'?text='+encodeURIComponent(t),'_blank');
+}
+let payTrash=[];try{payTrash=JSON.parse(localStorage.getItem('pcc_pay_trash')||'[]');}catch(e){}
+function _saveTrash(){try{localStorage.setItem('pcc_pay_trash',JSON.stringify(payTrash.slice(-10)));}catch(e){}}
+function showUndoBar(msg,fn){
+  const old=document.getElementById('undo-bar');if(old)old.remove();
+  const d=document.createElement('div');d.id='undo-bar';d.className='undo-bar';
+  d.innerHTML='<span>'+_payEsc(msg)+'</span><button>↩ পূর্বাবস্থা</button>';
+  d.querySelector('button').onclick=function(){d.remove();fn();};
+  document.body.appendChild(d);setTimeout(function(){if(d.parentNode)d.remove();},10000);
+}
+function restoreLastPayment(){
+  const p=payTrash.pop();if(!p)return;_saveTrash();
+  if(!payments.some(function(x){return x.id===p.id;}))payments.push(p);
+  rebuildPaid();save();render();renderPayHistory();
+  if(document.getElementById('archive-modal').classList.contains('open')&&archTab==='paid')renderArchiveContent();
+  showToast('↩ পেমেন্ট ফিরে এসেছে');
+}
 async function deletePayment(id){
   const p=payments.find(function(x){return x.id===id;});if(!p)return;
   const ok=await showConfirm('এই পেমেন্ট রেকর্ড মুছবেন?',(p.regName||'')+' · '+fmtMoney(p.total)+' · '+(p.items||[]).length+' ফাইল');if(!ok)return;
+  payTrash.push(p);_saveTrash();
   payments=payments.filter(function(x){return x.id!==id;});rebuildPaid();save();render();renderPayHistory();
   if(document.getElementById('archive-modal').classList.contains('open')&&archTab==='paid')renderArchiveContent();
+  showUndoBar('পেমেন্ট মুছে গেছে',restoreLastPayment);
 }
 // Archive → monthly payments with per-register totals
 function renderPaidArchive(el){
@@ -2245,7 +2326,8 @@ function renderPaidArchive(el){
         +'<div class="pay-bsub">'+(p.items||[]).length+' ফাইল'+(bc.u?' · 🔴 '+bc.u:'')+(bc.i?' · ⭐ '+bc.i:'')+'</div>'
         +_payItemRows(p)+'</div>';
     }).join('');
-    return '<div class="arch-section"><div class="arch-header"><span class="arch-month-label">৳ '+g.label+'</span></div>'
+    const gy=parseInt(e[0].slice(0,4)),gm=parseInt(e[0].slice(5,7));
+    return '<div class="arch-section"><div class="arch-header"><span class="arch-month-label">৳ '+g.label+'</span><span><button class="pay-mini" onclick="copyMonthReport('+gy+','+gm+')">📋</button> <button class="pay-mini" onclick="downloadMonthCSV('+gy+','+gm+')">⬇ CSV</button></span></div>'
       +'<div class="arch-badges">'+(mc.u?'<span class="arch-badge urgent">🔴 '+mc.u+'</span>':'')+(mc.i?'<span class="arch-badge important">⭐ '+mc.i+'</span>':'')+'<span class="arch-badge total">'+items.length+' ফাইল · '+fmtMoney(mtot)+'</span></div>'
       +'<div style="margin:6px 0 8px">'+regRows+'</div>'+batches+'</div>';
   }).join('');
@@ -2700,6 +2782,118 @@ async function baselineMonthOnce(){
   }finally{_baselinePending=false;}
 }
 
+// ── Mark date + register assignment ──
+function _todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function _noteStarDate(ref,level){if(level>0)starDate[ref]=_todayISO();else delete starDate[ref];}
+function _regName(id){const r=registers.find(function(x){return x.id===id;});return r?r.name:'';}
+function _regPhoneFor(id){const r=registers.find(function(x){return x.id===id;});return r?(r.phone||''):_registerPhone;}
+async function pickRegister(title){
+  if(!registers.length)return '';
+  if(registers.length===1)return registers[0].id;
+  const last=localStorage.getItem('pcc_last_fwd_reg')||'';
+  const btns=registers.map(function(r,i){return {label:'👤 '+r.name+(r.id===last?' (শেষবার)':''),value:r.id,cls:i===0?'pri':''};});
+  btns.push({label:'বাতিল',value:null});
+  const v=await showChoice(title,'',btns);
+  if(v)localStorage.setItem('pcc_last_fwd_reg',v);
+  return v; // null = cancelled
+}
+function _dues(){
+  const seen=new Set(allApps.map(function(a){return a.ref;}));
+  const pool=allApps.concat(Object.values(historyStore).filter(function(h){return h&&!seen.has(h.ref);}));
+  const out={};
+  pool.forEach(function(a){
+    const lv=stars[a.ref]||0,rid=fileReg[a.ref];
+    if(!lv||!rid||paidStore[a.ref]||_isLegacy(a))return;
+    const reg=registers.find(function(r){return r.id===rid;});if(!reg)return;
+    const amt=lv===2?(reg.urgentRate||0):(reg.importantRate||0);
+    if(!out[rid])out[rid]={reg:reg,refs:[],total:0,u:0,i:0};
+    out[rid].refs.push(a.ref);out[rid].total+=amt;if(lv===2)out[rid].u++;else out[rid].i++;
+  });
+  return out;
+}
+function payDues(rid){const d=_dues()[rid];if(!d)return;openPaySheet(d.refs);_psReg=rid;_psAmt={};renderPaySheet();}
+
+// ── Payment start date (legacy files) ──
+// Legacy = applied before the start date AND already past 2/10 (files still at 0–2/10 stay "live",
+// e.g. applied on the last day of the previous month, paid at 2/10 in the new month).
+function _isLegacy(a,start){
+  const st=start||payStart;if(!st||!a)return false;
+  const iso=starDate[a.ref]||toInputDate(a.apply_date||'');if(!iso||iso>=st)return false;
+  const n=parseInt((a.status||'').split('/')[0])||0;return n>=3;
+}
+function savePayStart(v){
+  payStart=v||'';localStorage.setItem('pcc_pay_start',payStart);save();render();
+  const i=document.getElementById('pay-start-input');if(i)i.value=payStart;
+  showToast(payStart?'✓ শুরুর তারিখ: '+payStart:'✓ সব ফাইল ধরা হবে');
+}
+let _psAskPending=false;
+async function payStartPromptOnce(){
+  if(_psAskPending||localStorage.getItem('pcc_paystart_asked')||!allApps.length)return;
+  _psAskPending=true;
+  try{
+    if(payStart){localStorage.setItem('pcc_paystart_asked','1');return;}
+    const now=new Date();const first=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
+    const seen=new Set(allApps.map(function(a){return a.ref;}));
+    const pool=allApps.concat(Object.values(historyStore).filter(function(h){return h&&!seen.has(h.ref);}));
+    const old=pool.filter(function(a){const lv=stars[a.ref]||0;if(!lv||paidStore[a.ref])return false;return _isLegacy(a,first);});
+    if(!old.length){localStorage.setItem('pcc_paystart_asked','1');return;}
+    const ok=await showConfirm('আগের আনপেইড ফাইল "পুরনো" ধরবেন?',old.length+'টি Urgent/Important ফাইল এ মাসের আগের আবেদনের ও ৩/১০ পার করা। ৳ ব্লিংক ও up: থেকে বাদ যাবে, পেমেন্ট শিটে তবুও দেওয়া যাবে। (সেটিংসে তারিখ বদলানো যায়)');
+    localStorage.setItem('pcc_paystart_asked','1');
+    if(ok){payStart=first;localStorage.setItem('pcc_pay_start',payStart);save();render();showToast('✓ পুরনো ফাইল বাদ দেওয়া হলো');}
+  }finally{_psAskPending=false;}
+}
+
+// ── Monthly payment report (copy / CSV) ──
+function _monthPays(y,m){
+  return payments.filter(function(p){const d=new Date(p.ts);return !isNaN(d)&&d.getFullYear()===y&&d.getMonth()===m;}).sort(function(a,b){return (a.ts||'').localeCompare(b.ts||'');});
+}
+function _curPayYM(){const d=payMonth||_monthStartNow();return [d.getFullYear(),d.getMonth()];}
+function _monthReportText(y,m){
+  const list=_monthPays(y,m);if(!list.length)return '';
+  const all=[];list.forEach(function(p){(p.items||[]).forEach(function(x){all.push({x:x,p:p});});});
+  const c=_batchCounts(all.map(function(e){return e.x;}));const tot=list.reduce(function(t,p){return t+(p.total||0);},0);
+  const L=['৳ পেমেন্ট রিপোর্ট — '+MONTHS_SHORT[m]+' '+y,'মোট: '+fmtMoney(tot)+' · '+all.length+' ফাইল (Ur '+c.u+', Im '+c.i+')','','রেজিস্টার ভিত্তিক:'];
+  const byReg={};
+  list.forEach(function(p){const k=p.regName||'—';if(!byReg[k])byReg[k]={items:[],total:0};(p.items||[]).forEach(function(x){byReg[k].items.push(x);});byReg[k].total+=p.total||0;});
+  Object.keys(byReg).sort(function(a,b){return byReg[b].total-byReg[a].total;}).forEach(function(k){
+    const bc=_batchCounts(byReg[k].items);L.push('• '+k+' — '+byReg[k].items.length+' ফাইল (Ur '+bc.u+', Im '+bc.i+') — '+fmtMoney(byReg[k].total));
+  });
+  const carry=all.filter(function(e){return _isCarry(e.x,e.p);});
+  if(carry.length){L.push('');L.push('↩ আগের মাসের আবেদন, এ মাসে পেমেন্ট: '+carry.length+' ফাইল · '+fmtMoney(carry.reduce(function(t,e){return t+(e.x.amount||0);},0)));}
+  L.push('');L.push('বিস্তারিত:');
+  list.forEach(function(p){
+    L.push(fmtPayTime(p.ts)+' · '+(p.regName||'—')+' · '+fmtMoney(p.total));
+    (p.items||[]).forEach(function(x,i){
+      const fk=_fileMonthKey(x);
+      L.push('  '+(i+1)+'. '+(x.level===2?'[Ur] ':x.level===1?'[Im] ':'')+x.name+' ('+x.ref+')'+(_isCarry(x,p)?' ↩'+MONTHS_SHORT[parseInt(fk.slice(5,7))-1]:'')+' — '+fmtMoney(x.amount));
+    });
+  });
+  return L.join('\n');
+}
+function _csvCell(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
+function _monthCSV(y,m){
+  const list=_monthPays(y,m);if(!list.length)return '';
+  const rows=[['তারিখ-সময়','রেজিস্টার','Ref','নাম','টাইপ','আবেদনের তারিখ','আগের মাসের ফাইল','টাকা']];
+  list.forEach(function(p){(p.items||[]).forEach(function(x){
+    rows.push([fmtPayTime(p.ts),p.regName||'',x.ref,x.name,x.level===2?'Urgent':x.level===1?'Important':'',x.applyDate||((_findApp(x.ref)||{}).apply_date)||'',_isCarry(x,p)?'হ্যাঁ':'না',x.amount]);
+  });});
+  return rows.map(function(r){return r.map(_csvCell).join(',');}).join('\r\n');
+}
+function copyMonthReport(y,m){
+  if(y===undefined){const ym=_curPayYM();y=ym[0];m=ym[1];}
+  const t=_monthReportText(y,m);if(!t){showToast('এ মাসে কোনো পেমেন্ট নেই');return;}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){showToast('✓ রিপোর্ট কপি');}).catch(function(){showToast('কপি করা যায়নি');});
+  else showToast('কপি করা যায়নি');
+}
+function downloadMonthCSV(y,m){
+  if(y===undefined){const ym=_curPayYM();y=ym[0];m=ym[1];}
+  const csv=_monthCSV(y,m);if(!csv){showToast('এ মাসে কোনো পেমেন্ট নেই');return;}
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='pcc-payments-'+y+'-'+String(m+1).padStart(2,'0')+'.csv';
+  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1500);
+}
+
 // ── Monthly auto-reset of Urgent/Important counters (header) ──
 function monthlyRollover(){
   try{
@@ -2754,7 +2948,7 @@ function markSelected(starLevel){
   if(!selected.size)return;
   selected.forEach(function(ref){
     const prev=stars[ref]||0;
-    stars[ref]=starLevel;
+    stars[ref]=starLevel;_noteStarDate(ref,starLevel);
     const app=allApps.find(function(a){return a.ref===ref;});
     const entry=app?(app.name+' '+ref):ref;
     // Update counts
@@ -3065,7 +3259,7 @@ function syncPrimaryRegister(){
   _registerName=r?(r.name||''):'';_registerPhone=r?(r.phone||''):'';
   localStorage.setItem('pcc_register_name',_registerName);localStorage.setItem('pcc_register_phone',_registerPhone);
 }
-function loadRegDraft(){_regDraft=registers.map(function(r){return Object.assign({},r);});if(!_regDraft.length)_regDraft.push({id:'r'+Date.now(),name:'',phone:'',urgentRate:'',importantRate:''});renderRegList();}
+function loadRegDraft(){const psi=document.getElementById('pay-start-input');if(psi)psi.value=payStart||'';_regDraft=registers.map(function(r){return Object.assign({},r);});if(!_regDraft.length)_regDraft.push({id:'r'+Date.now(),name:'',phone:'',urgentRate:'',importantRate:''});renderRegList();}
 function readRegInputs(){
   const rows=document.querySelectorAll('#reg-list .reg-row');
   rows.forEach(function(row,i){
@@ -3494,12 +3688,14 @@ function doForwardAction(){
     return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];
   });
   if(!files.length){showToast('⏳ কোনো ফাইল নেই');return;}
-  showConfirm(files.length+'টি ফাইল forward করবেন?').then(function(ok){
+  showConfirm(files.length+'টি ফাইল forward করবেন?').then(async function(ok){
     if(!ok)return;
+    const regId=await pickRegister('কোন রেজিস্টারকে ফরোয়ার্ড?');if(regId===null)return;
     var text=files.map(function(a){return a.name+' — '+a.ref;}).join('\n');
     navigator.clipboard.writeText(text).then(function(){
       files.forEach(function(a){
         forwarded[a.ref]=true;
+        if(regId)fileReg[a.ref]=regId;
         blinkStopped[a.ref]=true;
         forwardedLog.push({date:todayStr(),ref:a.ref,name:a.name,printDate:getEffectivePrintDate(a.ref)||'',applyDate:a.apply_date||''});
       });
@@ -3507,8 +3703,9 @@ function doForwardAction(){
       save();render();openForwardedLogModal();
       // Refresh modal to show files moved out
       openForwardedLogModal();
-      if(_registerPhone){
-        var waNum='88'+_registerPhone.replace(/[^0-9]/g,'');
+      var _wpB=_regPhoneFor(regId);
+      if(_wpB){
+        var waNum='88'+_wpB.replace(/[^0-9]/g,'');
         setTimeout(function(){window.open('https://wa.me/'+waNum+'?text='+encodeURIComponent(text),'_blank');},800);
       }
     }).catch(function(){showToast('❌ Copy ব্যর্থ');});
@@ -3605,7 +3802,7 @@ function daysSince(ds,ref){
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',2200);}
 function toggleStar(ref){
-  const prev=stars[ref]||0;stars[ref]=(prev+1)%3;const next=stars[ref];
+  const prev=stars[ref]||0;stars[ref]=(prev+1)%3;const next=stars[ref];_noteStarDate(ref,next);
   const app=allApps.find(a=>a.ref===ref);const entry=app?`${app.name} ${ref}`:ref;
   if(prev===0&&next===1){counts.important++;if(!history.important.includes(entry))history.important.push(entry);}
   else if(prev===1&&next===2){counts.important=Math.max(0,counts.important-1);history.important=history.important.filter(e=>e!==entry);counts.urgent++;if(!history.urgent.includes(entry))history.urgent.push(entry);}
@@ -3719,7 +3916,7 @@ function cardHTML(app){
         onclick="handleTap('${app.ref}')">
         <div class="card-top">
           <div class="name" onclick="${nameClick}">${app._hl?hlText(app.name,app._hl):app.name}</div>
-          <div class="card-top-right">${(s>0&&!paidStore[app.ref])?'<span class="pay-blink" title="Unpaid">৳</span>':''}${stageBtn}</div>
+          <div class="card-top-right">${(s>0&&!paidStore[app.ref]&&!_isLegacy(app))?'<span class="pay-blink" title="Unpaid">৳</span>':''}${stageBtn}</div>
         </div>
         <div class="info">
           ${refHTML} &nbsp;|&nbsp;
@@ -3797,6 +3994,7 @@ function render(){
   _fixStatusHistory();
   monthlyRollover();
   baselineMonthOnce();
+  payStartPromptOnce();
   const q=(document.getElementById('search-bar').value||'').toLowerCase().trim();
   const displayApps=getDisplayApps().filter(a=>{
     if(!matchesFilter(a))return false;
@@ -3824,8 +4022,8 @@ function render(){
       ${count!==null?`<div class="section-count ${countCls||''}">${count} file</div>`:''}
     </div>`;
   }
-  if(star2.length){html+=secRow('🔴 Urgent',star2.length,'urgent-title','urgent-count',star2.filter(a=>!paidStore[a.ref]).length);star2.forEach(a=>html+=cardHTML(a));}
-  if(star1.length){html+=secRow('⭐ Important',star1.length,'important-title','important-count',star1.filter(a=>!paidStore[a.ref]).length);star1.forEach(a=>html+=cardHTML(a));}
+  if(star2.length){html+=secRow('🔴 Urgent',star2.length,'urgent-title','urgent-count',star2.filter(a=>!paidStore[a.ref]&&!_isLegacy(a)).length);star2.forEach(a=>html+=cardHTML(a));}
+  if(star1.length){html+=secRow('⭐ Important',star1.length,'important-title','important-count',star1.filter(a=>!paidStore[a.ref]&&!_isLegacy(a)).length);star1.forEach(a=>html+=cardHTML(a));}
   if(normal.length){html+=secRow('Normal',normal.length,'normal-title','normal-count');normal.forEach(a=>html+=cardHTML(a));}
   if(done.length){html+=`<div class="section-row"><div class="section-title">✓ Delivered</div></div>`;done.forEach(a=>html+=cardHTML(a));}
   // Archive search

@@ -1130,7 +1130,7 @@ async function initAccountGate(){
     </div>
     <div style="border-top:1px solid #1e3a5f;padding-top:14px;margin-top:14px">
       <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">৳ পেমেন্ট শুরুর তারিখ</div>
-      <div style="font-size:10px;color:#64748b;margin-bottom:8px">অ্যাপ ভার্সন: 2026-11-11 · stage-icons-2</div>
+      <div style="font-size:10px;color:#64748b;margin-bottom:8px">অ্যাপ ভার্সন: 2026-11-11 · collect-10</div>
       <div class="settings-info" style="margin-bottom:8px">এই তারিখের আগের আবেদন, যেগুলো ৩/১০ পার করেছে, সেই Urgent/Important ফাইল "পুরনো" ধরা হবে: ৳ ব্লিংক করবে না, up: গণনায় আসবে না। (২/১০ বা তার আগের ফাইল এর বাইরে, তারা চলতিই থাকে।) (পেমেন্ট শিটে তবুও দেওয়া যাবে।) ফাঁকা = সব ফাইল ধরা হবে।</div>
       <input class="settings-input" type="date" id="pay-start-input" onchange="savePayStart(this.value)">
       <button class="settings-save-btn" onclick="savePayStart('')" style="margin-top:8px;background:transparent;border:1px dashed #475569;color:#94a3b8">সব ফাইল ধরুন (তারিখ মুছুন)</button>
@@ -3026,8 +3026,8 @@ function _buildTickerParts(){
     const n=parseInt(lastSt.split('/')[0])||0;
     const add=(g,st)=>{if(!grp[g].some(x=>x.ref===a.ref))grp[g].push({...a,_tickerSt:st});};
     if(n===5&&(stars[a.ref]||0)>0) add('printed',lastSt);
-    else if(n===9&&collected[a.ref]&&(stars[a.ref]||0)>0) add('box_ready',lastSt);
-    else if(n===9&&(stars[a.ref]||0)>0) add('collect_ready',lastSt);
+    else if(n>=9&&collected[a.ref]&&(stars[a.ref]||0)>0) add('box_ready',lastSt);
+    else if(n>=9&&(stars[a.ref]||0)>0) add('collect_ready',lastSt);
     else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref)){
       // Only urgent/important/rejected get status_update in ticker
       const isRej=(lastSt||'').toLowerCase().includes('reject');
@@ -3116,8 +3116,8 @@ function buildTicker(){
     const n=parseInt(lastSt.split('/')[0])||0;
     const add=(g,st)=>{if(!grp[g].some(x=>x.ref===a.ref))grp[g].push({...a,_tickerSt:st});};
     if(n===5&&(stars[a.ref]||0)>0) add('printed',lastSt);
-    else if(n===9&&collected[a.ref]&&(stars[a.ref]||0)>0) add('box_ready',lastSt);
-    else if(n===9&&(stars[a.ref]||0)>0) add('collect_ready',lastSt);
+    else if(n>=9&&collected[a.ref]&&(stars[a.ref]||0)>0) add('box_ready',lastSt);
+    else if(n>=9&&(stars[a.ref]||0)>0) add('collect_ready',lastSt);
     else if(!grp.applied.some(x=>x.ref===a.ref)&&!grp.draft.some(x=>x.ref===a.ref)){
       // Only urgent/important/rejected get status_update in ticker
       const isRej=(lastSt||'').toLowerCase().includes('reject');
@@ -3618,7 +3618,7 @@ function openCollectedLogModal(){
   if(!el)return;
   var ready=getDisplayApps().filter(function(a){
     var n=parseInt((a.status||'').split('/')[0])||0;
-    return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
+    return n>=9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];
   });
   window._colExpand=ready.length>0?false:true;
   var histColHtml=_renderColHistory(_buildColLogData());
@@ -3748,7 +3748,7 @@ function doCollectAction(filterPrintDate){
   // filterPrintDate: specific print date string OR null = all
   var files=getDisplayApps().filter(function(a){
     var n=parseInt((a.status||'').split('/')[0])||0;
-    if(!(n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref]))return false;
+    if(!(n>=9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref]))return false;
     if(filterPrintDate){
       var pd=getEffectivePrintDate(a.ref)||'(No Date)';
       return pd===filterPrintDate;
@@ -3789,7 +3789,7 @@ function filterPressStart(e,type){
         }
       }catch(e){showToast('❌ কপি ব্যর্থ');}
     } else if(type==='collected'){
-      const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
+      const files=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n>=9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
       if(!files.length){showToast('📥 কোনো ফাইল নেই');return;}
       const ok=await showConfirm(files.length+'টি ফাইল একসাথে Collected করবেন?');
       if(!ok)return;
@@ -3818,7 +3818,7 @@ function matchesFilter(app){
   if(activeFilter==='all')return true;if(activeFilter==='draft')return isDraft;
   if(activeFilter==='ready')return !!(collected[app.ref]&&!delivered[app.ref]);
   if(activeFilter==='waiting'){const n=parseInt((app.status||'').split('/')[0])||0;return n===2&&(stars[app.ref]||0)===1&&!forwarded[app.ref]&&!delivered[app.ref];}
-  if(activeFilter==='collected'){const n=parseInt((app.status||'').split('/')[0])||0;return n===9&&(stars[app.ref]||0)>0&&!collected[app.ref]&&!delivered[app.ref];}
+  if(activeFilter==='collected'){const n=parseInt((app.status||'').split('/')[0])||0;return n>=9&&(stars[app.ref]||0)>0&&!collected[app.ref]&&!delivered[app.ref];}
   if(activeFilter==='1-5')return !isDraft&&num>=1&&num<=5;if(activeFilter==='6-8')return !isDraft&&num>=6&&num<=8;
   return true;
 }
@@ -3899,7 +3899,7 @@ function cardHTML(app){
   const daysCol=(isCol&&!isDelivered&&collectedDate[app.ref]!==undefined)?daysSinceDate(collectedDate[app.ref]):null;
   const noteVal=notes[app.ref]||'';const isSelected=selected.has(app.ref);
   const shouldBlink=s===1&&!isDelivered&&num===2&&!blinkStopped[app.ref];
-  const shouldBlink910=(s>=1)&&!isDelivered&&num===9&&!isCol;
+  const shouldBlink910=(s>=1)&&!isDelivered&&num>=9&&!isCol;
   const printDate=getEffectivePrintDate(app.ref);const policeTag=policeTags[app.ref]||'';
   // Due code + collected → blink
   const deuColBlink=isCol&&deuVal?'deu-collected-blink':'';
@@ -4098,7 +4098,7 @@ function render(){
   const draftBtn=document.getElementById('draft-btn');
   if(draftBtn){if(hasDraft&&activeFilter!=='draft')draftBtn.classList.add('draft-blink');else draftBtn.classList.remove('draft-blink');}
   // Collect blink: urgent/important uncollected cards exist
-  const hasUncollected=getDisplayApps().some(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
+  const hasUncollected=getDisplayApps().some(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n>=9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];});
   const waitingCount=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===2&&(stars[a.ref]||0)===1&&!forwarded[a.ref]&&!delivered[a.ref];}).length;
   const waitingBtn=document.getElementById('waiting-btn');
   if(waitingBtn){
@@ -4107,7 +4107,7 @@ function render(){
     if(waitingCount>0&&activeFilter!=='waiting'){waitingBtn.style.animation='blink-col 1.2s ease-in-out infinite';waitingBtn.style.borderColor='#f59e0b';waitingBtn.style.color='#f59e0b';}
     else{waitingBtn.style.animation='';waitingBtn.style.borderColor='';waitingBtn.style.color='';}
   }
-  const collectCount=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n===9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];}).length;
+  const collectCount=getDisplayApps().filter(a=>{const n=parseInt((a.status||'').split('/')[0])||0;return n>=9&&(stars[a.ref]||0)>0&&!collected[a.ref]&&!delivered[a.ref];}).length;
   const collectBtn=document.getElementById('collect-btn');
   if(collectBtn){
     collectBtn.textContent=collectCount>0?'📥 '+collectCount:'📥';
